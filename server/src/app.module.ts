@@ -1,7 +1,8 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import configs from './config';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { MongoExceptionFilter } from './common/filters/mongo-exception.filter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -28,6 +29,10 @@ import { MailerModule } from './infrastructure/nodemailer/mailer.module';
   controllers: [AppController],
   providers: [
     AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
     {
       provide: APP_FILTER,
       useClass: MongoExceptionFilter,

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../../database/schemas/user.schema';
@@ -15,6 +15,12 @@ export class UserService {
 
   // CREATE
   async create(createUserDto: CreateUserDto): Promise<IUser> {
+    const {email, } = createUserDto;
+    let isExist = await this.userModel.findOne({email});
+    if(isExist){
+      throw new BadRequestException(`User with email ${email} already exists`);
+    }
+
     const newUser = new this.userModel(createUserDto);
     const savedUser = await newUser.save();
     return UserMapper.toDomain(savedUser) as IUser;
@@ -22,7 +28,7 @@ export class UserService {
 
   // READ ALL
   async findAll(): Promise<IUser[]> {
-    const users = await this.userModel.find();
+    const users = await this.userModel.find({is_deleted: {$ne: true},is_banned: false });
     return UserMapper.toDomainList(users);
   }
 
@@ -51,7 +57,7 @@ export class UserService {
 
   // DELETE
   async remove(id: string): Promise<IUser> {
-    const deletedUser = await this.userModel.findByIdAndDelete(id);
+    const deletedUser = await this.userModel.findByIdAndUpdate(id,{is_deleted: true});
     if (!deletedUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }

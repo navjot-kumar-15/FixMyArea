@@ -18,8 +18,17 @@ export class User extends Document {
   @Prop({ default: '', index: true })
   email: string;
 
+  @Prop({ default: '' })
+  password: string;
+
   @Prop({ default: '', index: true })
   phone_number: string;
+
+  @Prop({ default: false })
+  is_phone_number_verified: boolean;
+
+  @Prop({ default: false })
+  is_email_verified: boolean;
 
   @Prop({ type: Types.ObjectId, ref: 'Role' })
   role_id: Types.ObjectId;

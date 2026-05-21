@@ -11,13 +11,19 @@ import { Types } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUserDto {
-  @ApiPropertyOptional({ description: 'Full name of the user', example: 'John Doe' })
+  @ApiPropertyOptional({
+    description: 'Full name of the user',
+    example: 'John Doe',
+  })
   @IsOptional()
   @IsString()
   @Transform(({ value }) => value?.trim().toLowerCase())
   full_name?: string;
 
-  @ApiProperty({ description: 'First name of the user (Required)', example: 'john' })
+  @ApiProperty({
+    description: 'First name of the user (Required)',
+    example: 'john',
+  })
   @IsNotEmpty()
   @IsString()
   @Transform(({ value }) => value?.trim().toLowerCase())
@@ -29,13 +35,19 @@ export class CreateUserDto {
   @Transform(({ value }) => value?.trim().toLowerCase())
   last_name?: string;
 
-  @ApiPropertyOptional({ description: 'URL to the profile picture', example: 'https://example.com/profile.jpg' })
+  @ApiPropertyOptional({
+    description: 'URL to the profile picture',
+    example: 'https://example.com/profile.jpg',
+  })
   @IsOptional()
   @IsUrl()
   @Transform(({ value }) => value?.trim())
   profile_picture_url?: string;
 
-  @ApiProperty({ description: 'Email address of the user (Required)', example: 'john@example.com' })
+  @ApiProperty({
+    description: 'Email address of the user (Required)',
+    example: 'john@example.com',
+  })
   @IsNotEmpty()
   @IsEmail()
   @Transform(({ value }) => value?.trim().toLowerCase())
@@ -47,7 +59,16 @@ export class CreateUserDto {
   @Transform(({ value }) => value?.trim())
   phone_number?: string;
 
-  @ApiPropertyOptional({ description: 'MongoDB ID of the assigned role', type: String })
+  @ApiPropertyOptional({ description: 'Password', example: 'password123' })
+  @IsNotEmpty()
+  @IsString()
+  @Transform(({ value }) => value?.trim())
+  password!: string;
+
+  @ApiPropertyOptional({
+    description: 'MongoDB ID of the assigned role',
+    type: String,
+  })
   @IsOptional()
   @IsMongoId()
   @Transform(({ value }) =>
@@ -55,7 +76,10 @@ export class CreateUserDto {
   )
   role_id?: Types.ObjectId;
 
-  @ApiPropertyOptional({ description: 'MongoDB ID of the user address', type: String })
+  @ApiPropertyOptional({
+    description: 'MongoDB ID of the user address',
+    type: String,
+  })
   @IsOptional()
   @IsMongoId()
   @Transform(({ value }) =>
