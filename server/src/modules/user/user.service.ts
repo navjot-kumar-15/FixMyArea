@@ -26,6 +26,21 @@ export class UserService {
     return UserMapper.toDomain(savedUser) as IUser;
   }
 
+  // FIND BY EMAIL (For Auth)
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email }).exec();
+  }
+
+  // UPDATE PASSWORD (For Auth)
+  async updatePassword(id: string, newPasswordHash: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(id, { password: newPasswordHash }).exec();
+  }
+
+  // UPDATE REFRESH TOKEN (For Auth)
+  async updateRefreshToken(id: string, refreshToken: string | null): Promise<void> {
+    await this.userModel.findByIdAndUpdate(id, { refresh_token: refreshToken }).exec();
+  }
+
   // READ ALL
   async findAll(): Promise<IUser[]> {
     const users = await this.userModel.find({is_deleted: {$ne: true},is_banned: false });

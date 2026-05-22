@@ -17,7 +17,8 @@ export class RoleSeeder implements OnApplicationBootstrap {
     const rolesToSeed = [
       { name: RoleType.ADMIN, description: 'Administrator with full platform access' },
       { name: RoleType.USER, description: 'Standard platform user' },
-      { name: RoleType.MODERATOR, description: 'Moderator for managing content' },
+      { name: RoleType.GUEST, description: 'Guest user with limited access' },
+      { name: RoleType.WORKER, description: 'Worker for service tasks' },
     ];
 
     try {

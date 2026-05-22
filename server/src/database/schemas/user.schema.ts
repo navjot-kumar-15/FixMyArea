@@ -21,6 +21,9 @@ export class User extends Document {
   @Prop({ default: '' })
   password: string;
 
+  @Prop({ default: "" })
+  refresh_token: string ;
+
   @Prop({ default: '', index: true })
   phone_number: string;
 

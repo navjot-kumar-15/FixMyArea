@@ -4,7 +4,8 @@ import { Document } from 'mongoose';
 export enum RoleType {
   ADMIN = 'admin',
   USER = 'user',
-  MODERATOR = 'moderator',
+  GUEST = 'guest',
+  WORKER = "worker"
 }
 
 @Schema({ timestamps: true })
