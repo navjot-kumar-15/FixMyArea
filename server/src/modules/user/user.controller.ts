@@ -8,6 +8,7 @@ import {
   Delete,
   BadRequestException,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,6 +22,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
+import { FilterUserDto } from './dto/filter-user.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -62,9 +64,9 @@ export class UserController {
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return an array of all users.' })
-  async findAll() {
+  async findAll(@Query() filterUserDto: FilterUserDto) {
    try {
-     const users = await this.userService.findAll();
+     const users = await this.userService.findAll(filterUserDto);
      return CustomResponse.success(users, MESSAGES.USER.FETCHED_ALL);
    } catch (error) {
     if(error instanceof BadRequestException){

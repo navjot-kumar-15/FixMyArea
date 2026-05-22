@@ -22,5 +22,13 @@ export const MESSAGES = {
     ACCESS_DENIED: 'Access Denied',
     INVALID_REFRESH_TOKEN: 'Invalid refresh token',
     INVALID_RESET_TOKEN: 'Invalid or expired reset token',
+  },
+  REPORT: {
+    CREATED: 'Report successfully created!',
+    FETCHED_ALL: 'All reports retrieved successfully',
+    FETCHED: 'Report retrieved successfully',
+    UPDATED: 'Report updated successfully',
+    DELETED: 'Report deleted successfully',
+    NOT_FOUND: 'Report not found',
   }
 };

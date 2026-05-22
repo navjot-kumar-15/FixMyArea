@@ -6,6 +6,8 @@ import { IUser } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserMapper } from './mapper/user.mapper';
+import { FilterUserDto } from './dto/filter-user.dto';
+import { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
 
 @Injectable()
 export class UserService {
@@ -42,9 +44,31 @@ export class UserService {
   }
 
   // READ ALL
-  async findAll(): Promise<IUser[]> {
-    const users = await this.userModel.find({is_deleted: {$ne: true},is_banned: false });
-    return UserMapper.toDomainList(users);
+  async findAll(filterUserDto: FilterUserDto): Promise<PaginatedResult<IUser>> {
+    const { page = 1, limit = 10, search } = filterUserDto || {};
+    const skip = (page - 1) * limit;
+
+    const query: any = { is_deleted: { $ne: true }, is_banned: false };
+    
+    if (search) {
+      query.$or = [
+        { first_name: { $regex: search, $options: 'i' } },
+        { last_name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+      ];
+    }
+    const [users, total] = await Promise.all([
+      this.userModel.find(query).skip(skip).limit(limit),
+      this.userModel.countDocuments(query),
+    ]);
+
+    return {
+      data: UserMapper.toDomainList(users),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   // READ ONE

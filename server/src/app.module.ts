@@ -12,6 +12,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { MailerModule } from './infrastructure/nodemailer/mailer.module';
+import { ReportModule } from './modules/report/report.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { MailerModule } from './infrastructure/nodemailer/mailer.module';
     DatabaseModule,
     RedisModule,
     MailerModule,
+    ReportModule,
   ],
   controllers: [AppController],
   providers: [
