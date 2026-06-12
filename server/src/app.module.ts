@@ -14,6 +14,9 @@ import { RedisModule } from './infrastructure/redis/redis.module';
 import { MailerModule } from './infrastructure/nodemailer/mailer.module';
 import { ReportModule } from './modules/report/report.module';
 import { MediaModule } from './modules/media/media.module';
+import { CommentModule } from './modules/comment/comment.module';
+import { AssignmentModule } from './modules/assignment/assignment.module';
+import { ProgressUpdateModule } from './modules/progress-update/progress-update.module';
 
 @Module({
   imports: [
@@ -32,6 +35,9 @@ import { MediaModule } from './modules/media/media.module';
     MailerModule,
     ReportModule,
     MediaModule,
+    CommentModule,
+    AssignmentModule,
+    ProgressUpdateModule,
   ],
   controllers: [AppController],
   providers: [

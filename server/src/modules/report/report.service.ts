@@ -39,7 +39,7 @@ export class ReportService {
     } = filterReportDto || {};
     const skip = (page - 1) * limit;
 
-    const query: any = { isDeleted: { $ne: true } };
+    const query: any = { is_deleted: { $ne: true } };
 
     if (search) {
       query.$or = [
@@ -94,7 +94,7 @@ export class ReportService {
   async remove(id: string): Promise<IReport> {
     const deletedReport = await this.reportModel.findByIdAndUpdate(
       id,
-      { isDeleted: true },
+      { is_deleted: true },
       { new: true },
     );
     if (!deletedReport) {

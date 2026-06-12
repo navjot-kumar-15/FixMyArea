@@ -25,7 +25,10 @@ export function getAutoLoadSchemas(): { name: string; schema: any }[] {
         // e.g., 'user.schema.ts' -> 'User'
         const filename = path.basename(fullPath);
         const baseName = filename.replace(/\.schema\.(ts|js)$/, '');
-        const modelName = baseName.charAt(0).toUpperCase() + baseName.slice(1);
+        const modelName = baseName
+          .split(/[-_]/)
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join('');
 
         const exportedKeys = Object.keys(exported);
         for (const key of exportedKeys) {

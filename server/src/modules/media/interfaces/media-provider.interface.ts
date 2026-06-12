@@ -1,6 +1,6 @@
 export interface UploadResult {
   url: string;
-  publicId: string;
+  public_id: string;
 }
 
 export interface IMediaProvider {
@@ -13,7 +13,7 @@ export interface IMediaProvider {
 
   /**
    * Deletes a file from the configured storage provider.
-   * @param publicId The unique identifier of the file to delete
+   * @param public_id The unique identifier of the file to delete
    */
-  deleteFile(publicId: string): Promise<boolean>;
+  deleteFile(public_id: string): Promise<boolean>;
 }

@@ -18,9 +18,18 @@ describe('ReportService', () => {
   const mockReportModel = {
     new: jest.fn().mockResolvedValue(mockReport),
     constructor: jest.fn().mockResolvedValue(mockReport),
-    find: jest.fn(),
-    findById: jest.fn(),
-    findByIdAndUpdate: jest.fn(),
+    find: jest.fn().mockReturnValue({
+      skip: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      populate: jest.fn().mockResolvedValue([mockReport]),
+    }),
+    countDocuments: jest.fn().mockResolvedValue(1),
+    findById: jest.fn().mockReturnValue({
+      populate: jest.fn().mockResolvedValue(mockReport),
+    }),
+    findByIdAndUpdate: jest.fn().mockReturnValue({
+      populate: jest.fn().mockResolvedValue(mockReport),
+    }),
   };
 
   beforeEach(async () => {
@@ -42,29 +51,26 @@ describe('ReportService', () => {
   });
 
   describe('findAll', () => {
-    it('should return an array of reports', async () => {
-      const reports = [mockReport];
-      mockReportModel.find.mockResolvedValue(reports);
-
-      const result = await service.findAll();
-      expect(result).toBeInstanceOf(Array);
+    it('should return a paginated result of reports', async () => {
+      const result = await service.findAll({});
+      expect(result.data).toBeInstanceOf(Array);
       expect(mockReportModel.find).toHaveBeenCalledWith({
-        isDeleted: { $ne: true },
+        is_deleted: { $ne: true },
       });
     });
   });
 
   describe('findOne', () => {
     it('should return a single report', async () => {
-      mockReportModel.findById.mockResolvedValue(mockReport);
-
       const result = await service.findOne(mockReport._id);
       expect(result).toBeDefined();
       expect(mockReportModel.findById).toHaveBeenCalledWith(mockReport._id);
     });
 
     it('should throw NotFoundException if report not found', async () => {
-      mockReportModel.findById.mockResolvedValue(null);
+      mockReportModel.findById.mockReturnValue({
+        populate: jest.fn().mockResolvedValue(null),
+      });
 
       await expect(service.findOne('invalidId')).rejects.toThrow(
         NotFoundException,

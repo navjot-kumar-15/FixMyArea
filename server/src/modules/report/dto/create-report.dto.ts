@@ -26,7 +26,7 @@ class ReportImageDto {
   @ApiProperty({ description: 'Public ID of the image for cloud storage' })
   @IsString()
   @IsNotEmpty()
-  publicId: string;
+  public_id: string;
 }
 
 class ReportLocationDto {
@@ -146,7 +146,7 @@ export class CreateReportDto {
   @Transform(({ value }) =>
     Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value,
   )
-  createdBy: Types.ObjectId;
+  created_by: Types.ObjectId;
 
   @ApiPropertyOptional({ description: 'Tags for the report', type: [String] })
   @IsOptional()

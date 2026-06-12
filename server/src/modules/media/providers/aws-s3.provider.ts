@@ -29,12 +29,12 @@ export class AwsS3Provider implements IMediaProvider {
 
     return {
       url: `https://mock-bucket.s3.amazonaws.com/${folder || 'default'}/mock-id-${Date.now()}.jpg`,
-      publicId: `mock-s3-key-${Date.now()}`,
+      public_id: `mock-s3-key-${Date.now()}`,
     };
   }
 
-  async deleteFile(publicId: string): Promise<boolean> {
-    this.logger.debug(`Mocking deletion of ${publicId} from AWS S3`);
+  async deleteFile(public_id: string): Promise<boolean> {
+    this.logger.debug(`Mocking deletion of ${public_id} from AWS S3`);
     // TODO: Implement DeleteObjectCommand logic here
     return true;
   }

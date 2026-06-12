@@ -25,9 +25,9 @@ export class MediaService {
 
   /**
    * Deletes media delegating to the injected strategy
-   * @param publicId The ID of the file to delete
+   * @param public_id The ID of the file to delete
    */
-  async deleteMedia(publicId: string): Promise<boolean> {
-    return this.mediaProvider.deleteFile(publicId);
+  async deleteMedia(public_id: string): Promise<boolean> {
+    return this.mediaProvider.deleteFile(public_id);
   }
 }

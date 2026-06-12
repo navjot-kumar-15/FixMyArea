@@ -16,10 +16,21 @@ export class RoleSeeder implements OnApplicationBootstrap {
       {
         name: RoleType.ADMIN,
         description: 'Administrator with full platform access',
+        permissions: [],
+        is_active: true,
       },
-      { name: RoleType.USER, description: 'Standard platform user' },
-      { name: RoleType.GUEST, description: 'Guest user with limited access' },
-      { name: RoleType.WORKER, description: 'Worker for service tasks' },
+      {
+        name: RoleType.USER,
+        description: 'Standard platform user',
+        permissions: [],
+        is_active: true,
+      },
+      {
+        name: RoleType.WORKER,
+        description: 'Worker for service tasks',
+        permissions: [],
+        is_active: true,
+      },
     ];
 
     try {
@@ -30,6 +41,9 @@ export class RoleSeeder implements OnApplicationBootstrap {
         if (!existingRole) {
           await this.roleModel.create(roleData);
           this.logger.log(`Seeded missing role: ${roleData.name}`);
+        }else{
+           await this.roleModel.updateOne({ name: roleData.name }, roleData)
+          this.logger.log(`Updated missing role: ${roleData.name}`);
         }
       }
       this.logger.log('Role seeding completed.');

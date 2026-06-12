@@ -16,10 +16,10 @@ export class UpdateReportDto extends PartialType(CreateReportDto) {
   @ApiPropertyOptional({ description: 'Is the report verified by an admin?' })
   @IsOptional()
   @IsBoolean()
-  isVerified?: boolean;
+  is_verified?: boolean;
 
   @ApiPropertyOptional({ description: 'Is the report resolved?' })
   @IsOptional()
   @IsBoolean()
-  isResolved?: boolean;
+  is_resolved?: boolean;
 }

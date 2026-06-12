@@ -32,4 +32,28 @@ export const MESSAGES = {
     DELETED: 'Report deleted successfully',
     NOT_FOUND: 'Report not found',
   },
+  COMMENT: {
+    CREATED: 'Comment successfully created!',
+    FETCHED_ALL: 'All comments retrieved successfully',
+    FETCHED: 'Comment retrieved successfully',
+    UPDATED: 'Comment updated successfully',
+    DELETED: 'Comment deleted successfully',
+    NOT_FOUND: 'Comment not found',
+  },
+  ASSIGNMENT: {
+    CREATED: 'Assignment successfully created!',
+    FETCHED_ALL: 'All assignments retrieved successfully',
+    FETCHED: 'Assignment retrieved successfully',
+    UPDATED: 'Assignment updated successfully',
+    DELETED: 'Assignment deleted successfully',
+    NOT_FOUND: 'Assignment not found',
+  },
+  PROGRESS_UPDATE: {
+    CREATED: 'Progress update successfully created!',
+    FETCHED_ALL: 'All progress updates retrieved successfully',
+    FETCHED: 'Progress update retrieved successfully',
+    UPDATED: 'Progress update updated successfully',
+    DELETED: 'Progress update deleted successfully',
+    NOT_FOUND: 'Progress update not found',
+  },
 };

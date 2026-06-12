@@ -1,16 +1,68 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 
-@Schema({ timestamps: true })
-export class Category extends Document {
-  @Prop({ required: true, unique: true, trim: true })
+export type CategoryDocument = HydratedDocument<Category>;
+
+export enum DepartmentType {
+  PWD = 'pwd',
+  WATER = 'water',
+  ELECTRICITY = 'electricity',
+  SANITATION = 'sanitation',
+  TRAFFIC = 'traffic',
+  TELECOM = 'telecom',
+  OTHER = 'other',
+}
+
+@Schema({
+  timestamps: true,
+  collection: 'categories',
+})
+export class Category {
+  @Prop({
+    required: true,
+    unique: true,
+    trim: true,
+  })
   name: string;
 
-  @Prop({ trim: true })
+  @Prop({
+    default: '',
+    trim: true,
+  })
   description: string;
 
-  @Prop({ default: true })
-  isActive: boolean;
+  @Prop({
+    required: true,
+    enum: Object.values(DepartmentType),
+  })
+  department: DepartmentType;
+
+  @Prop({
+    default: '',
+  })
+  icon: string;
+
+  @Prop({
+    default: '#000000',
+  })
+  color: string;
+
+  @Prop({
+    min: 1,
+    max: 5,
+    default: 3,
+  })
+  priority_weight: number;
+
+  @Prop({
+    default: 72, // hours
+  })
+  sla_hours: number;
+
+  @Prop({
+    default: true,
+  })
+  is_active: boolean;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

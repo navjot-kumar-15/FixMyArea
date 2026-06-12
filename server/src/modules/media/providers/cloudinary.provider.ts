@@ -29,12 +29,12 @@ export class CloudinaryProvider implements IMediaProvider {
 
     return {
       url: `https://res.cloudinary.com/mock-cloud/image/upload/v1/${folder || 'default'}/mock-id-${Date.now()}.jpg`,
-      publicId: `mock-cloudinary-id-${Date.now()}`,
+      public_id: `mock-cloudinary-id-${Date.now()}`,
     };
   }
 
-  async deleteFile(publicId: string): Promise<boolean> {
-    this.logger.debug(`Mocking deletion of ${publicId} from Cloudinary`);
+  async deleteFile(public_id: string): Promise<boolean> {
+    this.logger.debug(`Mocking deletion of ${public_id} from Cloudinary`);
     // TODO: Implement v2.uploader.destroy(publicId)
     return true;
   }

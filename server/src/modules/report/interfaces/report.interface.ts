@@ -6,7 +6,7 @@ import {
 
 export interface IReportImage {
   url: string;
-  publicId: string;
+  public_id: string;
 }
 
 export interface IReportLocation {
@@ -15,15 +15,15 @@ export interface IReportLocation {
 }
 
 export interface IAiAnalysis {
-  detectedCategory: string;
+  detected_category: string;
   confidence: number;
-  suggestedPriority: string;
-  toxicityScore: number;
+  suggested_priority: string;
+  toxicity_score: number;
 }
 
 export interface IModeration {
-  isFlagged: boolean;
-  flaggedReason: string;
+  is_flagged: boolean;
+  flagged_reason: string;
 }
 
 export interface IReport {
@@ -40,25 +40,25 @@ export interface IReport {
   pincode?: string;
   status: ReportStatus | string;
   priority: ReportPriority | string;
-  severityScore: number;
-  createdBy: string;
-  assignedWorker?: string;
-  duplicateOf?: string;
-  upvotesCount: number;
-  downvotesCount: number;
-  commentsCount: number;
-  viewsCount: number;
-  supportersCount: number;
-  isVerified: boolean;
-  isResolved: boolean;
-  resolvedAt?: Date;
-  resolvedBy?: string;
-  aiAnalysis?: IAiAnalysis;
+  severity_score: number;
+  created_by: string;
+  assigned_worker?: string;
+  duplicate_of?: string;
+  upvotes_count: number;
+  downvotes_count: number;
+  comments_count: number;
+  views_count: number;
+  supporters_count: number;
+  is_verified: boolean;
+  is_resolved: boolean;
+  resolved_at?: Date;
+  resolved_by?: string;
+  ai_analysis?: IAiAnalysis;
   tags: string[];
   moderation: IModeration;
   visibility: VisibilityType | string;
-  isDeleted: boolean;
-  deletedAt?: Date;
+  is_deleted: boolean;
+  deleted_at?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
