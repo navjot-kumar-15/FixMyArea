@@ -1,4 +1,6 @@
 import { IReport } from '../interfaces/report.interface';
+import { ReportResponseDto } from '../dto/report-response.dto';
+
 
 export class ReportMapper {
   /**
@@ -62,4 +64,73 @@ export class ReportMapper {
       .map((raw) => this.toDomain(raw))
       .filter((report): report is IReport => report !== null);
   }
+
+  /**
+   * Maps a domain object to a plain response object.
+   */
+  static toResponse(domain: IReport | null): ReportResponseDto | null {
+    if (!domain) return null;
+
+    return {
+      id: domain.id,
+      title: domain.title,
+      description: domain.description,
+      category: domain.category,
+      images: domain.images ? domain.images.map((img: any) => ({
+        url: img.url,
+        public_id: img.public_id,
+      })) : [],
+      location: domain.location ? {
+        type: domain.location.type,
+        coordinates: domain.location.coordinates,
+      } : { type: 'Point', coordinates: [] },
+      address: domain.address,
+      city: domain.city,
+      state: domain.state,
+      country: domain.country,
+      pincode: domain.pincode,
+      status: domain.status,
+      priority: domain.priority,
+      severity_score: domain.severity_score,
+      created_by: domain.created_by,
+      assigned_worker: domain.assigned_worker,
+      duplicate_of: domain.duplicate_of,
+      upvotes_count: domain.upvotes_count,
+      downvotes_count: domain.downvotes_count,
+      comments_count: domain.comments_count,
+      views_count: domain.views_count,
+      supporters_count: domain.supporters_count,
+      is_verified: domain.is_verified,
+      is_resolved: domain.is_resolved,
+      resolved_at: domain.resolved_at,
+      resolved_by: domain.resolved_by,
+      ai_analysis: domain.ai_analysis ? {
+        detected_category: domain.ai_analysis.detected_category,
+        confidence: domain.ai_analysis.confidence,
+        suggested_priority: domain.ai_analysis.suggested_priority,
+        toxicity_score: domain.ai_analysis.toxicity_score,
+      } : undefined,
+      tags: domain.tags || [],
+      moderation: domain.moderation ? {
+        is_flagged: domain.moderation.is_flagged,
+        flagged_reason: domain.moderation.flagged_reason,
+      } : { is_flagged: false },
+      visibility: domain.visibility,
+      is_deleted: domain.is_deleted,
+      deleted_at: domain.deleted_at,
+      createdAt: domain.createdAt,
+      updatedAt: domain.updatedAt,
+    };
+  }
+
+  /**
+   * Maps an array of domain objects to an array of response objects.
+   */
+  static toResponseList(domainList: IReport[]): ReportResponseDto[] {
+    if (!domainList) return [];
+    return domainList
+      .map((domain) => this.toResponse(domain))
+      .filter((dto): dto is ReportResponseDto => dto !== null);
+  }
 }
+

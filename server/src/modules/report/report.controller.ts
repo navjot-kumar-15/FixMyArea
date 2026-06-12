@@ -23,6 +23,9 @@ import { UpdateReportDto } from './dto/update-report.dto';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
 import { FilterReportDto } from './dto/filter-report.dto';
+import { ReportResponseDto, PaginatedReportResponseDto } from './dto/report-response.dto';
+import { ReportMapper } from './mapper/report.mapper';
+
 
 @ApiTags('Report')
 @Controller('report')
@@ -38,14 +41,17 @@ export class ReportController {
   })
   @ApiResponse({
     status: 201,
+    type: ReportResponseDto,
     description: 'The report has been successfully created.',
   })
   @ApiResponse({ status: 400, description: 'Validation error in payload.' })
   async create(@Body() createReportDto: CreateReportDto) {
     try {
       const report = await this.reportService.create(createReportDto);
-      return CustomResponse.success(report, MESSAGES.REPORT.CREATED, 201);
+      const mapped = ReportMapper.toResponse(report);
+      return CustomResponse.success(mapped, MESSAGES.REPORT.CREATED, 201);
     } catch (error) {
+
       if (error instanceof BadRequestException) {
         return CustomResponse.error(error.message, null, 400);
       }
@@ -55,11 +61,15 @@ export class ReportController {
 
   @Get()
   @ApiOperation({ summary: 'Get all reports' })
-  @ApiResponse({ status: 200, description: 'Return an array of all reports.' })
+  @ApiResponse({ status: 200, type: PaginatedReportResponseDto, description: 'Return an array of all reports.' })
   async findAll(@Query() filterReportDto: FilterReportDto) {
     try {
-      const reports = await this.reportService.findAll(filterReportDto);
-      return CustomResponse.success(reports, MESSAGES.REPORT.FETCHED_ALL);
+      const paginatedResult = await this.reportService.findAll(filterReportDto);
+      const mappedResult: PaginatedReportResponseDto = {
+        ...paginatedResult,
+        data: ReportMapper.toResponseList(paginatedResult.data),
+      };
+      return CustomResponse.success(mappedResult, MESSAGES.REPORT.FETCHED_ALL);
     } catch (error) {
       return CustomResponse.error(error.message, null, 500);
     }
@@ -72,12 +82,13 @@ export class ReportController {
     required: true,
     description: 'MongoDB ObjectID of the report (Required)',
   })
-  @ApiResponse({ status: 200, description: 'Return the specific report.' })
+  @ApiResponse({ status: 200, type: ReportResponseDto, description: 'Return the specific report.' })
   @ApiResponse({ status: 404, description: 'Report not found.' })
   async findOne(@Param('id') id: string) {
     try {
       const report = await this.reportService.findOne(id);
-      return CustomResponse.success(report, MESSAGES.REPORT.FETCHED);
+      const mapped = ReportMapper.toResponse(report);
+      return CustomResponse.success(mapped, MESSAGES.REPORT.FETCHED);
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);
@@ -100,6 +111,7 @@ export class ReportController {
   })
   @ApiResponse({
     status: 200,
+    type: ReportResponseDto,
     description: 'The report has been successfully updated.',
   })
   @ApiResponse({ status: 404, description: 'Report not found.' })
@@ -109,7 +121,8 @@ export class ReportController {
   ) {
     try {
       const report = await this.reportService.update(id, updateReportDto);
-      return CustomResponse.success(report, MESSAGES.REPORT.UPDATED);
+      const mapped = ReportMapper.toResponse(report);
+      return CustomResponse.success(mapped, MESSAGES.REPORT.UPDATED);
     } catch (error) {
       if (error instanceof BadRequestException) {
         return CustomResponse.error(error.message, null, 400);
@@ -130,13 +143,15 @@ export class ReportController {
   })
   @ApiResponse({
     status: 200,
+    type: ReportResponseDto,
     description: 'The report has been successfully deleted.',
   })
   @ApiResponse({ status: 404, description: 'Report not found.' })
   async remove(@Param('id') id: string) {
     try {
       const report = await this.reportService.remove(id);
-      return CustomResponse.success(report, MESSAGES.REPORT.DELETED);
+      const mapped = ReportMapper.toResponse(report);
+      return CustomResponse.success(mapped, MESSAGES.REPORT.DELETED);
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);
