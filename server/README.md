@@ -1,98 +1,166 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# FixMyArea (CivicConnect) Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+FixMyArea is a robust civic problem-reporting backend API built on **NestJS** and **Mongoose (MongoDB)**. It provides a structured workflow connecting Citizens, Local Authorities, and Field Workers to report, assign, track, and resolve local public issues (potholes, street light failures, water leaks, etc.).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🏗️ Project Architecture & Design Pattern
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+The application is built using a highly structured, scalable **Modular NestJS Architecture**. Each domain entity has its own dedicated module, isolating its controllers, services, database schemas, mappers, and data transfer objects (DTOs).
 
-## Project setup
-
-```bash
-$ npm install
+```mermaid
+graph TD
+    Client[Client / Frontend] -->|HTTP Request| Controller[Controller]
+    Controller -->|DTO Validation| Service[Service]
+    Service -->|Mongoose Query| DB[(MongoDB)]
+    DB -->|Mongoose Document| Service
+    Service -->|Domain Interface / Doc| Controller
+    Controller -->|Mapper.toResponse| ResponseDTO[Response DTO / Swagger Schema]
+    ResponseDTO -->|JSON Response| Client
 ```
 
-## Compile and run the project
+### 📂 Directory Structure
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```text
+src/
+├── common/                  # Shared utilities, constants, filters, interceptors
+│   ├── constants/           # Core constants (e.g., MESSAGES, role schemas)
+│   ├── guards/              # Authentication guards (JWT, Roles)
+│   └── responses/           # API response helpers
+├── database/                # Database configuration
+│   ├── schemas/             # Mongoose schemas (snake_case database models)
+│   ├── seeders/             # Database seeders (Roles, Categories)
+│   ├── database.module.ts
+│   ├── database.service.ts
+│   └── schema-loader.ts     # Dynamically registers Mongoose schemas
+├── modules/                 # Modular Domain Entities
+│   ├── auth/                # JWT Auth, Register, Login, Refresh, Password Reset
+│   ├── user/                # User accounts & Role management
+│   ├── report/              # Issue reporting (Citizens create, Admins view/update)
+│   ├── comment/             # Threaded issue comments & conversations
+│   ├── assignment/          # Worker assignment workflows (Assigned, Accepted, Completed)
+│   └── progress-update/     # Multi-step progress tracking with image attachments
+└── main.ts                  # NestJS bootstrap entry point
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ npm run test
+## ⚙️ Core Architecture Concepts
 
-# e2e tests
-$ npm run test:e2e
+### 1. Dynamic Mongoose Schema Loader (`schema-loader.ts`)
+Instead of manually registering every schema in the database module, a custom `schema-loader.ts` dynamically parses files inside `src/database/schemas/`.
+*   **Case Normalization**: It automatically extracts the file base name (e.g., `progress-update.schema.ts` or `user-role.schema.ts`), converts kebab-case/snake_case names into PascalCase (`ProgressUpdate`, `UserRole`), and registers them dynamically as Mongoose models.
 
-# test coverage
-$ npm run test:cov
+### 2. Controller-Service-Mapper Pattern
+*   **Controller**: Exposes REST endpoints, performs request payload validation using class-validator DTOs, and handles HTTP response envelopes.
+*   **Service**: Contains business rules, database transactions, state-tracking logic, and coordinates database operations.
+*   **Mapper**: Sanitizes database models before sending them back. It defines:
+    *   `toDomain`: Converts MongoDB documents into domain interfaces.
+    *   `toResponse`: Map domain data structures to clean Response DTO objects, purging internal system fields and converting database ObjectIds to string formats.
+
+---
+
+## 🗄️ Database Relations Map
+
+The database follows a **snake_case** naming convention for collections and fields, utilizing MongoDB References (`ref`) for relational mapping.
+
+```mermaid
+erDiagram
+    User ||--o{ Report : "creates"
+    User ||--o{ Assignment : "is_assigned"
+    User ||--o{ Comment : "writes"
+    User ||--o{ ProgressUpdate : "posts"
+    Category ||--o{ Report : "categorizes"
+    Report ||--o{ Assignment : "has"
+    Report ||--o{ Comment : "receives"
+    Report ||--o{ ProgressUpdate : "tracks"
 ```
 
-## Deployment
+*   **`User`**: Linked to specific Roles. Can be a Citizen, Admin, or Worker.
+*   **`Report`**: Has a direct link to `user_id` (Citizen creator) and `category_id`.
+*   **`Assignment`**: Connects a `report_id` to a `worker_id` (User) and tracks who assigned it (`assigned_by` Admin User ID).
+*   **`Comment`**: Connects `report_id` to the author `user_id`. Supports threading via optional `parent_comment_id`.
+*   **`ProgressUpdate`**: Posted by the assigned `worker_id` for a specific `report_id`. Optionally verified by an Admin via `verified_by`.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 📝 Swagger Documentation & Dummy Data DTOs
 
+The API is fully documented with **Swagger**. To provide front-end developers with precise interface details, we utilize custom **Response DTOs** annotated with realistic example values (dummy data):
+
+### Swagger Example Response Schemas
+- **Comment Endpoint**: Returns `CommentResponseDto` containing exact comment fields:
+  ```json
+  {
+    "id": "60d0fe4f5311236168a109ca",
+    "report_id": "60d0fe4f5311236168a109cb",
+    "user_id": "60d0fe4f5311236168a109cc",
+    "message": "This is a comment about the pothole.",
+    "is_edited": false,
+    "is_deleted": false
+  }
+  ```
+- **Assignment Endpoint**: Returns `AssignmentResponseDto` mapping statuses and instructions:
+  ```json
+  {
+    "id": "60d0fe4f5311236168a109da",
+    "status": "assigned",
+    "note": "Please inspect the pothole and fix it.",
+    "is_active": true
+  }
+  ```
+- **ProgressUpdate Endpoint**: Returns `ProgressUpdateResponseDto` representing progress tracking with array of completion images:
+  ```json
+  {
+    "id": "60d0fe4f5311236168a109ea",
+    "progress_percentage": 75,
+    "images": [
+      {
+        "url": "https://example.com/image.jpg",
+        "public_id": "cloudinary_public_id_123"
+      }
+    ],
+    "is_final_update": false
+  }
+  ```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Setup & Installation
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Install dependencies
+npm install
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 2. Environment Configuration
+Create a `.env.development` file in the server root matching the schema:
+```env
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/fixmyarea
+JWT_SECRET=yourSuperSecretJWTKey
+JWT_EXPIRES_IN=1d
+```
 
-## Resources
+### 3. Running Locally
+```bash
+# Start server in watch mode
+npm run start:dev
+```
+Once booted, the Swagger UI is available at:
+👉 **`http://localhost:3000/api/docs`**
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 🧪 Testing Suite
 
-## Support
+We maintain a full suite of Unit and E2E integration tests:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# Run all unit tests
+npm run test
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+# Run e2e tests
+npm run test:e2e
+```
