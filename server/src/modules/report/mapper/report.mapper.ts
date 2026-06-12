@@ -13,7 +13,11 @@ export class ReportMapper {
       id: raw.id ? raw.id : raw._id ? raw._id.toString() : undefined,
       title: raw.title,
       description: raw.description,
-      category: raw.category ? (raw.category._id ? raw.category : raw.category.toString()) : undefined,
+      category: raw.category
+        ? raw.category._id
+          ? raw.category
+          : raw.category.toString()
+        : undefined,
       images: raw.images,
       location: raw.location,
       address: raw.address,
@@ -25,7 +29,9 @@ export class ReportMapper {
       priority: raw.priority,
       severityScore: raw.severityScore,
       createdBy: raw.createdBy ? raw.createdBy.toString() : undefined,
-      assignedWorker: raw.assignedWorker ? raw.assignedWorker.toString() : undefined,
+      assignedWorker: raw.assignedWorker
+        ? raw.assignedWorker.toString()
+        : undefined,
       duplicateOf: raw.duplicateOf ? raw.duplicateOf.toString() : undefined,
       upvotesCount: raw.upvotesCount,
       downvotesCount: raw.downvotesCount,

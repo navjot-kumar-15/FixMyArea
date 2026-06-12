@@ -40,7 +40,8 @@ export class ReportLocation {
   @Prop({ type: [Number], required: true })
   coordinates: number[]; // [longitude, latitude]
 }
-export const ReportLocationSchema = SchemaFactory.createForClass(ReportLocation);
+export const ReportLocationSchema =
+  SchemaFactory.createForClass(ReportLocation);
 
 @Schema({ _id: false })
 export class AiAnalysis {

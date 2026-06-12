@@ -20,7 +20,10 @@ import { MediaModule } from './modules/media/media.module';
     ConfigModule.forRoot({
       isGlobal: true,
       load: configs,
-      envFilePath: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? '.env.production'
+          : '.env.development',
     }),
     UserModule,
     AuthModule,

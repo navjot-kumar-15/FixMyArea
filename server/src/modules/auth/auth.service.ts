@@ -60,16 +60,12 @@ export class AuthService {
 
     await this.updateRefreshTokenHash(user._id.toString(), refresh_token);
 
+    const { password, ...data } = user.toObject();
     return {
+      user: data,
       tokens: {
         access_token,
         refresh_token,
-      },
-      user: {
-        id: user._id.toString(),
-        email: user.email,
-        first_name: user.first_name,
-        last_name: user.last_name,
       },
     };
   }

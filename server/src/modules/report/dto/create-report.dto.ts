@@ -12,7 +12,10 @@ import {
 import { Type, Transform } from 'class-transformer';
 import { Types } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ReportPriority, VisibilityType } from '../../../database/schemas/report.schema';
+import {
+  ReportPriority,
+  VisibilityType,
+} from '../../../database/schemas/report.schema';
 
 class ReportImageDto {
   @ApiProperty({ description: 'URL of the image' })
@@ -27,12 +30,19 @@ class ReportImageDto {
 }
 
 class ReportLocationDto {
-  @ApiProperty({ description: 'Type of location', default: 'Point', enum: ['Point'] })
+  @ApiProperty({
+    description: 'Type of location',
+    default: 'Point',
+    enum: ['Point'],
+  })
   @IsString()
   @IsOptional()
   type?: string = 'Point';
 
-  @ApiProperty({ description: 'Coordinates [longitude, latitude]', type: [Number] })
+  @ApiProperty({
+    description: 'Coordinates [longitude, latitude]',
+    type: [Number],
+  })
   @IsArray()
   @IsNumber({}, { each: true })
   @IsNotEmpty()

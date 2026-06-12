@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IMediaProvider, UploadResult } from '../interfaces/media-provider.interface';
+import {
+  IMediaProvider,
+  UploadResult,
+} from '../interfaces/media-provider.interface';
 
 @Injectable()
 export class CloudinaryProvider implements IMediaProvider {
@@ -11,14 +14,19 @@ export class CloudinaryProvider implements IMediaProvider {
     // v2.config({ cloud_name: process.env.CLOUDINARY_CLOUD_NAME, ... });
   }
 
-  async uploadFile(file: Express.Multer.File, folder?: string): Promise<UploadResult> {
-    this.logger.debug(`Mocking upload of ${file.originalname} to Cloudinary folder: ${folder || 'default'}`);
-    
+  async uploadFile(
+    file: Express.Multer.File,
+    folder?: string,
+  ): Promise<UploadResult> {
+    this.logger.debug(
+      `Mocking upload of ${file.originalname} to Cloudinary folder: ${folder || 'default'}`,
+    );
+
     // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // TODO: Implement actual v2.uploader.upload_stream logic here
-    
+
     return {
       url: `https://res.cloudinary.com/mock-cloud/image/upload/v1/${folder || 'default'}/mock-id-${Date.now()}.jpg`,
       publicId: `mock-cloudinary-id-${Date.now()}`,

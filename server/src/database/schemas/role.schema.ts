@@ -5,7 +5,7 @@ export enum RoleType {
   ADMIN = 'admin',
   USER = 'user',
   GUEST = 'guest',
-  WORKER = "worker"
+  WORKER = 'worker',
 }
 
 @Schema({ timestamps: true })

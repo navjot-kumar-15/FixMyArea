@@ -13,7 +13,8 @@ export const MESSAGES = {
     REGISTER_SUCCESS: 'User registered successfully',
     LOGIN_SUCCESS: 'Logged in successfully',
     FORGOT_PASSWORD_SENT: 'Password reset link sent successfully',
-    FORGOT_PASSWORD_INSTRUCTION: 'If that email is in our database, we will send a password reset link to it.',
+    FORGOT_PASSWORD_INSTRUCTION:
+      'If that email is in our database, we will send a password reset link to it.',
     FORGOT_PASSWORD_SIMULATION: 'Password reset email sent (Simulation)',
     RESET_PASSWORD_SUCCESS: 'Password has been reset successfully',
     LOGOUT_SUCCESS: 'Logged out successfully',
@@ -30,5 +31,5 @@ export const MESSAGES = {
     UPDATED: 'Report updated successfully',
     DELETED: 'Report deleted successfully',
     NOT_FOUND: 'Report not found',
-  }
+  },
 };

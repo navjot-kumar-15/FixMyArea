@@ -48,7 +48,9 @@ describe('ReportService', () => {
 
       const result = await service.findAll();
       expect(result).toBeInstanceOf(Array);
-      expect(mockReportModel.find).toHaveBeenCalledWith({ isDeleted: { $ne: true } });
+      expect(mockReportModel.find).toHaveBeenCalledWith({
+        isDeleted: { $ne: true },
+      });
     });
   });
 

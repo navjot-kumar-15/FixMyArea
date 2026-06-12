@@ -7,7 +7,7 @@ import { setupValidation } from './setup/validation.setup';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // Initialize setup configurations
   setupValidation(app);
   setupSwagger(app);
@@ -17,6 +17,9 @@ async function bootstrap() {
 
   await app.listen(port);
   Logger.log(`🚀 Server is running on port: ${port}`, 'Bootstrap');
-  Logger.log(`📚 Swagger documentation is available at: http://localhost:${port}/api/docs`, 'Bootstrap');
+  Logger.log(
+    `📚 Swagger documentation is available at: http://localhost:${port}/api/docs`,
+    'Bootstrap',
+  );
 }
 bootstrap();

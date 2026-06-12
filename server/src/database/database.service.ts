@@ -45,17 +45,21 @@ export class DatabaseService implements OnModuleInit {
     if (error.name === 'MongoServerError' && error.code === 11000) {
       const field = Object.keys(error.keyValue || {})[0];
       throw new ConflictException(
-        `${field ? field.charAt(0).toUpperCase() + field.slice(1) : 'Record'} already exists.`
+        `${field ? field.charAt(0).toUpperCase() + field.slice(1) : 'Record'} already exists.`,
       );
     }
 
     // Mongoose Validation Error
     if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((err: any) => err.message);
+      const messages = Object.values(error.errors).map(
+        (err: any) => err.message,
+      );
       throw new ConflictException(`Validation failed: ${messages.join(', ')}`);
     }
 
     // General exception for any other unhandled DB errors
-    throw new InternalServerErrorException('An unexpected database error occurred');
+    throw new InternalServerErrorException(
+      'An unexpected database error occurred',
+    );
   }
 }

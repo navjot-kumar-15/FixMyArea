@@ -3,7 +3,9 @@ import { IsOptional, IsString, IsMongoId } from 'class-validator';
 import { PaginationDto } from '../../../common/dtos/pagination.dto';
 
 export class FilterReportDto extends PaginationDto {
-  @ApiPropertyOptional({ description: 'Search reports by title or description' })
+  @ApiPropertyOptional({
+    description: 'Search reports by title or description',
+  })
   @IsOptional()
   @IsString()
   search?: string;

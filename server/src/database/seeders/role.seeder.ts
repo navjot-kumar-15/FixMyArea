@@ -7,15 +7,16 @@ import { Role, RoleType } from '../schemas/role.schema';
 export class RoleSeeder implements OnApplicationBootstrap {
   private readonly logger = new Logger(RoleSeeder.name);
 
-  constructor(
-    @InjectModel('Role') private readonly roleModel: Model<Role>,
-  ) {}
+  constructor(@InjectModel('Role') private readonly roleModel: Model<Role>) {}
 
   async onApplicationBootstrap() {
     this.logger.log('Checking roles in the database...');
-    
+
     const rolesToSeed = [
-      { name: RoleType.ADMIN, description: 'Administrator with full platform access' },
+      {
+        name: RoleType.ADMIN,
+        description: 'Administrator with full platform access',
+      },
       { name: RoleType.USER, description: 'Standard platform user' },
       { name: RoleType.GUEST, description: 'Guest user with limited access' },
       { name: RoleType.WORKER, description: 'Worker for service tasks' },
@@ -23,7 +24,9 @@ export class RoleSeeder implements OnApplicationBootstrap {
 
     try {
       for (const roleData of rolesToSeed) {
-        const existingRole = await this.roleModel.findOne({ name: roleData.name }).exec();
+        const existingRole = await this.roleModel
+          .findOne({ name: roleData.name })
+          .exec();
         if (!existingRole) {
           await this.roleModel.create(roleData);
           this.logger.log(`Seeded missing role: ${roleData.name}`);

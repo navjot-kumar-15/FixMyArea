@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IMediaProvider, UploadResult } from '../interfaces/media-provider.interface';
+import {
+  IMediaProvider,
+  UploadResult,
+} from '../interfaces/media-provider.interface';
 
 @Injectable()
 export class AwsS3Provider implements IMediaProvider {
@@ -11,14 +14,19 @@ export class AwsS3Provider implements IMediaProvider {
     // this.s3Client = new S3Client({ region: process.env.AWS_REGION, ... });
   }
 
-  async uploadFile(file: Express.Multer.File, folder?: string): Promise<UploadResult> {
-    this.logger.debug(`Mocking upload of ${file.originalname} to AWS S3 bucket/folder: ${folder || 'default'}`);
-    
+  async uploadFile(
+    file: Express.Multer.File,
+    folder?: string,
+  ): Promise<UploadResult> {
+    this.logger.debug(
+      `Mocking upload of ${file.originalname} to AWS S3 bucket/folder: ${folder || 'default'}`,
+    );
+
     // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // TODO: Implement actual PutObjectCommand logic here
-    
+
     return {
       url: `https://mock-bucket.s3.amazonaws.com/${folder || 'default'}/mock-id-${Date.now()}.jpg`,
       publicId: `mock-s3-key-${Date.now()}`,

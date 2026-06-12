@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../../database/schemas/user.schema';
@@ -17,9 +21,9 @@ export class UserService {
 
   // CREATE
   async create(createUserDto: CreateUserDto): Promise<IUser> {
-    const {email, } = createUserDto;
-    let isExist = await this.userModel.findOne({email});
-    if(isExist){
+    const { email } = createUserDto;
+    const isExist = await this.userModel.findOne({ email });
+    if (isExist) {
       throw new BadRequestException(`User with email ${email} already exists`);
     }
 
@@ -35,12 +39,19 @@ export class UserService {
 
   // UPDATE PASSWORD (For Auth)
   async updatePassword(id: string, newPasswordHash: string): Promise<void> {
-    await this.userModel.findByIdAndUpdate(id, { password: newPasswordHash }).exec();
+    await this.userModel
+      .findByIdAndUpdate(id, { password: newPasswordHash })
+      .exec();
   }
 
   // UPDATE REFRESH TOKEN (For Auth)
-  async updateRefreshToken(id: string, refreshToken: string | null): Promise<void> {
-    await this.userModel.findByIdAndUpdate(id, { refresh_token: refreshToken }).exec();
+  async updateRefreshToken(
+    id: string,
+    refreshToken: string | null,
+  ): Promise<void> {
+    await this.userModel
+      .findByIdAndUpdate(id, { refresh_token: refreshToken })
+      .exec();
   }
 
   // READ ALL
@@ -49,7 +60,7 @@ export class UserService {
     const skip = (page - 1) * limit;
 
     const query: any = { is_deleted: { $ne: true }, is_banned: false };
-    
+
     if (search) {
       query.$or = [
         { first_name: { $regex: search, $options: 'i' } },
@@ -96,7 +107,9 @@ export class UserService {
 
   // DELETE
   async remove(id: string): Promise<IUser> {
-    const deletedUser = await this.userModel.findByIdAndUpdate(id,{is_deleted: true});
+    const deletedUser = await this.userModel.findByIdAndUpdate(id, {
+      is_deleted: true,
+    });
     if (!deletedUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }

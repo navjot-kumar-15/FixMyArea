@@ -47,36 +47,36 @@ export class UserController {
     description: 'User with this email or phone already exists.',
   })
   async create(@Body() createUserDto: CreateUserDto) {
-   try {
-     const user = await this.userService.create(createUserDto);
-     return CustomResponse.success(user, MESSAGES.USER.CREATED);
-   } catch (error) {
-    if(error instanceof BadRequestException){
-      return CustomResponse.error(error.message, null, 400);
+    try {
+      const user = await this.userService.create(createUserDto);
+      return CustomResponse.success(user, MESSAGES.USER.CREATED);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        return CustomResponse.error(error.message, null, 400);
+      }
+      if (error instanceof NotFoundException) {
+        return CustomResponse.error(error.message, null, 404);
+      }
+      return CustomResponse.error(error.message, null, 500);
     }
-    if(error instanceof NotFoundException){
-      return CustomResponse.error(error.message, null, 404);
-    }
-    return CustomResponse.error(error.message, null, 500);
-   }
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return an array of all users.' })
   async findAll(@Query() filterUserDto: FilterUserDto) {
-   try {
-     const users = await this.userService.findAll(filterUserDto);
-     return CustomResponse.success(users, MESSAGES.USER.FETCHED_ALL);
-   } catch (error) {
-    if(error instanceof BadRequestException){
-      return CustomResponse.error(error.message, null, 400);
+    try {
+      const users = await this.userService.findAll(filterUserDto);
+      return CustomResponse.success(users, MESSAGES.USER.FETCHED_ALL);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        return CustomResponse.error(error.message, null, 400);
+      }
+      if (error instanceof NotFoundException) {
+        return CustomResponse.error(error.message, null, 404);
+      }
+      return CustomResponse.error(error.message, null, 500);
     }
-    if(error instanceof NotFoundException){
-      return CustomResponse.error(error.message, null, 404);
-    }
-    return CustomResponse.error(error.message, null, 500);
-   }
   }
 
   @Get(':id')

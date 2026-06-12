@@ -1,4 +1,8 @@
-import { ReportStatus, ReportPriority, VisibilityType } from '../../../database/schemas/report.schema';
+import {
+  ReportStatus,
+  ReportPriority,
+  VisibilityType,
+} from '../../../database/schemas/report.schema';
 
 export interface IReportImage {
   url: string;

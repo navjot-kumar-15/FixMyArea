@@ -7,7 +7,9 @@ export class MailerService {
 
   constructor(private readonly configService: ConfigService) {
     const host = this.configService.get<string>('mailer.host');
-    this.logger.log(`Nodemailer configuration loaded for host: ${host || 'N/A'} (Implementation pending)`);
+    this.logger.log(
+      `Nodemailer configuration loaded for host: ${host || 'N/A'} (Implementation pending)`,
+    );
   }
 
   // Placeholder for future email sending operations

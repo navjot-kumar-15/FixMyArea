@@ -103,7 +103,10 @@ export class ReportController {
     description: 'The report has been successfully updated.',
   })
   @ApiResponse({ status: 404, description: 'Report not found.' })
-  async update(@Param('id') id: string, @Body() updateReportDto: UpdateReportDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateReportDto: UpdateReportDto,
+  ) {
     try {
       const report = await this.reportService.update(id, updateReportDto);
       return CustomResponse.success(report, MESSAGES.REPORT.UPDATED);

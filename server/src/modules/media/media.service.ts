@@ -7,7 +7,8 @@ export const MEDIA_PROVIDER_TOKEN = 'MEDIA_PROVIDER';
 @Injectable()
 export class MediaService {
   constructor(
-    @Inject(MEDIA_PROVIDER_TOKEN) private readonly mediaProvider: IMediaProvider,
+    @Inject(MEDIA_PROVIDER_TOKEN)
+    private readonly mediaProvider: IMediaProvider,
   ) {}
 
   /**
@@ -15,7 +16,10 @@ export class MediaService {
    * @param file The file to upload
    * @param folder The target folder
    */
-  async uploadMedia(file: Express.Multer.File, folder?: string): Promise<UploadResult> {
+  async uploadMedia(
+    file: Express.Multer.File,
+    folder?: string,
+  ): Promise<UploadResult> {
     return this.mediaProvider.uploadFile(file, folder);
   }
 

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Report } from '../../database/schemas/report.schema';
@@ -23,8 +27,16 @@ export class ReportService {
   }
 
   // READ ALL
-  async findAll(filterReportDto: FilterReportDto): Promise<PaginatedResult<IReport>> {
-    const { page = 1, limit = 10, search, category, status } = filterReportDto || {};
+  async findAll(
+    filterReportDto: FilterReportDto,
+  ): Promise<PaginatedResult<IReport>> {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      category,
+      status,
+    } = filterReportDto || {};
     const skip = (page - 1) * limit;
 
     const query: any = { isDeleted: { $ne: true } };
@@ -68,11 +80,9 @@ export class ReportService {
 
   // UPDATE
   async update(id: string, updateReportDto: UpdateReportDto): Promise<IReport> {
-    const updatedReport = await this.reportModel.findByIdAndUpdate(
-      id,
-      updateReportDto,
-      { new: true },
-    ).populate('category');
+    const updatedReport = await this.reportModel
+      .findByIdAndUpdate(id, updateReportDto, { new: true })
+      .populate('category');
 
     if (!updatedReport) {
       throw new NotFoundException(`Report with ID ${id} not found`);
@@ -85,7 +95,7 @@ export class ReportService {
     const deletedReport = await this.reportModel.findByIdAndUpdate(
       id,
       { isDeleted: true },
-      { new: true }
+      { new: true },
     );
     if (!deletedReport) {
       throw new NotFoundException(`Report with ID ${id} not found`);

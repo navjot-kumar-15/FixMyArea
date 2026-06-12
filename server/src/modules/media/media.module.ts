@@ -13,11 +13,11 @@ import { AwsS3Provider } from './providers/aws-s3.provider';
       useFactory: () => {
         // Read from environment variable (default to Cloudinary if not set)
         const provider = process.env.ACTIVE_STORAGE_PROVIDER || 'CLOUDINARY';
-        
+
         if (provider.toUpperCase() === 'AWS') {
           return new AwsS3Provider();
         }
-        
+
         // Return Cloudinary by default
         return new CloudinaryProvider();
       },

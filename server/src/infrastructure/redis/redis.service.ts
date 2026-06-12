@@ -8,7 +8,9 @@ export class RedisService {
   constructor(private readonly configService: ConfigService) {
     const host = this.configService.get<string>('redis.host');
     const port = this.configService.get<number>('redis.port');
-    this.logger.log(`Redis configuration loaded for host: ${host}:${port} (Implementation pending)`);
+    this.logger.log(
+      `Redis configuration loaded for host: ${host}:${port} (Implementation pending)`,
+    );
   }
 
   // Placeholder for future Redis operations
