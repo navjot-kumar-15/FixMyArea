@@ -16,6 +16,8 @@ export class UserMapper {
       last_name: raw.last_name,
       profile_picture_url: raw.profile_picture_url,
       email: raw.email,
+      otp: raw.otp,
+      otp_expires_at: raw.otp_expires_at,
       phone_number: raw.phone_number,
       role_id: raw.role_id ? raw.role_id.toString() : undefined,
       address_id: raw.address_id ? raw.address_id.toString() : undefined,

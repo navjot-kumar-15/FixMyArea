@@ -6,11 +6,13 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserModule } from '../user/user.module';
 import { JwtStrategy } from '../../common/guards/jwt.strategy';
+import { MailerModule } from 'src/infrastructure/nodemailer/mailer.module';
 
 @Module({
   imports: [
     UserModule,
     PassportModule,
+    MailerModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

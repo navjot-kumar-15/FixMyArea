@@ -23,6 +23,9 @@ export const MESSAGES = {
     ACCESS_DENIED: 'Access Denied',
     INVALID_REFRESH_TOKEN: 'Invalid refresh token',
     INVALID_RESET_TOKEN: 'Invalid or expired reset token',
+    INVALID_OTP: 'Invalid OTP',
+    OTP_EXPIRED: 'OTP has expired',
+    OTP_VERIFIED: 'OTP verified successfully',
   },
   REPORT: {
     CREATED: 'Report successfully created!',

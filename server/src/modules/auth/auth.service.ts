@@ -14,6 +14,8 @@ import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { generateUniqueDigits } from 'src/common/utils/number';
+import { MailerService } from 'src/infrastructure/nodemailer/mailer.service';
 
 @Injectable()
 export class AuthService {
@@ -21,9 +23,11 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly mailService: MailerService,
   ) {}
 
   async register(registerDto: RegisterDto) {
+    // TODO:Need to handle with phoneNumber as well in future
     const existingUser = await this.userService.findByEmail(registerDto.email);
     if (existingUser) {
       throw new BadRequestException(MESSAGES.USER.ALREADY_EXISTS);
@@ -130,11 +134,49 @@ export class AuthService {
       { sub: user._id.toString() },
       { expiresIn: '15m' },
     );
+    const otp = generateUniqueDigits();
+    await this.userService.update(user._id.toString(), {
+      otp,
+      otp_expires_at: new Date(Date.now() + 15 * 60 * 1000),
+    });
+
+    await this.mailService.sendOtp(user.email,+otp,`${user.first_name} ${user.last_name}`)
 
     return {
       message: MESSAGES.AUTH.FORGOT_PASSWORD_SIMULATION,
       _simulateToken: resetToken,
     };
+  }
+
+  async verifyOtp(query:{otp:number,token:string}){
+    const {otp,token} = query
+    const decoded = this.jwtService.verify(token)
+
+    if(!decoded){
+      throw new BadRequestException(MESSAGES.AUTH.INVALID_RESET_TOKEN);
+    }
+
+    const user = await this.userService.findOne(decoded.sub)
+    if(!user){
+      throw new NotFoundException(MESSAGES.USER.NOT_FOUND);
+    }
+
+    if(user?.otp !== otp){
+      throw new BadRequestException(MESSAGES.AUTH.INVALID_OTP);
+    }
+
+    if(user?.otp_expires_at && user.otp_expires_at < new Date()){
+      throw new BadRequestException(MESSAGES.AUTH.OTP_EXPIRED);
+    }
+
+    await this.userService.update(user.id, {otp:null,otp_expires_at:null });
+
+
+ const resetToken = this.jwtService.sign(
+      { sub: user.id },
+      { expiresIn: '15m' },
+    );
+    return { reset_password_token:resetToken };
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {

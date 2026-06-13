@@ -6,6 +6,8 @@ import {
   Req,
   UnauthorizedException,
   BadRequestException,
+  NotFoundException,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,6 +22,7 @@ import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -105,6 +108,29 @@ export class AuthController {
       MESSAGES.AUTH.FORGOT_PASSWORD_SENT,
       200,
     );
+  }
+
+  @Post('verify-otp')
+  @ApiOperation({ summary: 'Verify OTP' })
+  @ApiResponse({ status: 200, description: 'OTP verified successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired OTP/token' })
+  async verifyOtp(@Query() verifyOtpDto: VerifyOtpDto) {
+    try {
+      const result = await this.authService.verifyOtp(verifyOtpDto);
+      return CustomResponse.success(
+        result,
+        MESSAGES.AUTH.OTP_VERIFIED,
+        200,
+      );
+    } catch (error) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+      throw new BadRequestException(MESSAGES.AUTH.INVALID_OTP);
+    }
   }
 
   @Post('reset-password')

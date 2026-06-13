@@ -3,7 +3,7 @@
  * @param otp The one-time password code
  * @param name Optional recipient name
  */
-export function getOtpTemplate(otp: string, name?: string): string {
+export function getOtpTemplate(otp: number, name?: string): string {
   const recipientName = name || 'Valued User';
   return `
 <!DOCTYPE html>

@@ -42,6 +42,12 @@ export class User extends Document {
   @Prop({ type: Boolean, default: false })
   is_banned: boolean;
 
+  @Prop({type:Number,default:null})
+  otp:number | null;
+
+  @Prop({ type: Date, default: null })
+  otp_expires_at: Date | null;
+
   @Prop({ type: Boolean, default: false })
   is_blocked_by_admin: boolean;
 

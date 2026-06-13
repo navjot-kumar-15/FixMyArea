@@ -9,6 +9,8 @@ export interface IUser {
   role_id?: string;
   address_id?: string;
   is_banned: boolean;
+  otp?: number;
+  otp_expires_at?: Date;
   is_blocked_by_admin: boolean;
   is_deleted: boolean;
   createdAt?: Date;

@@ -2,6 +2,7 @@ import {
   IsBoolean,
   IsEmail,
   IsMongoId,
+  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
@@ -105,4 +106,11 @@ export class UpdateUserDto {
   @IsOptional()
   @IsBoolean()
   is_deleted?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  otp?: number | null;
+
+  @IsOptional()
+  otp_expires_at?: Date | null;
 }

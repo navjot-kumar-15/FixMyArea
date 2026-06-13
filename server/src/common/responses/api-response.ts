@@ -16,6 +16,7 @@ export class ApiResponse<T> {
     message: string = 'Operation successful',
     statusCode: number = 200,
   ): ApiResponse<T> {
+    
     return new ApiResponse<T>(true, message, data, statusCode);
   }
 
