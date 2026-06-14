@@ -59,4 +59,20 @@ export const MESSAGES = {
     DELETED: 'Progress update deleted successfully',
     NOT_FOUND: 'Progress update not found',
   },
+  ROLE: {
+    CREATED: 'Role successfully created!',
+    FETCHED_ALL: 'All roles retrieved successfully',
+    FETCHED: 'Role retrieved successfully',
+    UPDATED: 'Role updated successfully',
+    DELETED: 'Role deleted successfully',
+    NOT_FOUND: 'Role not found',
+  },
+  CATEGORY: {
+    CREATED: 'Category successfully created!',
+    FETCHED_ALL: 'All categories retrieved successfully',
+    FETCHED: 'Category retrieved successfully',
+    UPDATED: 'Category updated successfully',
+    DELETED: 'Category deleted successfully',
+    NOT_FOUND: 'Category not found',
+  },
 };

@@ -148,11 +148,12 @@ export class AuthService {
     };
   }
 
-  async verifyOtp(query:{otp:number,token:string}){
-    const {otp,token} = query
-    const decoded = this.jwtService.verify(token)
-
-    if(!decoded){
+  async verifyOtp(query: { otp: number; token: string }) {
+    const { otp, token } = query;
+    let decoded: any;
+    try {
+      decoded = this.jwtService.verify(token);
+    } catch (error) {
       throw new BadRequestException(MESSAGES.AUTH.INVALID_RESET_TOKEN);
     }
 
@@ -180,10 +181,12 @@ export class AuthService {
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    const decoded = this.jwtService.verify(resetPasswordDto.token);
-    // if(!decoded){
-    //   throw new BadRequestException(MESSAGES.AUTH.INVALID_RESET_TOKEN);
-    // }
+    let decoded: any;
+    try {
+      decoded = this.jwtService.verify(resetPasswordDto.token);
+    } catch (error) {
+      throw new BadRequestException(MESSAGES.AUTH.INVALID_RESET_TOKEN);
+    }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(
