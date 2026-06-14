@@ -16,19 +16,30 @@ export class RoleSeeder implements OnApplicationBootstrap {
       {
         name: RoleType.ADMIN,
         description: 'Administrator with full platform access',
-        permissions: [],
+        permissions: ['*'],
         is_active: true,
       },
       {
         name: RoleType.USER,
         description: 'Standard platform user',
-        permissions: [],
+        permissions: [
+          'read:reports',
+          'create:reports',
+          'update:reports',
+          'delete:reports',
+          'create:comments',
+          'read:comments',
+        ],
         is_active: true,
       },
       {
         name: RoleType.WORKER,
         description: 'Worker for service tasks',
-        permissions: [],
+        permissions: [
+          'read:reports',
+          'update:reports',
+          'create:progress-updates',
+        ],
         is_active: true,
       },
     ];

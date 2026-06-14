@@ -33,9 +33,9 @@ export class Category {
 
   @Prop({
     required: true,
-    enum: Object.values(DepartmentType),
+    trim: true,
   })
-  department: DepartmentType;
+  department: string;
 
   @Prop({
     default: '',

@@ -39,11 +39,10 @@ export class Role {
   @Prop({
     required: true,
     unique: true,
-    enum: Object.values(RoleType),
     lowercase: true,
     trim: true,
   })
-  name: RoleType;
+  name: string;
 
   @Prop({
     default: '',

@@ -17,6 +17,8 @@ import { MediaModule } from './modules/media/media.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { AssignmentModule } from './modules/assignment/assignment.module';
 import { ProgressUpdateModule } from './modules/progress-update/progress-update.module';
+import { RoleModule } from './modules/role/role.module';
+import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { ProgressUpdateModule } from './modules/progress-update/progress-update.
     CommentModule,
     AssignmentModule,
     ProgressUpdateModule,
+    RoleModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [
