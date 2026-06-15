@@ -1,4 +1,4 @@
-# Project: CivicConnect / Local Problem Reporting Platform
+# Project: CivicConnect | FixMyArea / Local Problem Reporting Platform
 
 ![Image](https://images.openai.com/static-rsc-4/VocacY-nPYbxNTs3Yvk7qrEeftJoGXHWJyLWhdxWk4e8bKS8Tyg7izub8EYCdSe-Vtdm90tAlv4LEZV4nLiyKVZ80YQ_T5lp_Rila0gYJKJva85ztQdNHptOPFI7UOkNmGPoLK9av01h8Th4Rq_y_CFfd_KtU1nPFz2oxRaAhTG1TlV980R6axNO5FImFCAq?purpose=fullsize)
 
