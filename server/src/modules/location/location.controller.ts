@@ -28,8 +28,17 @@ import { ApiResponse as CustomResponse } from '../../common/responses/api-respon
 import { MESSAGES } from '../../common/constants/messages.constant';
 import { LocationType } from '../../database/schemas/location.schema';
 
+interface FindAllFilters {
+  type?: LocationType;
+  parent_id?: string;
+  is_active?: boolean;
+  is_serviceable?: boolean;
+  longitude?: number;
+  latitude?: number;
+  radius?: number;
+}
+
 @ApiTags('Location')
-@Controller('location')
 @Controller('location')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
@@ -56,16 +65,17 @@ export class LocationController {
         MESSAGES.LOCATION.CREATED,
       );
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof ConflictException) {
-        return CustomResponse.error(error.message, null, 409);
+        return CustomResponse.error(message, null, 409);
       }
       if (error instanceof NotFoundException) {
-        return CustomResponse.error(error.message, null, 404);
+        return CustomResponse.error(message, null, 404);
       }
       if (error instanceof BadRequestException) {
-        return CustomResponse.error(error.message, null, 400);
+        return CustomResponse.error(message, null, 400);
       }
-      return CustomResponse.error(error.message, null, 500);
+      return CustomResponse.error(message, null, 500);
     }
   }
 
@@ -95,6 +105,25 @@ export class LocationController {
     type: Boolean,
     description: 'Filter locations by serviceable status',
   })
+  @ApiQuery({
+    name: 'longitude',
+    required: false,
+    type: Number,
+    description: 'Filter locations near this longitude (requires latitude)',
+  })
+  @ApiQuery({
+    name: 'latitude',
+    required: false,
+    type: Number,
+    description: 'Filter locations near this latitude (requires longitude)',
+  })
+  @ApiQuery({
+    name: 'radius',
+    required: false,
+    type: Number,
+    description:
+      'Geospatial search radius in meters (default is 10,000 meters)',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of locations',
@@ -105,9 +134,12 @@ export class LocationController {
     @Query('parent_id') parent_id?: string,
     @Query('is_active') is_active?: string,
     @Query('is_serviceable') is_serviceable?: string,
+    @Query('longitude') longitude?: string,
+    @Query('latitude') latitude?: string,
+    @Query('radius') radius?: string,
   ) {
     try {
-      const filters: any = {};
+      const filters: FindAllFilters = {};
       if (type) {
         filters.type = type;
       }
@@ -120,6 +152,13 @@ export class LocationController {
       if (is_serviceable !== undefined) {
         filters.is_serviceable = is_serviceable === 'true';
       }
+      if (longitude !== undefined && latitude !== undefined) {
+        filters.longitude = Number(longitude);
+        filters.latitude = Number(latitude);
+        if (radius !== undefined) {
+          filters.radius = Number(radius);
+        }
+      }
 
       const locations = await this.locationService.findAll(filters);
       return CustomResponse.success(
@@ -127,7 +166,8 @@ export class LocationController {
         MESSAGES.LOCATION.FETCHED_ALL,
       );
     } catch (error) {
-      return CustomResponse.error(error.message, null, 500);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return CustomResponse.error(message, null, 500);
     }
   }
 
@@ -149,13 +189,14 @@ export class LocationController {
         MESSAGES.LOCATION.FETCHED,
       );
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof NotFoundException) {
-        return CustomResponse.error(error.message, null, 404);
+        return CustomResponse.error(message, null, 404);
       }
       if (error instanceof BadRequestException) {
-        return CustomResponse.error(error.message, null, 400);
+        return CustomResponse.error(message, null, 400);
       }
-      return CustomResponse.error(error.message, null, 500);
+      return CustomResponse.error(message, null, 500);
     }
   }
 
@@ -182,16 +223,17 @@ export class LocationController {
         MESSAGES.LOCATION.UPDATED,
       );
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof ConflictException) {
-        return CustomResponse.error(error.message, null, 409);
+        return CustomResponse.error(message, null, 409);
       }
       if (error instanceof NotFoundException) {
-        return CustomResponse.error(error.message, null, 404);
+        return CustomResponse.error(message, null, 404);
       }
       if (error instanceof BadRequestException) {
-        return CustomResponse.error(error.message, null, 400);
+        return CustomResponse.error(message, null, 400);
       }
-      return CustomResponse.error(error.message, null, 500);
+      return CustomResponse.error(message, null, 500);
     }
   }
 
@@ -217,16 +259,17 @@ export class LocationController {
         MESSAGES.LOCATION.DELETED,
       );
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof ConflictException) {
-        return CustomResponse.error(error.message, null, 409);
+        return CustomResponse.error(message, null, 409);
       }
       if (error instanceof NotFoundException) {
-        return CustomResponse.error(error.message, null, 404);
+        return CustomResponse.error(message, null, 404);
       }
       if (error instanceof BadRequestException) {
-        return CustomResponse.error(error.message, null, 400);
+        return CustomResponse.error(message, null, 400);
       }
-      return CustomResponse.error(error.message, null, 500);
+      return CustomResponse.error(message, null, 500);
     }
   }
 }

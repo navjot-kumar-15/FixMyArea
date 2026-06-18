@@ -1,15 +1,21 @@
 import { ILocation } from '../interfaces/location.interface';
 import { LocationResponseDto } from '../dto/location-response.dto';
+import { LocationType } from '../../../database/schemas/location.schema';
 
 interface RawLocation {
   id?: any;
   _id?: any;
   name: string;
-  type: any;
+  type: LocationType;
   parent_id?: any;
+  geo_location?: {
+    type: string;
+    coordinates: number[];
+  };
+  latitude?: number;
+  longitude?: number;
   is_active?: boolean;
   is_serviceable?: boolean;
-  code?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -24,9 +30,16 @@ export class LocationMapper {
       name: raw.name,
       type: raw.type,
       parent_id: raw.parent_id ? String(raw.parent_id) : null,
+      geo_location: raw.geo_location
+        ? {
+            type: raw.geo_location.type,
+            coordinates: raw.geo_location.coordinates,
+          }
+        : undefined,
+      latitude: raw.latitude,
+      longitude: raw.longitude,
       is_active: raw.is_active ?? true,
       is_serviceable: raw.is_serviceable ?? true,
-      code: raw.code,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
     };
@@ -47,9 +60,16 @@ export class LocationMapper {
       name: domain.name,
       type: domain.type,
       parent_id: domain.parent_id,
+      geo_location: domain.geo_location
+        ? {
+            type: domain.geo_location.type,
+            coordinates: domain.geo_location.coordinates,
+          }
+        : undefined,
+      latitude: domain.latitude,
+      longitude: domain.longitude,
       is_active: domain.is_active,
       is_serviceable: domain.is_serviceable,
-      code: domain.code,
       createdAt: domain.createdAt,
       updatedAt: domain.updatedAt,
     };

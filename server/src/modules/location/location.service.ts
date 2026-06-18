@@ -12,11 +12,66 @@ import { UpdateLocationDto } from './dto/update-location.dto';
 import { ILocation } from './interfaces/location.interface';
 import { LocationMapper } from './mapper/location.mapper';
 
+interface UpdateLocationData {
+  name?: string;
+  type?: LocationType;
+  parent_id?: Types.ObjectId | null;
+  geo_location?: {
+    type: string;
+    coordinates: number[];
+  };
+  latitude?: number;
+  longitude?: number;
+  is_active?: boolean;
+  is_serviceable?: boolean;
+}
+
+interface LocationFilterQuery {
+  type?: LocationType;
+  parent_id?: Types.ObjectId | null;
+  is_active?: boolean;
+  is_serviceable?: boolean;
+  geo_location?: {
+    $nearSphere: {
+      $geometry: {
+        type: string;
+        coordinates: number[];
+      };
+      $maxDistance: number;
+    };
+  };
+}
+
 @Injectable()
 export class LocationService {
   constructor(
     @InjectModel(Location.name) private readonly locationModel: Model<Location>,
   ) {}
+
+  private syncGeoData(dto: UpdateLocationData) {
+    if (
+      dto.geo_location &&
+      dto.geo_location.coordinates &&
+      dto.geo_location.coordinates.length === 2
+    ) {
+      if (dto.longitude === undefined || dto.longitude === null) {
+        dto.longitude = dto.geo_location.coordinates[0];
+      }
+      if (dto.latitude === undefined || dto.latitude === null) {
+        dto.latitude = dto.geo_location.coordinates[1];
+      }
+    } else if (
+      dto.latitude !== undefined &&
+      dto.latitude !== null &&
+      dto.longitude !== undefined &&
+      dto.longitude !== null
+    ) {
+      dto.geo_location = {
+        type: 'Point',
+        coordinates: [dto.longitude, dto.latitude],
+      };
+    }
+  }
 
   async create(createLocationDto: CreateLocationDto): Promise<ILocation> {
     const nameTrimmed = createLocationDto.name.trim();
@@ -49,12 +104,25 @@ export class LocationService {
       );
     }
 
-    const newLocation = new this.locationModel({
-      ...createLocationDto,
+    const dataToSave: UpdateLocationData = {
       name: nameTrimmed,
+      type: createLocationDto.type,
       parent_id: parentId,
-    });
+      is_active: createLocationDto.is_active,
+      is_serviceable: createLocationDto.is_serviceable,
+      latitude: createLocationDto.latitude,
+      longitude: createLocationDto.longitude,
+      geo_location: createLocationDto.geo_location
+        ? {
+            type: createLocationDto.geo_location.type || 'Point',
+            coordinates: createLocationDto.geo_location.coordinates,
+          }
+        : undefined,
+    };
 
+    this.syncGeoData(dataToSave);
+
+    const newLocation = new this.locationModel(dataToSave);
     const saved = await newLocation.save();
     return LocationMapper.toDomain(saved) as ILocation;
   }
@@ -64,8 +132,11 @@ export class LocationService {
     parent_id?: string;
     is_active?: boolean;
     is_serviceable?: boolean;
+    longitude?: number;
+    latitude?: number;
+    radius?: number;
   }): Promise<ILocation[]> {
-    const query: any = {};
+    const query: LocationFilterQuery = {};
 
     if (filters.type) {
       query.type = filters.type;
@@ -83,6 +154,21 @@ export class LocationService {
 
     if (filters.is_serviceable !== undefined) {
       query.is_serviceable = filters.is_serviceable;
+    }
+
+    // Geospatial search by latitude and longitude
+    if (filters.longitude !== undefined && filters.latitude !== undefined) {
+      const maxDistance =
+        filters.radius !== undefined ? Number(filters.radius) : 10000; // default 10km in meters
+      query.geo_location = {
+        $nearSphere: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [Number(filters.longitude), Number(filters.latitude)],
+          },
+          $maxDistance: maxDistance,
+        },
+      };
     }
 
     const locations = await this.locationModel.find(query).exec();
@@ -113,13 +199,22 @@ export class LocationService {
       throw new NotFoundException(`Location with ID "${id}" not found.`);
     }
 
-    const updateData: any = { ...updateLocationDto };
+    const updateData: UpdateLocationData = {};
 
-    // Handle name trim and parent_id conversion
-    if (updateLocationDto.name) {
+    if (updateLocationDto.name !== undefined) {
       updateData.name = updateLocationDto.name.trim();
     }
+    if (updateLocationDto.type !== undefined) {
+      updateData.type = updateLocationDto.type;
+    }
+    if (updateLocationDto.is_active !== undefined) {
+      updateData.is_active = updateLocationDto.is_active;
+    }
+    if (updateLocationDto.is_serviceable !== undefined) {
+      updateData.is_serviceable = updateLocationDto.is_serviceable;
+    }
 
+    // Handle parent_id conversion
     if (updateLocationDto.parent_id !== undefined) {
       if (updateLocationDto.parent_id === null) {
         updateData.parent_id = null;
@@ -142,6 +237,46 @@ export class LocationService {
           );
         }
         updateData.parent_id = new Types.ObjectId(updateLocationDto.parent_id);
+      }
+    }
+
+    // Handle geo-data synchronization on update
+    const finalLatitude =
+      updateLocationDto.latitude !== undefined
+        ? updateLocationDto.latitude
+        : location.latitude;
+    const finalLongitude =
+      updateLocationDto.longitude !== undefined
+        ? updateLocationDto.longitude
+        : location.longitude;
+
+    if (
+      updateLocationDto.geo_location &&
+      updateLocationDto.geo_location.coordinates &&
+      updateLocationDto.geo_location.coordinates.length === 2
+    ) {
+      updateData.longitude = updateLocationDto.geo_location.coordinates[0];
+      updateData.latitude = updateLocationDto.geo_location.coordinates[1];
+      updateData.geo_location = {
+        type: updateLocationDto.geo_location.type || 'Point',
+        coordinates: updateLocationDto.geo_location.coordinates,
+      };
+    } else if (
+      updateLocationDto.latitude !== undefined ||
+      updateLocationDto.longitude !== undefined
+    ) {
+      if (
+        finalLatitude !== undefined &&
+        finalLatitude !== null &&
+        finalLongitude !== undefined &&
+        finalLongitude !== null
+      ) {
+        updateData.longitude = finalLongitude;
+        updateData.latitude = finalLatitude;
+        updateData.geo_location = {
+          type: 'Point',
+          coordinates: [finalLongitude, finalLatitude],
+        };
       }
     }
 

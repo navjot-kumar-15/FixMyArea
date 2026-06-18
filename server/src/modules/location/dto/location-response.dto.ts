@@ -1,6 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { LocationType } from '../../../database/schemas/location.schema';
 
+export class GeoLocationResponseDto {
+  @ApiProperty({ example: 'Point' })
+  type: string;
+
+  @ApiProperty({ example: [77.5946, 12.9716], type: [Number] })
+  coordinates: number[];
+}
+
 export class LocationResponseDto {
   @ApiProperty({
     example: '60d21b4667d0d8992e610c85',
@@ -34,8 +42,14 @@ export class LocationResponseDto {
   })
   is_serviceable: boolean;
 
-  @ApiPropertyOptional({ example: 'KA', description: 'Optional short code' })
-  code?: string;
+  @ApiPropertyOptional({ type: GeoLocationResponseDto })
+  geo_location?: GeoLocationResponseDto;
+
+  @ApiPropertyOptional({ example: 12.9716 })
+  latitude?: number;
+
+  @ApiPropertyOptional({ example: 77.5946 })
+  longitude?: number;
 
   @ApiPropertyOptional({
     example: '2026-06-12T10:00:00.000Z',

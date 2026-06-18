@@ -5,10 +5,34 @@ import {
   IsEnum,
   IsBoolean,
   IsMongoId,
+  IsArray,
+  IsNumber,
+  ValidateNested,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { LocationType } from '../../../database/schemas/location.schema';
+
+export class GeoLocationDto {
+  @ApiProperty({
+    description: 'Type of location',
+    default: 'Point',
+    enum: ['Point'],
+  })
+  @IsString()
+  @IsOptional()
+  type?: string = 'Point';
+
+  @ApiProperty({
+    description: 'Coordinates [longitude, latitude]',
+    type: [Number],
+    example: [77.5946, 12.9716],
+  })
+  @IsArray()
+  @IsNumber({}, { each: true })
+  @IsNotEmpty()
+  coordinates: number[];
+}
 
 export class CreateLocationDto {
   @ApiProperty({
@@ -17,7 +41,9 @@ export class CreateLocationDto {
   })
   @IsNotEmpty()
   @IsString()
-  @Transform(({ value }) => value?.trim())
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : '',
+  )
   name: string;
 
   @ApiProperty({
@@ -55,11 +81,27 @@ export class CreateLocationDto {
   is_serviceable?: boolean;
 
   @ApiPropertyOptional({
-    description: 'Optional short code for the location',
-    example: 'KA',
+    description: 'Geospatial location coordinates',
+    type: GeoLocationDto,
   })
   @IsOptional()
-  @IsString()
-  @Transform(({ value }) => value?.trim())
-  code?: string;
+  @ValidateNested()
+  @Type(() => GeoLocationDto)
+  geo_location?: GeoLocationDto;
+
+  @ApiPropertyOptional({
+    description: 'Latitude coordinates',
+    example: 12.9716,
+  })
+  @IsOptional()
+  @IsNumber()
+  latitude?: number;
+
+  @ApiPropertyOptional({
+    description: 'Longitude coordinates',
+    example: 77.5946,
+  })
+  @IsOptional()
+  @IsNumber()
+  longitude?: number;
 }
