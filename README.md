@@ -393,32 +393,6 @@ Architecture:
 
 ---
 
-# Why This Is Valuable For Portfolio
-
-Most portfolios contain:
-
-```text
-Todo App
-Chat App
-Ecommerce Clone
-Netflix Clone
-```
-
-Recruiters see them repeatedly.
-
-This project shows:
-
-- Problem solving
-- Real-world thinking
-- System design
-- Scalable architecture
-- Complex data handling
-
-Resume example:
-
-> Built CivicConnect, a production-ready civic issue reporting platform using MERN stack with geolocation, role-based access control, real-time notifications, image uploads, and analytics dashboard.
-
----
 
 # How This Can Help India
 
