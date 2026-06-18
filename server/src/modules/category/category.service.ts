@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Category } from '../../database/schemas/category.schema';
@@ -9,13 +13,19 @@ import { CategoryMapper } from './mapper/category.mapper';
 
 @Injectable()
 export class CategoryService {
-  constructor(@InjectModel('Category') private readonly categoryModel: Model<Category>) {}
+  constructor(
+    @InjectModel('Category') private readonly categoryModel: Model<Category>,
+  ) {}
 
   async create(createCategoryDto: CreateCategoryDto): Promise<ICategory> {
     const nameTrimmed = createCategoryDto.name.trim();
-    const existing = await this.categoryModel.findOne({ name: { $regex: new RegExp(`^${nameTrimmed}$`, 'i') } }).exec();
+    const existing = await this.categoryModel
+      .findOne({ name: { $regex: new RegExp(`^${nameTrimmed}$`, 'i') } })
+      .exec();
     if (existing) {
-      throw new ConflictException(`Category with name "${createCategoryDto.name}" already exists.`);
+      throw new ConflictException(
+        `Category with name "${createCategoryDto.name}" already exists.`,
+      );
     }
 
     const newCategory = new this.categoryModel({
@@ -40,15 +50,22 @@ export class CategoryService {
     return CategoryMapper.toDomain(category) as ICategory;
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<ICategory> {
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<ICategory> {
     if (updateCategoryDto.name) {
       const nameTrimmed = updateCategoryDto.name.trim();
-      const existing = await this.categoryModel.findOne({
-        name: { $regex: new RegExp(`^${nameTrimmed}$`, 'i') },
-        _id: { $ne: id },
-      }).exec();
+      const existing = await this.categoryModel
+        .findOne({
+          name: { $regex: new RegExp(`^${nameTrimmed}$`, 'i') },
+          _id: { $ne: id },
+        })
+        .exec();
       if (existing) {
-        throw new ConflictException(`Another category with name "${updateCategoryDto.name}" already exists.`);
+        throw new ConflictException(
+          `Another category with name "${updateCategoryDto.name}" already exists.`,
+        );
       }
       updateCategoryDto.name = nameTrimmed;
     }

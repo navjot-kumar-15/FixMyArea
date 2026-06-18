@@ -21,7 +21,10 @@ import { AssignmentService } from './assignment.service';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 import { FilterAssignmentDto } from './dto/filter-assignment.dto';
-import { AssignmentResponseDto, PaginatedAssignmentResponseDto } from './dto/assignment-response.dto';
+import {
+  AssignmentResponseDto,
+  PaginatedAssignmentResponseDto,
+} from './dto/assignment-response.dto';
 import { AssignmentMapper } from './mapper/assignment.mapper';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
@@ -34,11 +37,16 @@ export class AssignmentController {
   @Post()
   @ApiOperation({ summary: 'Create a new assignment' })
   @ApiBody({ type: CreateAssignmentDto })
-  @ApiResponse({ status: 201, type: AssignmentResponseDto, description: 'The assignment has been successfully created.' })
+  @ApiResponse({
+    status: 201,
+    type: AssignmentResponseDto,
+    description: 'The assignment has been successfully created.',
+  })
   @ApiResponse({ status: 400, description: 'Invalid request data.' })
   async create(@Body() createAssignmentDto: CreateAssignmentDto) {
     try {
-      const assignment = await this.assignmentService.create(createAssignmentDto);
+      const assignment =
+        await this.assignmentService.create(createAssignmentDto);
       const mapped = AssignmentMapper.toResponse(assignment);
       return CustomResponse.success(mapped, MESSAGES.ASSIGNMENT.CREATED, 201);
     } catch (error) {
@@ -51,15 +59,23 @@ export class AssignmentController {
 
   @Get()
   @ApiOperation({ summary: 'Get all assignments' })
-  @ApiResponse({ status: 200, type: PaginatedAssignmentResponseDto, description: 'All assignments retrieved successfully.' })
+  @ApiResponse({
+    status: 200,
+    type: PaginatedAssignmentResponseDto,
+    description: 'All assignments retrieved successfully.',
+  })
   async findAll(@Query() filterAssignmentDto: FilterAssignmentDto) {
     try {
-      const paginatedResult = await this.assignmentService.findAll(filterAssignmentDto);
+      const paginatedResult =
+        await this.assignmentService.findAll(filterAssignmentDto);
       const mappedResult: PaginatedAssignmentResponseDto = {
         ...paginatedResult,
         data: AssignmentMapper.toResponseList(paginatedResult.data),
       };
-      return CustomResponse.success(mappedResult, MESSAGES.ASSIGNMENT.FETCHED_ALL);
+      return CustomResponse.success(
+        mappedResult,
+        MESSAGES.ASSIGNMENT.FETCHED_ALL,
+      );
     } catch (error) {
       return CustomResponse.error(error.message, null, 500);
     }
@@ -67,8 +83,16 @@ export class AssignmentController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get an assignment by ID' })
-  @ApiParam({ name: 'id', required: true, description: 'Assignment MongoDB ID' })
-  @ApiResponse({ status: 200, type: AssignmentResponseDto, description: 'Assignment retrieved successfully.' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Assignment MongoDB ID',
+  })
+  @ApiResponse({
+    status: 200,
+    type: AssignmentResponseDto,
+    description: 'Assignment retrieved successfully.',
+  })
   @ApiResponse({ status: 404, description: 'Assignment not found.' })
   async findOne(@Param('id') id: string) {
     try {
@@ -85,13 +109,27 @@ export class AssignmentController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update an assignment by ID' })
-  @ApiParam({ name: 'id', required: true, description: 'Assignment MongoDB ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Assignment MongoDB ID',
+  })
   @ApiBody({ type: UpdateAssignmentDto })
-  @ApiResponse({ status: 200, type: AssignmentResponseDto, description: 'Assignment updated successfully.' })
+  @ApiResponse({
+    status: 200,
+    type: AssignmentResponseDto,
+    description: 'Assignment updated successfully.',
+  })
   @ApiResponse({ status: 404, description: 'Assignment not found.' })
-  async update(@Param('id') id: string, @Body() updateAssignmentDto: UpdateAssignmentDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateAssignmentDto: UpdateAssignmentDto,
+  ) {
     try {
-      const assignment = await this.assignmentService.update(id, updateAssignmentDto);
+      const assignment = await this.assignmentService.update(
+        id,
+        updateAssignmentDto,
+      );
       const mapped = AssignmentMapper.toResponse(assignment);
       return CustomResponse.success(mapped, MESSAGES.ASSIGNMENT.UPDATED);
     } catch (error) {
@@ -104,8 +142,16 @@ export class AssignmentController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete an assignment by ID' })
-  @ApiParam({ name: 'id', required: true, description: 'Assignment MongoDB ID' })
-  @ApiResponse({ status: 200, type: AssignmentResponseDto, description: 'Assignment deleted successfully.' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Assignment MongoDB ID',
+  })
+  @ApiResponse({
+    status: 200,
+    type: AssignmentResponseDto,
+    description: 'Assignment deleted successfully.',
+  })
   @ApiResponse({ status: 404, description: 'Assignment not found.' })
   async remove(@Param('id') id: string) {
     try {

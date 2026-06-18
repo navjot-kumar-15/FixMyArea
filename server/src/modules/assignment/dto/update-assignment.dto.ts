@@ -1,9 +1,18 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { AssignmentStatus } from '../interfaces/assignment.interface';
 
 export class UpdateAssignmentDto {
-  @ApiPropertyOptional({ enum: AssignmentStatus, description: 'Status of assignment' })
+  @ApiPropertyOptional({
+    enum: AssignmentStatus,
+    description: 'Status of assignment',
+  })
   @IsOptional()
   @IsEnum(AssignmentStatus)
   status?: AssignmentStatus;

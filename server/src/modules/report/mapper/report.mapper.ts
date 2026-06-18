@@ -1,7 +1,6 @@
 import { IReport } from '../interfaces/report.interface';
 import { ReportResponseDto } from '../dto/report-response.dto';
 
-
 export class ReportMapper {
   /**
    * Maps a Mongoose document or raw database object into a plain domain interface.
@@ -76,14 +75,18 @@ export class ReportMapper {
       title: domain.title,
       description: domain.description,
       category: domain.category,
-      images: domain.images ? domain.images.map((img: any) => ({
-        url: img.url,
-        public_id: img.public_id,
-      })) : [],
-      location: domain.location ? {
-        type: domain.location.type,
-        coordinates: domain.location.coordinates,
-      } : { type: 'Point', coordinates: [] },
+      images: domain.images
+        ? domain.images.map((img: any) => ({
+            url: img.url,
+            public_id: img.public_id,
+          }))
+        : [],
+      location: domain.location
+        ? {
+            type: domain.location.type,
+            coordinates: domain.location.coordinates,
+          }
+        : { type: 'Point', coordinates: [] },
       address: domain.address,
       city: domain.city,
       state: domain.state,
@@ -104,17 +107,21 @@ export class ReportMapper {
       is_resolved: domain.is_resolved,
       resolved_at: domain.resolved_at,
       resolved_by: domain.resolved_by,
-      ai_analysis: domain.ai_analysis ? {
-        detected_category: domain.ai_analysis.detected_category,
-        confidence: domain.ai_analysis.confidence,
-        suggested_priority: domain.ai_analysis.suggested_priority,
-        toxicity_score: domain.ai_analysis.toxicity_score,
-      } : undefined,
+      ai_analysis: domain.ai_analysis
+        ? {
+            detected_category: domain.ai_analysis.detected_category,
+            confidence: domain.ai_analysis.confidence,
+            suggested_priority: domain.ai_analysis.suggested_priority,
+            toxicity_score: domain.ai_analysis.toxicity_score,
+          }
+        : undefined,
       tags: domain.tags || [],
-      moderation: domain.moderation ? {
-        is_flagged: domain.moderation.is_flagged,
-        flagged_reason: domain.moderation.flagged_reason,
-      } : { is_flagged: false },
+      moderation: domain.moderation
+        ? {
+            is_flagged: domain.moderation.is_flagged,
+            flagged_reason: domain.moderation.flagged_reason,
+          }
+        : { is_flagged: false },
       visibility: domain.visibility,
       is_deleted: domain.is_deleted,
       deleted_at: domain.deleted_at,
@@ -133,4 +140,3 @@ export class ReportMapper {
       .filter((dto): dto is ReportResponseDto => dto !== null);
   }
 }
-

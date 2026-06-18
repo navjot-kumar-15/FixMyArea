@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ProgressUpdate } from '../../database/schemas/progress-update.schema';
@@ -15,19 +12,30 @@ import { PaginatedResult } from '../../common/interfaces/paginated-result.interf
 @Injectable()
 export class ProgressUpdateService {
   constructor(
-    @InjectModel(ProgressUpdate.name) private readonly progressUpdateModel: Model<ProgressUpdate>,
+    @InjectModel(ProgressUpdate.name)
+    private readonly progressUpdateModel: Model<ProgressUpdate>,
   ) {}
 
   // CREATE
-  async create(createProgressUpdateDto: CreateProgressUpdateDto): Promise<IProgressUpdate> {
+  async create(
+    createProgressUpdateDto: CreateProgressUpdateDto,
+  ): Promise<IProgressUpdate> {
     const newUpdate = new this.progressUpdateModel(createProgressUpdateDto);
     const savedUpdate = await newUpdate.save();
     return ProgressUpdateMapper.toDomain(savedUpdate) as IProgressUpdate;
   }
 
   // READ ALL
-  async findAll(filterProgressUpdateDto: FilterProgressUpdateDto): Promise<PaginatedResult<IProgressUpdate>> {
-    const { page = 1, limit = 10, worker_id, report_id, is_verified } = filterProgressUpdateDto || {};
+  async findAll(
+    filterProgressUpdateDto: FilterProgressUpdateDto,
+  ): Promise<PaginatedResult<IProgressUpdate>> {
+    const {
+      page = 1,
+      limit = 10,
+      worker_id,
+      report_id,
+      is_verified,
+    } = filterProgressUpdateDto || {};
     const skip = (page - 1) * limit;
 
     const query: any = { is_deleted: { $ne: true } };
@@ -43,7 +51,11 @@ export class ProgressUpdateService {
     }
 
     const [updates, total] = await Promise.all([
-      this.progressUpdateModel.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      this.progressUpdateModel
+        .find(query)
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 }),
       this.progressUpdateModel.countDocuments(query),
     ]);
 
@@ -66,7 +78,10 @@ export class ProgressUpdateService {
   }
 
   // UPDATE
-  async update(id: string, updateProgressUpdateDto: UpdateProgressUpdateDto): Promise<IProgressUpdate> {
+  async update(
+    id: string,
+    updateProgressUpdateDto: UpdateProgressUpdateDto,
+  ): Promise<IProgressUpdate> {
     const updatePayload: any = { ...updateProgressUpdateDto };
 
     if (updateProgressUpdateDto.is_verified === true) {

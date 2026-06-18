@@ -75,4 +75,12 @@ export const MESSAGES = {
     DELETED: 'Category deleted successfully',
     NOT_FOUND: 'Category not found',
   },
+  LOCATION: {
+    CREATED: 'Location successfully created!',
+    FETCHED_ALL: 'All locations retrieved successfully',
+    FETCHED: 'Location retrieved successfully',
+    UPDATED: 'Location updated successfully',
+    DELETED: 'Location deleted successfully',
+    NOT_FOUND: 'Location not found',
+  },
 };

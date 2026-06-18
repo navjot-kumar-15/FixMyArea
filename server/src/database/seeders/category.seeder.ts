@@ -37,7 +37,8 @@ export class CategorySeeder implements OnApplicationBootstrap {
       },
       {
         name: 'Street Light Outage',
-        description: 'Malfunctioning or dark street lights causing safety issues',
+        description:
+          'Malfunctioning or dark street lights causing safety issues',
         department: DepartmentType.ELECTRICITY,
         icon: 'lightbulb',
         color: '#f1c40f',

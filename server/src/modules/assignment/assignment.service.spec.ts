@@ -29,7 +29,9 @@ describe('AssignmentService', () => {
       skip: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       sort: jest.fn().mockReturnThis(),
-      then: jest.fn().mockImplementation((resolve) => resolve([mockAssignment])),
+      then: jest
+        .fn()
+        .mockImplementation((resolve) => resolve([mockAssignment])),
     }),
     countDocuments: jest.fn().mockResolvedValue(1),
     findById: jest.fn().mockResolvedValue(mockAssignment),
@@ -83,12 +85,16 @@ describe('AssignmentService', () => {
       mockAssignmentModel.findById.mockResolvedValue(mockAssignment);
       const result = await service.findOne(mockAssignment._id.toString());
       expect(result).toBeDefined();
-      expect(mockAssignmentModel.findById).toHaveBeenCalledWith(mockAssignment._id.toString());
+      expect(mockAssignmentModel.findById).toHaveBeenCalledWith(
+        mockAssignment._id.toString(),
+      );
     });
 
     it('should throw NotFoundException if assignment not found', async () => {
       mockAssignmentModel.findById.mockResolvedValue(null);
-      await expect(service.findOne('invalidId')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('invalidId')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

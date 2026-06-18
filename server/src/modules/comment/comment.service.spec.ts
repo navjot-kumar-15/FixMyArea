@@ -81,12 +81,16 @@ describe('CommentService', () => {
       mockCommentModel.findById.mockResolvedValue(mockComment);
       const result = await service.findOne(mockComment._id.toString());
       expect(result).toBeDefined();
-      expect(mockCommentModel.findById).toHaveBeenCalledWith(mockComment._id.toString());
+      expect(mockCommentModel.findById).toHaveBeenCalledWith(
+        mockComment._id.toString(),
+      );
     });
 
     it('should throw NotFoundException if comment not found', async () => {
       mockCommentModel.findById.mockResolvedValue(null);
-      await expect(service.findOne('invalidId')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('invalidId')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

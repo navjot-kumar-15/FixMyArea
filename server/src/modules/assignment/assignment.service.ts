@@ -1,11 +1,11 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Assignment } from '../../database/schemas/assignment.schema';
-import { IAssignment, AssignmentStatus } from './interfaces/assignment.interface';
+import {
+  IAssignment,
+  AssignmentStatus,
+} from './interfaces/assignment.interface';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 import { AssignmentMapper } from './mapper/assignment.mapper';
@@ -15,7 +15,8 @@ import { PaginatedResult } from '../../common/interfaces/paginated-result.interf
 @Injectable()
 export class AssignmentService {
   constructor(
-    @InjectModel(Assignment.name) private readonly assignmentModel: Model<Assignment>,
+    @InjectModel(Assignment.name)
+    private readonly assignmentModel: Model<Assignment>,
   ) {}
 
   // CREATE
@@ -31,8 +32,16 @@ export class AssignmentService {
   }
 
   // READ ALL
-  async findAll(filterAssignmentDto: FilterAssignmentDto): Promise<PaginatedResult<IAssignment>> {
-    const { page = 1, limit = 10, worker_id, report_id, status } = filterAssignmentDto || {};
+  async findAll(
+    filterAssignmentDto: FilterAssignmentDto,
+  ): Promise<PaginatedResult<IAssignment>> {
+    const {
+      page = 1,
+      limit = 10,
+      worker_id,
+      report_id,
+      status,
+    } = filterAssignmentDto || {};
     const skip = (page - 1) * limit;
 
     const query: any = { is_deleted: { $ne: true } };
@@ -48,7 +57,11 @@ export class AssignmentService {
     }
 
     const [assignments, total] = await Promise.all([
-      this.assignmentModel.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      this.assignmentModel
+        .find(query)
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 }),
       this.assignmentModel.countDocuments(query),
     ]);
 
@@ -71,7 +84,10 @@ export class AssignmentService {
   }
 
   // UPDATE
-  async update(id: string, updateAssignmentDto: UpdateAssignmentDto): Promise<IAssignment> {
+  async update(
+    id: string,
+    updateAssignmentDto: UpdateAssignmentDto,
+  ): Promise<IAssignment> {
     const updatePayload: any = { ...updateAssignmentDto };
 
     // Set corresponding status date field if changed

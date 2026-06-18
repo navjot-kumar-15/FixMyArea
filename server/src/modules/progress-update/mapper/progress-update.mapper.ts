@@ -11,10 +11,12 @@ export class ProgressUpdateMapper {
       worker_id: raw.worker_id ? raw.worker_id.toString() : undefined,
       note: raw.note,
       progress_percentage: raw.progress_percentage,
-      images: raw.images ? raw.images.map((img: any) => ({
-        url: img.url,
-        public_id: img.public_id,
-      })) : [],
+      images: raw.images
+        ? raw.images.map((img: any) => ({
+            url: img.url,
+            public_id: img.public_id,
+          }))
+        : [],
       is_final_update: raw.is_final_update,
       is_verified: raw.is_verified,
       verified_by: raw.verified_by ? raw.verified_by.toString() : undefined,
@@ -33,7 +35,9 @@ export class ProgressUpdateMapper {
       .filter((update): update is IProgressUpdate => update !== null);
   }
 
-  static toResponse(domain: IProgressUpdate | null): ProgressUpdateResponseDto | null {
+  static toResponse(
+    domain: IProgressUpdate | null,
+  ): ProgressUpdateResponseDto | null {
     if (!domain) return null;
     return {
       id: domain.id,
@@ -41,10 +45,12 @@ export class ProgressUpdateMapper {
       worker_id: domain.worker_id,
       note: domain.note,
       progress_percentage: domain.progress_percentage,
-      images: domain.images ? domain.images.map((img: any) => ({
-        url: img.url,
-        public_id: img.public_id,
-      })) : [],
+      images: domain.images
+        ? domain.images.map((img: any) => ({
+            url: img.url,
+            public_id: img.public_id,
+          }))
+        : [],
       is_final_update: domain.is_final_update,
       is_verified: domain.is_verified,
       verified_by: domain.verified_by,
@@ -55,7 +61,9 @@ export class ProgressUpdateMapper {
     };
   }
 
-  static toResponseList(domainList: IProgressUpdate[]): ProgressUpdateResponseDto[] {
+  static toResponseList(
+    domainList: IProgressUpdate[],
+  ): ProgressUpdateResponseDto[] {
     if (!domainList) return [];
     return domainList
       .map((domain) => this.toResponse(domain))

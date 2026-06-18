@@ -30,7 +30,9 @@ describe('ProgressUpdateService', () => {
       skip: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       sort: jest.fn().mockReturnThis(),
-      then: jest.fn().mockImplementation((resolve) => resolve([mockProgressUpdate])),
+      then: jest
+        .fn()
+        .mockImplementation((resolve) => resolve([mockProgressUpdate])),
     }),
     countDocuments: jest.fn().mockResolvedValue(1),
     findById: jest.fn().mockResolvedValue(mockProgressUpdate),
@@ -85,12 +87,16 @@ describe('ProgressUpdateService', () => {
       mockProgressUpdateModel.findById.mockResolvedValue(mockProgressUpdate);
       const result = await service.findOne(mockProgressUpdate._id.toString());
       expect(result).toBeDefined();
-      expect(mockProgressUpdateModel.findById).toHaveBeenCalledWith(mockProgressUpdate._id.toString());
+      expect(mockProgressUpdateModel.findById).toHaveBeenCalledWith(
+        mockProgressUpdate._id.toString(),
+      );
     });
 
     it('should throw NotFoundException if update not found', async () => {
       mockProgressUpdateModel.findById.mockResolvedValue(null);
-      await expect(service.findOne('invalidId')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('invalidId')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

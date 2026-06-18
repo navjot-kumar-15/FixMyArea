@@ -19,6 +19,7 @@ import { AssignmentModule } from './modules/assignment/assignment.module';
 import { ProgressUpdateModule } from './modules/progress-update/progress-update.module';
 import { RoleModule } from './modules/role/role.module';
 import { CategoryModule } from './modules/category/category.module';
+import { LocationModule } from './modules/location/location.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { CategoryModule } from './modules/category/category.module';
     ProgressUpdateModule,
     RoleModule,
     CategoryModule,
+    LocationModule,
   ],
   controllers: [AppController],
   providers: [

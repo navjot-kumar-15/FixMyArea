@@ -84,8 +84,7 @@ export class Assignment {
   deleted_at: Date;
 }
 
-export const AssignmentSchema =
-  SchemaFactory.createForClass(Assignment);
+export const AssignmentSchema = SchemaFactory.createForClass(Assignment);
 
 /* Indexes */
 

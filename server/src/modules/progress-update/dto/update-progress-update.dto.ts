@@ -27,7 +27,9 @@ export class UpdateProgressUpdateDto {
   @Max(100)
   progress_percentage?: number;
 
-  @ApiPropertyOptional({ description: 'Is this the final update for the task?' })
+  @ApiPropertyOptional({
+    description: 'Is this the final update for the task?',
+  })
   @IsOptional()
   @IsBoolean()
   is_final_update?: boolean;
@@ -37,9 +39,13 @@ export class UpdateProgressUpdateDto {
   @IsBoolean()
   is_verified?: boolean;
 
-  @ApiPropertyOptional({ description: 'MongoDB ObjectID of the user who verified the update' })
+  @ApiPropertyOptional({
+    description: 'MongoDB ObjectID of the user who verified the update',
+  })
   @IsOptional()
   @IsMongoId()
-  @Transform(({ value }) => Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value)
+  @Transform(({ value }) =>
+    Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value,
+  )
   verified_by?: Types.ObjectId;
 }

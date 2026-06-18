@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
-import { getOtpTemplate, getResetPasswordTemplate } from 'src/common/templates/mail.templates';
-
+import {
+  getOtpTemplate,
+  getResetPasswordTemplate,
+} from 'src/common/templates/mail.templates';
 
 @Injectable()
 export class MailerService {
@@ -20,10 +22,13 @@ export class MailerService {
         host,
         port,
         secure: port === 465, // true for port 465, false for other ports
-        auth: user && pass ? {
-          user,
-          pass,
-        } : undefined,
+        auth:
+          user && pass
+            ? {
+                user,
+                pass,
+              }
+            : undefined,
       });
       this.logger.log(`Nodemailer configuration loaded for host: ${host}`);
     } else {
@@ -40,7 +45,8 @@ export class MailerService {
    * @param html HTML content of the email
    */
   async sendEmail(to: string, subject: string, html: string): Promise<void> {
-    const from = this.configService.get<string>('mailer.from') || 'noreply@fixmyarea.com';
+    const from =
+      this.configService.get<string>('mailer.from') || 'noreply@fixmyarea.com';
 
     if (this.transporter) {
       try {
@@ -79,9 +85,12 @@ export class MailerService {
    * @param resetUrl The complete password reset URL
    * @param name Recipient name
    */
-  async sendResetPassword(to: string, resetUrl: string, name?: string): Promise<void> {
+  async sendResetPassword(
+    to: string,
+    resetUrl: string,
+    name?: string,
+  ): Promise<void> {
     const html = getResetPasswordTemplate(resetUrl, name);
     await this.sendEmail(to, 'Reset Your Password - FixMyArea', html);
   }
 }
-

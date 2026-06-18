@@ -10,7 +10,9 @@ export class CommentMapper {
       report_id: raw.report_id ? raw.report_id.toString() : undefined,
       user_id: raw.user_id ? raw.user_id.toString() : undefined,
       message: raw.message,
-      parent_comment_id: raw.parent_comment_id ? raw.parent_comment_id.toString() : undefined,
+      parent_comment_id: raw.parent_comment_id
+        ? raw.parent_comment_id.toString()
+        : undefined,
       is_edited: raw.is_edited,
       edited_at: raw.edited_at,
       is_deleted: raw.is_deleted,
