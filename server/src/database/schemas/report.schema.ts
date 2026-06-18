@@ -169,8 +169,6 @@
 
 // ReportSchema.index({ location: '2dsphere' });
 
-
-
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
@@ -208,8 +206,7 @@ export class ReportImage {
   public_id: string;
 }
 
-export const ReportImageSchema =
-  SchemaFactory.createForClass(ReportImage);
+export const ReportImageSchema = SchemaFactory.createForClass(ReportImage);
 
 @Schema({ _id: false })
 export class ReportLocation {
@@ -251,8 +248,7 @@ export class AiAnalysis {
   toxicity_score: number;
 }
 
-export const AiAnalysisSchema =
-  SchemaFactory.createForClass(AiAnalysis);
+export const AiAnalysisSchema = SchemaFactory.createForClass(AiAnalysis);
 
 @Schema({ _id: false })
 export class Moderation {
@@ -263,8 +259,7 @@ export class Moderation {
   flagged_reason: string;
 }
 
-export const ModerationSchema =
-  SchemaFactory.createForClass(Moderation);
+export const ModerationSchema = SchemaFactory.createForClass(Moderation);
 
 @Schema({ _id: false })
 export class StatusHistory {
@@ -289,8 +284,7 @@ export class StatusHistory {
   changed_at: Date;
 }
 
-export const StatusHistorySchema =
-  SchemaFactory.createForClass(StatusHistory);
+export const StatusHistorySchema = SchemaFactory.createForClass(StatusHistory);
 
 /* -------------------------------------------------------------------------- */
 /*                                   REPORT                                   */
@@ -519,8 +513,7 @@ export class Report extends Document {
   deleted_by: Types.ObjectId;
 }
 
-export const ReportSchema =
-  SchemaFactory.createForClass(Report);
+export const ReportSchema = SchemaFactory.createForClass(Report);
 
 /* -------------------------------------------------------------------------- */
 /*                                   INDEXES                                  */

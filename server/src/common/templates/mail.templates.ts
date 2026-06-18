@@ -66,7 +66,10 @@ export function getOtpTemplate(otp: number, name?: string): string {
  * @param resetUrl The URL to reset the password
  * @param name Optional recipient name
  */
-export function getResetPasswordTemplate(resetUrl: string, name?: string): string {
+export function getResetPasswordTemplate(
+  resetUrl: string,
+  name?: string,
+): string {
   const recipientName = name || 'Valued User';
   return `
 <!DOCTYPE html>

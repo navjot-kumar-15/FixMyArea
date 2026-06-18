@@ -33,13 +33,20 @@ export class RoleController {
   @Post()
   @ApiOperation({ summary: 'Create a new role' })
   @ApiBody({ type: CreateRoleDto })
-  @ApiResponse({ status: 201, description: 'Role created successfully', type: RoleResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Role created successfully',
+    type: RoleResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 409, description: 'Role name already exists' })
   async create(@Body() createRoleDto: CreateRoleDto) {
     try {
       const role = await this.roleService.create(createRoleDto);
-      return CustomResponse.success(RoleMapper.toResponse(role), MESSAGES.ROLE.CREATED);
+      return CustomResponse.success(
+        RoleMapper.toResponse(role),
+        MESSAGES.ROLE.CREATED,
+      );
     } catch (error) {
       if (error instanceof ConflictException) {
         return CustomResponse.error(error.message, null, 409);
@@ -53,11 +60,18 @@ export class RoleController {
 
   @Get()
   @ApiOperation({ summary: 'Get all roles' })
-  @ApiResponse({ status: 200, description: 'List of all roles', type: [RoleResponseDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all roles',
+    type: [RoleResponseDto],
+  })
   async findAll() {
     try {
       const roles = await this.roleService.findAll();
-      return CustomResponse.success(RoleMapper.toResponseList(roles), MESSAGES.ROLE.FETCHED_ALL);
+      return CustomResponse.success(
+        RoleMapper.toResponseList(roles),
+        MESSAGES.ROLE.FETCHED_ALL,
+      );
     } catch (error) {
       return CustomResponse.error(error.message, null, 500);
     }
@@ -66,12 +80,19 @@ export class RoleController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a role by ID' })
   @ApiParam({ name: 'id', description: 'MongoDB ID of the role' })
-  @ApiResponse({ status: 200, description: 'Role details', type: RoleResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Role details',
+    type: RoleResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Role not found' })
   async findOne(@Param('id') id: string) {
     try {
       const role = await this.roleService.findOne(id);
-      return CustomResponse.success(RoleMapper.toResponse(role), MESSAGES.ROLE.FETCHED);
+      return CustomResponse.success(
+        RoleMapper.toResponse(role),
+        MESSAGES.ROLE.FETCHED,
+      );
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);
@@ -84,13 +105,20 @@ export class RoleController {
   @ApiOperation({ summary: 'Update a role by ID' })
   @ApiParam({ name: 'id', description: 'MongoDB ID of the role' })
   @ApiBody({ type: UpdateRoleDto })
-  @ApiResponse({ status: 200, description: 'Role updated successfully', type: RoleResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Role updated successfully',
+    type: RoleResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Role not found' })
   @ApiResponse({ status: 409, description: 'Role name already exists' })
   async update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
     try {
       const role = await this.roleService.update(id, updateRoleDto);
-      return CustomResponse.success(RoleMapper.toResponse(role), MESSAGES.ROLE.UPDATED);
+      return CustomResponse.success(
+        RoleMapper.toResponse(role),
+        MESSAGES.ROLE.UPDATED,
+      );
     } catch (error) {
       if (error instanceof ConflictException) {
         return CustomResponse.error(error.message, null, 409);
@@ -105,12 +133,19 @@ export class RoleController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a role by ID' })
   @ApiParam({ name: 'id', description: 'MongoDB ID of the role' })
-  @ApiResponse({ status: 200, description: 'Role deleted successfully', type: RoleResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Role deleted successfully',
+    type: RoleResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Role not found' })
   async remove(@Param('id') id: string) {
     try {
       const role = await this.roleService.remove(id);
-      return CustomResponse.success(RoleMapper.toResponse(role), MESSAGES.ROLE.DELETED);
+      return CustomResponse.success(
+        RoleMapper.toResponse(role),
+        MESSAGES.ROLE.DELETED,
+      );
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);

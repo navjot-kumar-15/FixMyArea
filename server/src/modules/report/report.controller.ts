@@ -23,9 +23,11 @@ import { UpdateReportDto } from './dto/update-report.dto';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
 import { FilterReportDto } from './dto/filter-report.dto';
-import { ReportResponseDto, PaginatedReportResponseDto } from './dto/report-response.dto';
+import {
+  ReportResponseDto,
+  PaginatedReportResponseDto,
+} from './dto/report-response.dto';
 import { ReportMapper } from './mapper/report.mapper';
-
 
 @ApiTags('Report')
 @Controller('report')
@@ -51,7 +53,6 @@ export class ReportController {
       const mapped = ReportMapper.toResponse(report);
       return CustomResponse.success(mapped, MESSAGES.REPORT.CREATED, 201);
     } catch (error) {
-
       if (error instanceof BadRequestException) {
         return CustomResponse.error(error.message, null, 400);
       }
@@ -61,7 +62,11 @@ export class ReportController {
 
   @Get()
   @ApiOperation({ summary: 'Get all reports' })
-  @ApiResponse({ status: 200, type: PaginatedReportResponseDto, description: 'Return an array of all reports.' })
+  @ApiResponse({
+    status: 200,
+    type: PaginatedReportResponseDto,
+    description: 'Return an array of all reports.',
+  })
   async findAll(@Query() filterReportDto: FilterReportDto) {
     try {
       const paginatedResult = await this.reportService.findAll(filterReportDto);
@@ -82,7 +87,11 @@ export class ReportController {
     required: true,
     description: 'MongoDB ObjectID of the report (Required)',
   })
-  @ApiResponse({ status: 200, type: ReportResponseDto, description: 'Return the specific report.' })
+  @ApiResponse({
+    status: 200,
+    type: ReportResponseDto,
+    description: 'Return the specific report.',
+  })
   @ApiResponse({ status: 404, description: 'Report not found.' })
   async findOne(@Param('id') id: string) {
     try {

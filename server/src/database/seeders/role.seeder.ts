@@ -52,8 +52,8 @@ export class RoleSeeder implements OnApplicationBootstrap {
         if (!existingRole) {
           await this.roleModel.create(roleData);
           this.logger.log(`Seeded missing role: ${roleData.name}`);
-        }else{
-           await this.roleModel.updateOne({ name: roleData.name }, roleData)
+        } else {
+          await this.roleModel.updateOne({ name: roleData.name }, roleData);
           this.logger.log(`Updated missing role: ${roleData.name}`);
         }
       }

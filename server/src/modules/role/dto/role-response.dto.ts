@@ -7,19 +7,32 @@ export class RoleResponseDto {
   @ApiProperty({ example: 'moderator', description: 'Name of the role' })
   name: string;
 
-  @ApiProperty({ example: 'Can edit and close reports', description: 'Description of the role' })
+  @ApiProperty({
+    example: 'Can edit and close reports',
+    description: 'Description of the role',
+  })
   description: string;
 
-  @ApiProperty({ example: ['edit:reports', 'close:reports'], type: [String], description: 'List of permissions associated with the role' })
+  @ApiProperty({
+    example: ['edit:reports', 'close:reports'],
+    type: [String],
+    description: 'List of permissions associated with the role',
+  })
   permissions: string[];
 
   @ApiProperty({ example: true, description: 'Whether the role is active' })
   is_active: boolean;
 
-  @ApiPropertyOptional({ example: '2026-06-12T10:00:00.000Z', description: 'Created timestamp' })
+  @ApiPropertyOptional({
+    example: '2026-06-12T10:00:00.000Z',
+    description: 'Created timestamp',
+  })
   createdAt?: Date;
 
-  @ApiPropertyOptional({ example: '2026-06-12T10:00:00.000Z', description: 'Updated timestamp' })
+  @ApiPropertyOptional({
+    example: '2026-06-12T10:00:00.000Z',
+    description: 'Updated timestamp',
+  })
   updatedAt?: Date;
 }
 

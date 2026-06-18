@@ -14,7 +14,10 @@ export class FilterAssignmentDto extends PaginationDto {
   @IsMongoId()
   report_id?: string;
 
-  @ApiPropertyOptional({ enum: AssignmentStatus, description: 'Filter by status' })
+  @ApiPropertyOptional({
+    enum: AssignmentStatus,
+    description: 'Filter by status',
+  })
   @IsOptional()
   @IsEnum(AssignmentStatus)
   status?: AssignmentStatus;

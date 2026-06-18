@@ -22,7 +22,9 @@ export class ProgressImageDto {
   @IsString()
   url: string;
 
-  @ApiPropertyOptional({ description: 'Public ID of the image for cloud storage' })
+  @ApiPropertyOptional({
+    description: 'Public ID of the image for cloud storage',
+  })
   @IsOptional()
   @IsString()
   public_id?: string;
@@ -32,13 +34,19 @@ export class CreateProgressUpdateDto {
   @ApiProperty({ description: 'MongoDB ObjectID of the report' })
   @IsNotEmpty()
   @IsMongoId()
-  @Transform(({ value }) => Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value)
+  @Transform(({ value }) =>
+    Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value,
+  )
   report_id: Types.ObjectId;
 
-  @ApiProperty({ description: 'MongoDB ObjectID of the worker making the update' })
+  @ApiProperty({
+    description: 'MongoDB ObjectID of the worker making the update',
+  })
   @IsNotEmpty()
   @IsMongoId()
-  @Transform(({ value }) => Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value)
+  @Transform(({ value }) =>
+    Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value,
+  )
   worker_id: Types.ObjectId;
 
   @ApiProperty({ description: 'A note describing the progress update' })
@@ -55,14 +63,19 @@ export class CreateProgressUpdateDto {
   @Max(100)
   progress_percentage: number;
 
-  @ApiPropertyOptional({ type: [ProgressImageDto], description: 'Optional progress images' })
+  @ApiPropertyOptional({
+    type: [ProgressImageDto],
+    description: 'Optional progress images',
+  })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ProgressImageDto)
   images?: ProgressImageDto[];
 
-  @ApiPropertyOptional({ description: 'Is this the final update for the task?' })
+  @ApiPropertyOptional({
+    description: 'Is this the final update for the task?',
+  })
   @IsOptional()
   @IsBoolean()
   is_final_update?: boolean;

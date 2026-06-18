@@ -140,7 +140,11 @@ export class AuthService {
       otp_expires_at: new Date(Date.now() + 15 * 60 * 1000),
     });
 
-    await this.mailService.sendOtp(user.email,+otp,`${user.first_name} ${user.last_name}`)
+    await this.mailService.sendOtp(
+      user.email,
+      +otp,
+      `${user.first_name} ${user.last_name}`,
+    );
 
     return {
       message: MESSAGES.AUTH.FORGOT_PASSWORD_SIMULATION,
@@ -157,27 +161,26 @@ export class AuthService {
       throw new BadRequestException(MESSAGES.AUTH.INVALID_RESET_TOKEN);
     }
 
-    const user = await this.userService.findOne(decoded.sub)
-    if(!user){
+    const user = await this.userService.findOne(decoded.sub);
+    if (!user) {
       throw new NotFoundException(MESSAGES.USER.NOT_FOUND);
     }
 
-    if(user?.otp !== otp){
+    if (user?.otp !== otp) {
       throw new BadRequestException(MESSAGES.AUTH.INVALID_OTP);
     }
 
-    if(user?.otp_expires_at && user.otp_expires_at < new Date()){
+    if (user?.otp_expires_at && user.otp_expires_at < new Date()) {
       throw new BadRequestException(MESSAGES.AUTH.OTP_EXPIRED);
     }
 
-    await this.userService.update(user.id, {otp:null,otp_expires_at:null });
+    await this.userService.update(user.id, { otp: null, otp_expires_at: null });
 
-
- const resetToken = this.jwtService.sign(
+    const resetToken = this.jwtService.sign(
       { sub: user.id },
       { expiresIn: '15m' },
     );
-    return { reset_password_token:resetToken };
+    return { reset_password_token: resetToken };
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {

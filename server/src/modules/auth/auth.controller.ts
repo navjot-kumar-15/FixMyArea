@@ -117,11 +117,7 @@ export class AuthController {
   async verifyOtp(@Query() verifyOtpDto: VerifyOtpDto) {
     try {
       const result = await this.authService.verifyOtp(verifyOtpDto);
-      return CustomResponse.success(
-        result,
-        MESSAGES.AUTH.OTP_VERIFIED,
-        200,
-      );
+      return CustomResponse.success(result, MESSAGES.AUTH.OTP_VERIFIED, 200);
     } catch (error) {
       if (
         error instanceof BadRequestException ||

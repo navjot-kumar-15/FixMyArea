@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comment } from '../../database/schemas/comment.schema';
@@ -26,7 +23,9 @@ export class CommentService {
   }
 
   // READ ALL
-  async findAll(filterCommentDto: FilterCommentDto): Promise<PaginatedResult<IComment>> {
+  async findAll(
+    filterCommentDto: FilterCommentDto,
+  ): Promise<PaginatedResult<IComment>> {
     const { page = 1, limit = 10, report_id, user_id } = filterCommentDto || {};
     const skip = (page - 1) * limit;
 
@@ -40,7 +39,11 @@ export class CommentService {
     }
 
     const [comments, total] = await Promise.all([
-      this.commentModel.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      this.commentModel
+        .find(query)
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 }),
       this.commentModel.countDocuments(query),
     ]);
 
@@ -63,7 +66,10 @@ export class CommentService {
   }
 
   // UPDATE
-  async update(id: string, updateCommentDto: UpdateCommentDto): Promise<IComment> {
+  async update(
+    id: string,
+    updateCommentDto: UpdateCommentDto,
+  ): Promise<IComment> {
     const updatedComment = await this.commentModel.findByIdAndUpdate(
       id,
       {

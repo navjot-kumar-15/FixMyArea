@@ -12,8 +12,7 @@ export class ProgressImage {
   public_id: string;
 }
 
-export const ProgressImageSchema =
-  SchemaFactory.createForClass(ProgressImage);
+export const ProgressImageSchema = SchemaFactory.createForClass(ProgressImage);
 
 @Schema({
   timestamps: true,
