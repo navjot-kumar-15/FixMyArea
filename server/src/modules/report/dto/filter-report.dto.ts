@@ -20,5 +20,10 @@ export class FilterReportDto extends PaginationDto {
   @IsString()
   status?: string;
 
+  @ApiPropertyOptional({ description: 'Filter by location ID' })
+  @IsOptional()
+  @IsMongoId()
+  location_id?: string;
+
   // Add future report-specific filters here
 }

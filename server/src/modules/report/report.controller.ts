@@ -53,10 +53,11 @@ export class ReportController {
       const mapped = ReportMapper.toResponse(report);
       return CustomResponse.success(mapped, MESSAGES.REPORT.CREATED, 201);
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof BadRequestException) {
-        return CustomResponse.error(error.message, null, 400);
+        return CustomResponse.error(message, null, 400);
       }
-      return CustomResponse.error(error.message, null, 500);
+      return CustomResponse.error(message, null, 500);
     }
   }
 
@@ -76,7 +77,8 @@ export class ReportController {
       };
       return CustomResponse.success(mappedResult, MESSAGES.REPORT.FETCHED_ALL);
     } catch (error) {
-      return CustomResponse.error(error.message, null, 500);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return CustomResponse.error(message, null, 500);
     }
   }
 
@@ -99,10 +101,11 @@ export class ReportController {
       const mapped = ReportMapper.toResponse(report);
       return CustomResponse.success(mapped, MESSAGES.REPORT.FETCHED);
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof NotFoundException) {
-        return CustomResponse.error(error.message, null, 404);
+        return CustomResponse.error(message, null, 404);
       }
-      return CustomResponse.error(error.message, null, 500);
+      return CustomResponse.error(message, null, 500);
     }
   }
 
@@ -133,13 +136,14 @@ export class ReportController {
       const mapped = ReportMapper.toResponse(report);
       return CustomResponse.success(mapped, MESSAGES.REPORT.UPDATED);
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof BadRequestException) {
-        return CustomResponse.error(error.message, null, 400);
+        return CustomResponse.error(message, null, 400);
       }
       if (error instanceof NotFoundException) {
-        return CustomResponse.error(error.message, null, 404);
+        return CustomResponse.error(message, null, 404);
       }
-      return CustomResponse.error(error.message, null, 500);
+      return CustomResponse.error(message, null, 500);
     }
   }
 
@@ -162,10 +166,11 @@ export class ReportController {
       const mapped = ReportMapper.toResponse(report);
       return CustomResponse.success(mapped, MESSAGES.REPORT.DELETED);
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof NotFoundException) {
-        return CustomResponse.error(error.message, null, 404);
+        return CustomResponse.error(message, null, 404);
       }
-      return CustomResponse.error(error.message, null, 500);
+      return CustomResponse.error(message, null, 500);
     }
   }
 }

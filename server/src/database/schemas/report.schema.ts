@@ -339,6 +339,13 @@ export class Report extends Document {
   })
   location: ReportLocation;
 
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Location',
+    default: null,
+  })
+  location_id: Types.ObjectId;
+
   @Prop()
   address: string;
 
@@ -521,6 +528,10 @@ export const ReportSchema = SchemaFactory.createForClass(Report);
 
 ReportSchema.index({
   location: '2dsphere',
+});
+
+ReportSchema.index({
+  location_id: 1,
 });
 
 ReportSchema.index({

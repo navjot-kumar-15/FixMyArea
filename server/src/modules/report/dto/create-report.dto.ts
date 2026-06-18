@@ -58,7 +58,9 @@ export class CreateReportDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
-  @Transform(({ value }) => value?.trim())
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : '',
+  )
   title: string;
 
   @ApiProperty({
@@ -69,7 +71,9 @@ export class CreateReportDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(2000)
-  @Transform(({ value }) => value?.trim())
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : '',
+  )
   description: string;
 
   @ApiProperty({
@@ -79,8 +83,10 @@ export class CreateReportDto {
   })
   @IsNotEmpty()
   @IsMongoId()
-  @Transform(({ value }) =>
-    Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value,
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' && Types.ObjectId.isValid(value)
+      ? new Types.ObjectId(value)
+      : value,
   )
   category: Types.ObjectId;
 
@@ -102,6 +108,20 @@ export class CreateReportDto {
   @ValidateNested()
   @Type(() => ReportLocationDto)
   location: ReportLocationDto;
+
+  @ApiPropertyOptional({
+    description: 'MongoDB ID of the associated administrative location',
+    type: String,
+    example: '60d21b4667d0d8992e610c85',
+  })
+  @IsOptional()
+  @IsMongoId()
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' && Types.ObjectId.isValid(value)
+      ? new Types.ObjectId(value)
+      : value,
+  )
+  location_id?: Types.ObjectId;
 
   @ApiPropertyOptional({ description: 'Formatted address' })
   @IsOptional()
@@ -143,8 +163,10 @@ export class CreateReportDto {
   })
   @IsNotEmpty()
   @IsMongoId()
-  @Transform(({ value }) =>
-    Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value,
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' && Types.ObjectId.isValid(value)
+      ? new Types.ObjectId(value)
+      : value,
   )
   created_by: Types.ObjectId;
 
