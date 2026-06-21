@@ -50,6 +50,38 @@ describe('MediaService', () => {
     });
   });
 
+  describe('uploadMultipleMedia', () => {
+    it('should delegate bulk uploads to the injected media provider', async () => {
+      const mockFiles = [
+        {
+          originalname: 'test1.png',
+          buffer: Buffer.from(''),
+          mimetype: 'image/png',
+        },
+        {
+          originalname: 'test2.png',
+          buffer: Buffer.from(''),
+          mimetype: 'image/png',
+        },
+      ] as Express.Multer.File[];
+
+      const results = await service.uploadMultipleMedia(mockFiles, 'test-folder');
+
+      expect(mockProvider.uploadFile).toHaveBeenNthCalledWith(1, mockFiles[0], 'test-folder');
+      expect(mockProvider.uploadFile).toHaveBeenNthCalledWith(2, mockFiles[1], 'test-folder');
+      expect(results).toEqual([
+        {
+          url: 'https://example.com/image.jpg',
+          public_id: 'some-id',
+        },
+        {
+          url: 'https://example.com/image.jpg',
+          public_id: 'some-id',
+        },
+      ]);
+    });
+  });
+
   describe('deleteMedia', () => {
     it('should delegate delete to the injected media provider', async () => {
       const result = await service.deleteMedia('some-id');

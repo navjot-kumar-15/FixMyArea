@@ -24,6 +24,18 @@ export class MediaService {
   }
 
   /**
+   * Uploads multiple media files concurrently delegating to the injected strategy
+   * @param files Array of files to upload
+   * @param folder The target folder
+   */
+  async uploadMultipleMedia(
+    files: Express.Multer.File[],
+    folder?: string,
+  ): Promise<UploadResult[]> {
+    return Promise.all(files.map((file) => this.mediaProvider.uploadFile(file, folder)));
+  }
+
+  /**
    * Deletes media delegating to the injected strategy
    * @param public_id The ID of the file to delete
    */
