@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import {
   ReportStatus,
   ReportPriority,
@@ -30,9 +31,10 @@ export interface IReport {
   id: string;
   title: string;
   description: string;
-  category: string | any;
+  category?: unknown;
   images: IReportImage[];
   location: IReportLocation;
+  location_id?: string | null;
   address?: string;
   city?: string;
   state?: string;
@@ -61,4 +63,15 @@ export interface IReport {
   deleted_at?: Date;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface IReportFilterQuery {
+  is_deleted?: { $ne: boolean };
+  $or?: Array<{
+    title?: { $regex: string; $options: string };
+    description?: { $regex: string; $options: string };
+  }>;
+  category?: Types.ObjectId;
+  status?: ReportStatus;
+  location_id?: Types.ObjectId;
 }

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { MediaController } from './media.controller';
 import { MediaService, MEDIA_PROVIDER_TOKEN } from './media.service';
 import { CloudinaryProvider } from './providers/cloudinary.provider';
@@ -8,19 +9,24 @@ import { AwsS3Provider } from './providers/aws-s3.provider';
   controllers: [MediaController],
   providers: [
     MediaService,
+    CloudinaryProvider,
+    AwsS3Provider,
     {
       provide: MEDIA_PROVIDER_TOKEN,
-      useFactory: () => {
-        // Read from environment variable (default to Cloudinary if not set)
-        const provider = process.env.ACTIVE_STORAGE_PROVIDER || 'CLOUDINARY';
+      useFactory: (
+        configService: ConfigService,
+        cloudinaryProvider: CloudinaryProvider,
+        awsS3Provider: AwsS3Provider,
+      ) => {
+        const provider = configService.get<string>('media.provider') || 'CLOUDINARY';
 
         if (provider.toUpperCase() === 'AWS') {
-          return new AwsS3Provider();
+          return awsS3Provider;
         }
 
-        // Return Cloudinary by default
-        return new CloudinaryProvider();
+        return cloudinaryProvider;
       },
+      inject: [ConfigService, CloudinaryProvider, AwsS3Provider],
     },
   ],
   exports: [MediaService],

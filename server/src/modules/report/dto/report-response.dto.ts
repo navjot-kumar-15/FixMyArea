@@ -102,6 +102,12 @@ export class ReportResponseDto {
   location: ReportLocationResponseDto;
 
   @ApiPropertyOptional({
+    example: '60d21b4667d0d8992e610c85',
+    description: 'MongoDB ID of the associated Location',
+  })
+  location_id?: string | null;
+
+  @ApiPropertyOptional({
     example: '123 Main St, Bengaluru',
     description: 'Formatted address',
   })

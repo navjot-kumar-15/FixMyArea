@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { ReportService } from './report.service';
 import { Report } from '../../database/schemas/report.schema';
+import { Location } from '../../database/schemas/location.schema';
 import { NotFoundException } from '@nestjs/common';
 import { Types } from 'mongoose';
 
@@ -21,14 +22,29 @@ describe('ReportService', () => {
     find: jest.fn().mockReturnValue({
       skip: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
-      populate: jest.fn().mockResolvedValue([mockReport]),
+      populate: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation(function (resolve) {
+        return resolve([mockReport]);
+      }),
     }),
     countDocuments: jest.fn().mockResolvedValue(1),
     findById: jest.fn().mockReturnValue({
-      populate: jest.fn().mockResolvedValue(mockReport),
+      populate: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation(function (resolve) {
+        return resolve(mockReport);
+      }),
     }),
     findByIdAndUpdate: jest.fn().mockReturnValue({
-      populate: jest.fn().mockResolvedValue(mockReport),
+      populate: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation(function (resolve) {
+        return resolve(mockReport);
+      }),
+    }),
+  };
+
+  const mockLocationModel = {
+    findOne: jest.fn().mockReturnValue({
+      exec: jest.fn().mockResolvedValue({ _id: new Types.ObjectId() }),
     }),
   };
 
@@ -39,6 +55,10 @@ describe('ReportService', () => {
         {
           provide: getModelToken(Report.name),
           useValue: mockReportModel,
+        },
+        {
+          provide: getModelToken(Location.name),
+          useValue: mockLocationModel,
         },
       ],
     }).compile();
@@ -69,7 +89,10 @@ describe('ReportService', () => {
 
     it('should throw NotFoundException if report not found', async () => {
       mockReportModel.findById.mockReturnValue({
-        populate: jest.fn().mockResolvedValue(null),
+        populate: jest.fn().mockReturnThis(),
+        then: jest.fn().mockImplementation(function (resolve) {
+          return resolve(null);
+        }),
       });
 
       await expect(service.findOne('invalidId')).rejects.toThrow(

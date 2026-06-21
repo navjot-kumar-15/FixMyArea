@@ -31,8 +31,8 @@ import { LocationModule } from './modules/location/location.module';
           ? '.env.production'
           : '.env.development',
     }),
-    UserModule,
     AuthModule,
+    UserModule,
     DatabaseModule,
     RedisModule,
     MailerModule,
