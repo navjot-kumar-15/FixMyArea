@@ -3,6 +3,7 @@ import databaseConfig from './database.config';
 import redisConfig from './redis.config';
 import jwtConfig from './jwt.config';
 import mailerConfig from './mailer.config';
+import mediaConfig from './media.config';
 
 export default [
   appConfig,
@@ -10,4 +11,5 @@ export default [
   redisConfig,
   jwtConfig,
   mailerConfig,
+  mediaConfig,
 ];

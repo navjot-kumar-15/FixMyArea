@@ -33,7 +33,7 @@ export class User extends Document {
   @Prop({ default: false })
   is_email_verified: boolean;
 
-  @Prop({ type: Types.ObjectId, ref: 'Role' })
+  @Prop({ type: Types.ObjectId, ref: 'Role',default:null })
   role_id: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Address' })

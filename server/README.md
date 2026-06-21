@@ -58,6 +58,7 @@ src/
 │   ├── user/                # User accounts & Profile management
 │   ├── role/                # Role management & permissions (seeded automatically)
 │   ├── category/            # Issue categories (seeded automatically)
+│   ├── location/            # Administrative locations & hierarchy (geospatial index)
 │   ├── report/              # Issue reporting (Citizens create, Admins view/update)
 │   ├── comment/             # Threaded issue comments & conversations
 │   ├── assignment/          # Worker assignment workflows
@@ -88,6 +89,10 @@ Instead of manually registering every schema in the database module, a custom `s
   - `toDomain`: Converts MongoDB documents into domain interfaces.
   - `toResponse`: Map domain data structures to clean Response DTO objects, purging internal system fields and converting database ObjectIds to string formats.
 
+### 3. Automatic Location Resolution for Reports
+
+When a report is created or updated, if a coordinate pair `[longitude, latitude]` is supplied in the `location.coordinates` field without an explicit `location_id`, the system performs an automatic geospatial lookup using Mongoose's `$nearSphere` query to find the closest administrative `Location` and automatically links it to the report's `location_id` field. This enables seamless, GPS-based reporting while maintaining association with formal administrative boundaries.
+
 ---
 
 ## 🗄️ Database Relations Map
@@ -101,13 +106,16 @@ erDiagram
     User ||--o{ Comment : "writes"
     User ||--o{ ProgressUpdate : "posts"
     Category ||--o{ Report : "categorizes"
+    Location ||--o{ Location : "parent_id (hierarchical)"
+    Location ||--o{ Report : "associates"
     Report ||--o{ Assignment : "has"
     Report ||--o{ Comment : "receives"
     Report ||--o{ ProgressUpdate : "tracks"
 ```
 
 - **`User`**: Linked to specific Roles. Can be an Admin, User (Citizen), or Worker.
-- **`Report`**: Has a direct link to `user_id` (Citizen creator) and `category_id`.
+- **`Location`**: Represents administrative levels (country, state, city, area) with hierarchical parent-child relationships and GeoJSON coordinates.
+- **`Report`**: Has a direct link to `user_id` (Citizen creator), `category_id`, and `location_id` (identifying the administrative Location).
 - **`Assignment`**: Connects a `report_id` to a `worker_id` (User) and tracks who assigned it (`assigned_by` Admin User ID).
 - **`Comment`**: Connects `report_id` to the author `user_id`. Supports threading via optional `parent_comment_id`.
 - **`ProgressUpdate`**: Posted by the assigned `worker_id` for a specific `report_id`. Optionally verified by an Admin via `verified_by`.
@@ -120,11 +128,12 @@ erDiagram
 2. **`user`**: Exposes user management endpoints. Allows fetching and updating user profiles, banning users, and managing account statuses.
 3. **`role`**: Handles system roles (e.g. `admin`, `user`, `worker`). Populated automatically on application bootstrap.
 4. **`category`**: Handles issue categories (e.g. `Pothole`, `Water Leakage`, `Street Light Outage`). Populated automatically on application bootstrap.
-5. **`report`**: The central module for creating, viewing, updating, and deleting public reports. Handles issue priorities and SLA calculations.
+5. **`report`**: The central module for creating, viewing, updating, and deleting public reports. Handles issue priorities and SLA calculations. Automatically resolves coordinates to administrative locations if no location ID is supplied.
 6. **`comment`**: Enables communication on reports. Supports standard comments, nested/threaded replies, and edits.
 7. **`assignment`**: Coordinates assigning tasks to field workers, updating assignment statuses, and active assignment tracking.
 8. **`progress-update`**: Tracks repair progress (0-100%) posted by field workers, storing notes and attachments.
 9. **`media`**: General-purpose upload/delete helper. Instantiates either AWS S3 or Cloudinary provider strategies depending on env configurations.
+10. **`location`**: Manages administrative levels (e.g. Area, City, State, Country) via a hierarchical structure and handles geospatial queries for mapping reports to specific service areas.
 
 ---
 
