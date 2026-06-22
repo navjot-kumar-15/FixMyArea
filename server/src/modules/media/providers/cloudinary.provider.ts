@@ -17,12 +17,14 @@ export class CloudinaryProvider implements IMediaProvider {
     const cloudName = this.configService.get<string>('media.cloudinary.cloudName');
     const apiKey = this.configService.get<string>('media.cloudinary.apiKey');
     const apiSecret = this.configService.get<string>('media.cloudinary.apiSecret');
+    const upload_prefix = this.configService.get<string>('media.cloudinary.uploadPrefix');
 
     if (cloudName && apiKey && apiSecret) {
       cloudinary.config({
         cloud_name: cloudName,
         api_key: apiKey,
         api_secret: apiSecret,
+        upload_prefix: upload_prefix
       });
       this.isConfigured = true;
       this.logger.log('Cloudinary Provider initialized with configuration');
@@ -62,8 +64,6 @@ export class CloudinaryProvider implements IMediaProvider {
         `Mocking upload of ${file.originalname} as ${uniqueFilename} to Cloudinary folder: ${folder || 'default'}`,
       );
 
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
 
       const result = {
         url: `https://res.cloudinary.com/mock-cloud/image/upload/v1/${folder || 'default'}/${uniqueFilename}`,

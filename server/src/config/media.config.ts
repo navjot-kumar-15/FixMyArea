@@ -6,6 +6,7 @@ export default registerAs('media', () => ({
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
     apiKey: process.env.CLOUDINARY_API_KEY,
     apiSecret: process.env.CLOUDINARY_API_SECRET,
+    uploadPrefix: process.env.CLOUDINARY_UPLOAD_PREFIX,
   },
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
