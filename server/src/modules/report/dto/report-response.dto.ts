@@ -10,13 +10,13 @@ export class ReportImageResponseDto {
     example: 'https://example.com/image.jpg',
     description: 'URL of the image',
   })
-  url: string;
+  url?: string;
 
   @ApiProperty({
     example: 'cloudinary_public_id_123',
     description: 'Public ID of the image for cloud storage',
   })
-  public_id: string;
+  public_id?: string;
 }
 
 export class ReportLocationResponseDto {

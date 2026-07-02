@@ -20,12 +20,10 @@ import {
 class ReportImageDto {
   @ApiProperty({ description: 'URL of the image' })
   @IsString()
-  @IsNotEmpty()
   url: string;
 
   @ApiProperty({ description: 'Public ID of the image for cloud storage' })
   @IsString()
-  @IsNotEmpty()
   public_id: string;
 }
 
@@ -82,7 +80,6 @@ export class CreateReportDto {
     example: '60d21b4667d0d8992e610c85',
   })
   @IsNotEmpty()
-  @IsMongoId()
   @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' && Types.ObjectId.isValid(value)
       ? new Types.ObjectId(value)
@@ -99,6 +96,15 @@ export class CreateReportDto {
   @ValidateNested({ each: true })
   @Type(() => ReportImageDto)
   images?: ReportImageDto[];
+
+  @ApiPropertyOptional({
+    description: 'Array of images',
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  resolution_images?: string[];
 
   @ApiProperty({
     description: 'Geospatial location of the report',
@@ -143,6 +149,16 @@ export class CreateReportDto {
   @IsString()
   country?: string;
 
+  @ApiPropertyOptional({ description: 'LandMark' })
+  @IsOptional()
+  @IsString()
+  landmark?: string;
+
+  @ApiPropertyOptional({ description: 'Ward Number' })
+  @IsOptional()
+  @IsString()
+  ward_number?: string;
+
   @ApiPropertyOptional({ description: 'Pincode/Zipcode' })
   @IsOptional()
   @IsString()
@@ -162,7 +178,6 @@ export class CreateReportDto {
     type: String,
   })
   @IsNotEmpty()
-  @IsMongoId()
   @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' && Types.ObjectId.isValid(value)
       ? new Types.ObjectId(value)

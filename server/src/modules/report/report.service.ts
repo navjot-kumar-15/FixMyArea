@@ -32,34 +32,33 @@ export class ReportService {
       createReportDto.location.coordinates &&
       createReportDto.location.coordinates.length === 2
     ) {
-      const closest = await this.locationModel
-        .findOne({
-          geo_location: {
-            $nearSphere: {
-              $geometry: {
-                type: 'Point',
-                coordinates: [
-                  createReportDto.location.coordinates[0],
-                  createReportDto.location.coordinates[1],
-                ],
-              },
-            },
-          },
-        })
-        .exec();
+      const closest = await this.locationModel.findOne({
+        location: {
+          // $nearSphere: {
+          // $geometry: {
+          type: 'Point',
+          coordinates: [
+            createReportDto.location.coordinates[0],
+            createReportDto.location.coordinates[1],
+          ],
+          // },
+          // $maxDistance: 5000,
+          // },
+        },
+      });
       if (closest) {
         resolvedLocationId = closest._id;
       }
     }
 
-    const reportData = {
+    const reportData: any = {
       ...createReportDto,
-      location_id: resolvedLocationId,
+      location_id: resolvedLocationId && resolvedLocationId,
     };
 
-    const newReport = new this.reportModel(reportData);
-    const savedReport = await newReport.save();
-    const domain = ReportMapper.toDomain(savedReport);
+    const newReport = await this.reportModel.create(reportData);
+    // const savedReport = await newReport.save();
+    const domain = ReportMapper.toDomain(newReport);
     if (!domain) {
       throw new BadRequestException('Failed to map saved report');
     }

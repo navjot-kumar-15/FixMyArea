@@ -70,7 +70,6 @@ export class CreateUserDto {
     type: String,
   })
   @IsOptional()
-  @IsMongoId()
   @Transform(({ value }) =>
     Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value,
   )
