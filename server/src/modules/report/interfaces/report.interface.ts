@@ -7,7 +7,7 @@ import {
 
 export interface IReportImage {
   url: string;
-  public_id: string;
+  public_id?: string;
 }
 
 export interface IReportLocation {

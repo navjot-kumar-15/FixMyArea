@@ -83,6 +83,7 @@ export class CloudinaryProvider implements IMediaProvider {
             public_id: publicId,
           },
           (error, res) => {
+
             if (error) {
               this.logger.error(`Cloudinary upload failed: ${error.message}`);
               return reject(error);

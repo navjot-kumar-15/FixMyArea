@@ -15,7 +15,7 @@ import { ApiResponse } from '../../common/responses/api-response';
 @ApiTags('Media')
 @Controller('media')
 export class MediaController {
-  constructor(private readonly mediaService: MediaService) {}
+  constructor(private readonly mediaService: MediaService) { }
 
   @Post('upload')
   @ApiOperation({ summary: 'Upload a file using the active storage provider' })
@@ -46,7 +46,9 @@ export class MediaController {
   }
 
   @Post('upload-bulk')
-  @ApiOperation({ summary: 'Upload multiple files in bulk using the active storage provider' })
+  @ApiOperation({
+    summary: 'Upload multiple files in bulk using the active storage provider',
+  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {

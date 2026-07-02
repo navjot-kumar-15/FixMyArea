@@ -30,17 +30,44 @@ export function getAutoLoadSchemas(): { name: string; schema: any }[] {
           .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
           .join('');
 
-        const exportedKeys = Object.keys(exported);
-        for (const key of exportedKeys) {
-          if (key.toLowerCase().includes('schema') && exported[key]) {
-            // Check if it's already added to prevent duplicates
-            if (!schemas.some((s) => s.name === modelName)) {
-              schemas.push({
-                name: modelName,
-                schema: exported[key],
-              });
+        const targetSchemaKey = `${modelName}Schema`;
+        if (exported[targetSchemaKey]) {
+          if (!schemas.some((s) => s.name === modelName)) {
+            schemas.push({
+              name: modelName,
+              schema: exported[targetSchemaKey],
+            });
+          }
+        } else {
+          const exportedKeys = Object.keys(exported);
+          let found = false;
+          for (const key of exportedKeys) {
+            if (
+              key.toLowerCase() === targetSchemaKey.toLowerCase() &&
+              exported[key]
+            ) {
+              if (!schemas.some((s) => s.name === modelName)) {
+                schemas.push({
+                  name: modelName,
+                  schema: exported[key],
+                });
+              }
+              found = true;
+              break;
             }
-            break; // Stop after finding the first schema export in this file
+          }
+          if (!found) {
+            for (const key of exportedKeys) {
+              if (key.toLowerCase().includes('schema') && exported[key]) {
+                if (!schemas.some((s) => s.name === modelName)) {
+                  schemas.push({
+                    name: modelName,
+                    schema: exported[key],
+                  });
+                }
+                break;
+              }
+            }
           }
         }
       }

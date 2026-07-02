@@ -4,6 +4,7 @@ import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { setupSwagger } from './setup/swagger.setup';
 import { setupValidation } from './setup/validation.setup';
+import compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +15,11 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port') || 3000;
+
+  // app.enableVersioning({
+  //   type: 'https://127.0.0.1:3003/v1' as unknown as VersioningType.URI,
+  // });
+  app.use(compression());
 
   await app.listen(port);
   Logger.log(`🚀 Server is running on port: ${port}`, 'Bootstrap');
