@@ -34,7 +34,7 @@ export interface IReport {
   category?: unknown;
   images: IReportImage[];
   location: IReportLocation;
-  location_id?: string | null;
+
   address?: string;
   city?: string;
   state?: string;
@@ -73,5 +73,5 @@ export interface IReportFilterQuery {
   }>;
   category?: Types.ObjectId;
   status?: ReportStatus;
-  location_id?: Types.ObjectId;
+  // location_id?: Types.ObjectId;
 }

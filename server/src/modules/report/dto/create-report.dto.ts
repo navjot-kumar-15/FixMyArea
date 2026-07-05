@@ -85,7 +85,7 @@ export class CreateReportDto {
       ? new Types.ObjectId(value)
       : value,
   )
-  category: Types.ObjectId;
+  category_id: Types.ObjectId;
 
   @ApiPropertyOptional({
     description: 'Array of images',
@@ -120,15 +120,14 @@ export class CreateReportDto {
     type: String,
     example: '60d21b4667d0d8992e610c85',
   })
-  @IsOptional()
-  @IsMongoId()
-  @Transform(({ value }: { value: unknown }) =>
-    typeof value === 'string' && Types.ObjectId.isValid(value)
-      ? new Types.ObjectId(value)
-      : value,
-  )
-  location_id?: Types.ObjectId;
-
+  // @IsOptional()
+  // @IsMongoId()
+  // @Transform(({ value }: { value: unknown }) =>
+  //   typeof value === 'string' && Types.ObjectId.isValid(value)
+  //     ? new Types.ObjectId(value)
+  //     : value,
+  // )
+  // location_id?: Types.ObjectId;
   @ApiPropertyOptional({ description: 'Formatted address' })
   @IsOptional()
   @IsString()
@@ -169,10 +168,9 @@ export class CreateReportDto {
     enum: ReportPriority,
     default: ReportPriority.Medium,
   })
-  @IsOptional()
-  @IsEnum(ReportPriority)
-  priority?: ReportPriority;
-
+  // @IsOptional()
+  // @IsEnum(ReportPriority)
+  // priority?: ReportPriority;
   @ApiProperty({
     description: 'MongoDB ID of the user who created the report',
     type: String,

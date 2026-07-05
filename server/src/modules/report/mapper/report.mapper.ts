@@ -6,8 +6,10 @@ interface RawReport {
   _id?: { toString(): string };
   title?: string;
   description?: string;
+
   category?:
     | { _id?: { toString(): string }; toString(): string }
+    | { name: string; icon: string; description: string; color: string }
     | string
     | null;
   images?: Array<{ url: string; public_id: string }>;
@@ -63,19 +65,6 @@ export class ReportMapper {
   static toDomain(raw: RawReport | null): IReport | null {
     if (!raw) return null;
 
-    let mappedCategory: unknown = undefined;
-    if (raw.category) {
-      if (
-        typeof raw.category === 'object' &&
-        raw.category !== null &&
-        '_id' in raw.category
-      ) {
-        mappedCategory = raw.category;
-      } else {
-        mappedCategory = raw.category.toString();
-      }
-    }
-
     let mappedLocationId: string | undefined = undefined;
     if (raw.location_id) {
       if (
@@ -94,11 +83,10 @@ export class ReportMapper {
       id: raw.id ? raw.id : raw._id ? raw._id.toString() : '',
       title: raw.title || '',
       description: raw.description || '',
-      category: mappedCategory,
       images: raw.images || [],
       location: raw.location || { type: 'Point', coordinates: [] },
-      location_id: mappedLocationId,
       address: raw.address,
+      category: raw.category || {},
       city: raw.city,
       state: raw.state,
       country: raw.country,
@@ -165,7 +153,6 @@ export class ReportMapper {
             coordinates: domain.location.coordinates,
           }
         : { type: 'Point', coordinates: [] },
-      location_id: domain.location_id,
       address: domain.address,
       city: domain.city,
       state: domain.state,

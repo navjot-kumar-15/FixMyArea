@@ -1,3 +1,5 @@
+import { PaginatedResult } from '../interfaces/paginated-result.interface';
+
 export class ApiResponse<T> {
   success: boolean;
   statusCode: number;
@@ -17,6 +19,14 @@ export class ApiResponse<T> {
     statusCode: number = 200,
   ): ApiResponse<T> {
     return new ApiResponse<T>(true, message, data, statusCode);
+  }
+
+  static pagination<T>(
+    data: PaginatedResult<T>,
+    message: string = 'Operation successful',
+    statusCode: number = 200,
+  ): ApiResponse<PaginatedResult<T>> {
+    return new ApiResponse(true, message, data, statusCode);
   }
 
   static error<T>(
