@@ -28,6 +28,7 @@ import {
   PaginatedReportResponseDto,
 } from './dto/report-response.dto';
 import { ReportMapper } from './mapper/report.mapper';
+import { PaginatedResult } from 'src/common/interfaces/paginated-result.interface';
 
 @ApiTags('Report')
 @Controller('report')
@@ -73,9 +74,15 @@ export class ReportController {
       const paginatedResult = await this.reportService.findAll(filterReportDto);
       const { data, total, page, limit, totalPages } = paginatedResult;
       // TODO:Need to fix the paginated response
-      let finalResult = { ...data, total, page, limit, totalPages };
+      let finalResult = {
+        data,
+        total,
+        page,
+        limit,
+        totalPages,
+      } as any;
       return CustomResponse.pagination(
-        { data: finalResult },
+        finalResult,
         MESSAGES.REPORT.FETCHED_ALL,
       );
     } catch (error) {

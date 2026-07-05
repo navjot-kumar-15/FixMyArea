@@ -116,6 +116,20 @@ export class ReportService {
                 preserveNullAndEmptyArrays: true,
               },
             },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'created_by',
+                foreignField: '_id',
+                as: 'userDetail',
+              },
+            },
+            {
+              $unwind: {
+                path: '$userDetail',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
 
             {
               $project: {
@@ -134,7 +148,10 @@ export class ReportService {
                 status: '$status',
                 priority: '$priority',
                 severity_score: '$severity_score',
-                created_by: '$created_by',
+                created_by: {
+                  id: '$userDetail._id',
+                  email: '$userDetail.email',
+                },
                 upvotes_count: '$upvotes_count',
                 downvotes_count: '$downvotes_count',
                 comments_count: '$comments_count',

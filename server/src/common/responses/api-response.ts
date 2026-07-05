@@ -10,7 +10,7 @@ export class ApiResponse<T> {
     this.success = success;
     if (statusCode) this.statusCode = statusCode;
     this.message = message;
-    this.data = data;
+    this.data = data && data;
   }
 
   static success<T>(
@@ -26,7 +26,7 @@ export class ApiResponse<T> {
     message: string = 'Operation successful',
     statusCode: number = 200,
   ): ApiResponse<PaginatedResult<T>> {
-    return new ApiResponse(true, message, data, statusCode);
+    return new ApiResponse(true, message, data?.data as any, statusCode);
   }
 
   static error<T>(

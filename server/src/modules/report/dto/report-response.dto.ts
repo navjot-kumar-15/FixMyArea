@@ -4,6 +4,7 @@ import {
   ReportPriority,
   VisibilityType,
 } from '../../../database/schemas/report.schema';
+import { Types } from 'mongoose';
 
 export class ReportImageResponseDto {
   @ApiProperty({
@@ -62,6 +63,20 @@ export class ModerationResponseDto {
     description: 'Reason for flagging',
   })
   flagged_reason?: string;
+}
+
+export class ReportCreatorResponseDto {
+  @ApiPropertyOptional({
+    example: '60d0fe4f5311236168a109eb',
+    description: 'MongoDB ID of the creator',
+  })
+  id?: string;
+
+  @ApiPropertyOptional({
+    example: 'creator@example.com',
+    description: 'Email of the creator',
+  })
+  email?: string;
 }
 
 export class ReportResponseDto {
@@ -143,22 +158,22 @@ export class ReportResponseDto {
   severity_score: number;
 
   @ApiProperty({
-    example: '60d0fe4f5311236168a109eb',
-    description: 'MongoDB ID of the creator',
+    type: ReportCreatorResponseDto,
+    description: 'Details of the creator of the report',
   })
-  created_by: string;
+  created_by: ReportCreatorResponseDto;
 
   @ApiPropertyOptional({
     example: '60d0fe4f5311236168a109ec',
     description: 'MongoDB ID of the assigned worker',
   })
-  assigned_worker?: string;
+  assigned_worker?: Types.ObjectId;
 
   @ApiPropertyOptional({
     example: '60d0fe4f5311236168a109ed',
     description: 'MongoDB ID of the duplicate report',
   })
-  duplicate_of?: string;
+  duplicate_of?: Types.ObjectId;
 
   @ApiProperty({ example: 0, description: 'Upvotes count' })
   upvotes_count: number;

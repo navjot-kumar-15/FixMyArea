@@ -43,9 +43,12 @@ export interface IReport {
   status: ReportStatus | string;
   priority: ReportPriority | string;
   severity_score: number;
-  created_by: string;
-  assigned_worker?: string;
-  duplicate_of?: string;
+  created_by: {
+    id?: Types.ObjectId | string;
+    email?: string;
+  };
+  assigned_worker?: Types.ObjectId | string;
+  duplicate_of?: Types.ObjectId | string;
   upvotes_count: number;
   downvotes_count: number;
   comments_count: number;

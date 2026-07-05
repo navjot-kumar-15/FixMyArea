@@ -1,5 +1,6 @@
 import { IReport } from '../interfaces/report.interface';
 import { ReportResponseDto } from '../dto/report-response.dto';
+import { Types } from 'mongoose';
 
 interface RawReport {
   id?: string;
@@ -26,7 +27,7 @@ interface RawReport {
   status?: string;
   priority?: string;
   severity_score?: number;
-  created_by?: { toString(): string };
+  created_by?: any;
   assigned_worker?: { toString(): string };
   duplicate_of?: { toString(): string };
   upvotes_count?: number;
@@ -95,7 +96,10 @@ export class ReportMapper {
       priority: raw.priority || '',
       severity_score:
         raw.severity_score !== undefined ? raw.severity_score : 50,
-      created_by: raw.created_by ? raw.created_by.toString() : '',
+      created_by: {
+        id: raw.created_by?.id,
+        email: raw.created_by?.email,
+      },
       assigned_worker: raw.assigned_worker
         ? raw.assigned_worker.toString()
         : undefined,
@@ -161,9 +165,16 @@ export class ReportMapper {
       status: domain.status,
       priority: domain.priority,
       severity_score: domain.severity_score,
-      created_by: domain.created_by,
-      assigned_worker: domain.assigned_worker,
-      duplicate_of: domain.duplicate_of,
+      created_by: {
+        id: domain.created_by?.id ? domain.created_by.id.toString() : undefined,
+        email: domain.created_by?.email,
+      },
+      assigned_worker: domain.assigned_worker
+        ? new Types.ObjectId(domain.assigned_worker)
+        : undefined,
+      duplicate_of: domain.duplicate_of
+        ? new Types.ObjectId(domain.duplicate_of)
+        : undefined,
       upvotes_count: domain.upvotes_count,
       downvotes_count: domain.downvotes_count,
       comments_count: domain.comments_count,
