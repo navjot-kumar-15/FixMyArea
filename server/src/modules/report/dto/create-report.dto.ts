@@ -18,20 +18,25 @@ import {
 } from '../../../database/schemas/report.schema';
 
 class ReportImageDto {
-  @ApiProperty({ description: 'URL of the image' })
+  @ApiProperty({ description: 'URL of the image', required: true })
   @IsString()
   url: string;
 
-  @ApiProperty({ description: 'Public ID of the image for cloud storage' })
+  @ApiPropertyOptional({
+    description: 'Public ID of the image for cloud storage',
+    required: false,
+  })
   @IsString()
-  public_id: string;
+  @IsOptional()
+  public_id?: string;
 }
 
 class ReportLocationDto {
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Type of location',
     default: 'Point',
     enum: ['Point'],
+    required: false,
   })
   @IsString()
   @IsOptional()
@@ -40,6 +45,7 @@ class ReportLocationDto {
   @ApiProperty({
     description: 'Coordinates [longitude, latitude]',
     type: [Number],
+    required: true,
   })
   @IsArray()
   @IsNumber({}, { each: true })
@@ -52,6 +58,7 @@ export class CreateReportDto {
     description: 'Title of the report',
     example: 'Pothole on Main St',
     maxLength: 150,
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -65,6 +72,7 @@ export class CreateReportDto {
     description: 'Detailed description of the report',
     example: 'There is a huge pothole causing traffic slowdown.',
     maxLength: 2000,
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
@@ -78,6 +86,7 @@ export class CreateReportDto {
     description: 'MongoDB ID of the category',
     type: String,
     example: '60d21b4667d0d8992e610c85',
+    required: true,
   })
   @IsNotEmpty()
   @Transform(({ value }: { value: unknown }) =>
@@ -90,6 +99,8 @@ export class CreateReportDto {
   @ApiPropertyOptional({
     description: 'Array of images',
     type: [ReportImageDto],
+    required: false,
+    default: [],
   })
   @IsOptional()
   @IsArray()
@@ -98,8 +109,10 @@ export class CreateReportDto {
   images?: ReportImageDto[];
 
   @ApiPropertyOptional({
-    description: 'Array of images',
+    description: 'Array of images for report resolution',
     type: [String],
+    required: false,
+    default: [],
   })
   @IsOptional()
   @IsArray()
@@ -109,6 +122,7 @@ export class CreateReportDto {
   @ApiProperty({
     description: 'Geospatial location of the report',
     type: ReportLocationDto,
+    required: true,
   })
   @IsNotEmpty()
   @ValidateNested()
@@ -116,49 +130,57 @@ export class CreateReportDto {
   location: ReportLocationDto;
 
   @ApiPropertyOptional({
-    description: 'MongoDB ID of the associated administrative location',
-    type: String,
-    example: '60d21b4667d0d8992e610c85',
+    description: 'Formatted address',
+    required: false,
   })
-  // @IsOptional()
-  // @IsMongoId()
-  // @Transform(({ value }: { value: unknown }) =>
-  //   typeof value === 'string' && Types.ObjectId.isValid(value)
-  //     ? new Types.ObjectId(value)
-  //     : value,
-  // )
-  // location_id?: Types.ObjectId;
-  @ApiPropertyOptional({ description: 'Formatted address' })
   @IsOptional()
   @IsString()
   address?: string;
 
-  @ApiPropertyOptional({ description: 'City' })
+  @ApiPropertyOptional({
+    description: 'City',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   city?: string;
 
-  @ApiPropertyOptional({ description: 'State' })
+  @ApiPropertyOptional({
+    description: 'State',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   state?: string;
 
-  @ApiPropertyOptional({ description: 'Country' })
+  @ApiPropertyOptional({
+    description: 'Country',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   country?: string;
 
-  @ApiPropertyOptional({ description: 'LandMark' })
+  @ApiPropertyOptional({
+    description: 'Landmark',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   landmark?: string;
 
-  @ApiPropertyOptional({ description: 'Ward Number' })
+  @ApiPropertyOptional({
+    description: 'Ward Number',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   ward_number?: string;
 
-  @ApiPropertyOptional({ description: 'Pincode/Zipcode' })
+  @ApiPropertyOptional({
+    description: 'Pincode/Zipcode',
+    required: true,
+  })
   @IsOptional()
   @IsString()
   pincode?: string;
@@ -167,13 +189,17 @@ export class CreateReportDto {
     description: 'Priority of the report',
     enum: ReportPriority,
     default: ReportPriority.Medium,
+    required: false,
   })
-  // @IsOptional()
-  // @IsEnum(ReportPriority)
-  // priority?: ReportPriority;
+  @IsOptional()
+  @IsEnum(ReportPriority)
+  priority?: ReportPriority;
+
   @ApiProperty({
     description: 'MongoDB ID of the user who created the report',
     type: String,
+    example: '60d0fe4f5311236168a109eb',
+    required: true,
   })
   @IsNotEmpty()
   @Transform(({ value }: { value: unknown }) =>
@@ -183,7 +209,12 @@ export class CreateReportDto {
   )
   created_by: Types.ObjectId;
 
-  @ApiPropertyOptional({ description: 'Tags for the report', type: [String] })
+  @ApiPropertyOptional({
+    description: 'Tags for the report',
+    type: [String],
+    required: false,
+    default: [],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
@@ -193,6 +224,7 @@ export class CreateReportDto {
     description: 'Visibility of the report',
     enum: VisibilityType,
     default: VisibilityType.Public,
+    required: false,
   })
   @IsOptional()
   @IsEnum(VisibilityType)

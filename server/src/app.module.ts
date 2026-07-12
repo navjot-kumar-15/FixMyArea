@@ -20,6 +20,7 @@ import { ProgressUpdateModule } from './modules/progress-update/progress-update.
 import { RoleModule } from './modules/role/role.module';
 import { CategoryModule } from './modules/category/category.module';
 import { LocationModule } from './modules/location/location.module';
+import { TagModule } from './modules/tag/tag.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { LocationModule } from './modules/location/location.module';
     RoleModule,
     CategoryModule,
     LocationModule,
+    TagModule,
   ],
   controllers: [AppController],
   providers: [

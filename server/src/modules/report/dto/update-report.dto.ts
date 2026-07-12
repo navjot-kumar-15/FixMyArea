@@ -8,17 +8,27 @@ export class UpdateReportDto extends PartialType(CreateReportDto) {
   @ApiPropertyOptional({
     description: 'Status of the report',
     enum: ReportStatus,
+    required: false,
+    default: ReportStatus.Pending,
   })
   @IsOptional()
   @IsEnum(ReportStatus)
   status?: ReportStatus;
 
-  @ApiPropertyOptional({ description: 'Is the report verified by an admin?' })
+  @ApiPropertyOptional({
+    description: 'Is the report verified by an admin?',
+    required: false,
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   is_verified?: boolean;
 
-  @ApiPropertyOptional({ description: 'Is the report resolved?' })
+  @ApiPropertyOptional({
+    description: 'Is the report resolved?',
+    required: false,
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   is_resolved?: boolean;

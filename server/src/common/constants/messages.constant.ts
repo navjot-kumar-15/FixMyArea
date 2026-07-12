@@ -83,4 +83,12 @@ export const MESSAGES = {
     DELETED: 'Location deleted successfully',
     NOT_FOUND: 'Location not found',
   },
+  TAG: {
+    CREATED: 'Tag successfully created!',
+    FETCHED_ALL: 'All tags retrieved successfully',
+    FETCHED: 'Tag retrieved successfully',
+    UPDATED: 'Tag updated successfully',
+    DELETED: 'Tag deleted successfully',
+    NOT_FOUND: 'Tag not found',
+  },
 };
