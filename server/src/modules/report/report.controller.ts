@@ -28,6 +28,7 @@ import {
   PaginatedReportResponseDto,
 } from './dto/report-response.dto';
 import { ReportMapper } from './mapper/report.mapper';
+import { PaginatedResult } from 'src/common/interfaces/paginated-result.interface';
 
 @ApiTags('Report')
 @Controller('report')
@@ -68,14 +69,22 @@ export class ReportController {
     type: PaginatedReportResponseDto,
     description: 'Return an array of all reports.',
   })
-  async findAll(@Query() filterReportDto: FilterReportDto) {
+  async findAll(@Query() filterReportDto: FilterReportDto): Promise<any> {
     try {
       const paginatedResult = await this.reportService.findAll(filterReportDto);
-      const mappedResult: PaginatedReportResponseDto = {
-        ...paginatedResult,
-        data: ReportMapper.toResponseList(paginatedResult.data),
-      };
-      return CustomResponse.success(mappedResult, MESSAGES.REPORT.FETCHED_ALL);
+      const { data, total, page, limit, totalPages } = paginatedResult;
+      // TODO:Need to fix the paginated response
+      let finalResult = {
+        data,
+        total,
+        page,
+        limit,
+        totalPages,
+      } as any;
+      return CustomResponse.pagination(
+        finalResult,
+        MESSAGES.REPORT.FETCHED_ALL,
+      );
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       return CustomResponse.error(message, null, 500);

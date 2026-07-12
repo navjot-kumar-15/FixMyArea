@@ -29,6 +29,7 @@ export class ResponseInterceptor<T> implements NestInterceptor<
           if (!data.statusCode) {
             data.statusCode = statusCode;
           }
+
           return data;
         }
 

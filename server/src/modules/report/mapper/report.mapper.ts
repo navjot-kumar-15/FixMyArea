@@ -1,13 +1,16 @@
 import { IReport } from '../interfaces/report.interface';
 import { ReportResponseDto } from '../dto/report-response.dto';
+import { Types } from 'mongoose';
 
 interface RawReport {
   id?: string;
   _id?: { toString(): string };
   title?: string;
   description?: string;
+
   category?:
     | { _id?: { toString(): string }; toString(): string }
+    | { name: string; icon: string; description: string; color: string }
     | string
     | null;
   images?: Array<{ url: string; public_id: string }>;
@@ -24,7 +27,7 @@ interface RawReport {
   status?: string;
   priority?: string;
   severity_score?: number;
-  created_by?: { toString(): string };
+  created_by?: any;
   assigned_worker?: { toString(): string };
   duplicate_of?: { toString(): string };
   upvotes_count?: number;
@@ -63,19 +66,6 @@ export class ReportMapper {
   static toDomain(raw: RawReport | null): IReport | null {
     if (!raw) return null;
 
-    let mappedCategory: unknown = undefined;
-    if (raw.category) {
-      if (
-        typeof raw.category === 'object' &&
-        raw.category !== null &&
-        '_id' in raw.category
-      ) {
-        mappedCategory = raw.category;
-      } else {
-        mappedCategory = raw.category.toString();
-      }
-    }
-
     let mappedLocationId: string | undefined = undefined;
     if (raw.location_id) {
       if (
@@ -94,11 +84,10 @@ export class ReportMapper {
       id: raw.id ? raw.id : raw._id ? raw._id.toString() : '',
       title: raw.title || '',
       description: raw.description || '',
-      category: mappedCategory,
       images: raw.images || [],
       location: raw.location || { type: 'Point', coordinates: [] },
-      location_id: mappedLocationId,
       address: raw.address,
+      category: raw.category || {},
       city: raw.city,
       state: raw.state,
       country: raw.country,
@@ -107,7 +96,10 @@ export class ReportMapper {
       priority: raw.priority || '',
       severity_score:
         raw.severity_score !== undefined ? raw.severity_score : 50,
-      created_by: raw.created_by ? raw.created_by.toString() : '',
+      created_by: {
+        id: raw.created_by?.id,
+        email: raw.created_by?.email,
+      },
       assigned_worker: raw.assigned_worker
         ? raw.assigned_worker.toString()
         : undefined,
@@ -165,7 +157,6 @@ export class ReportMapper {
             coordinates: domain.location.coordinates,
           }
         : { type: 'Point', coordinates: [] },
-      location_id: domain.location_id,
       address: domain.address,
       city: domain.city,
       state: domain.state,
@@ -174,9 +165,16 @@ export class ReportMapper {
       status: domain.status,
       priority: domain.priority,
       severity_score: domain.severity_score,
-      created_by: domain.created_by,
-      assigned_worker: domain.assigned_worker,
-      duplicate_of: domain.duplicate_of,
+      created_by: {
+        id: domain.created_by?.id ? domain.created_by.id.toString() : undefined,
+        email: domain.created_by?.email,
+      },
+      assigned_worker: domain.assigned_worker
+        ? new Types.ObjectId(domain.assigned_worker)
+        : undefined,
+      duplicate_of: domain.duplicate_of
+        ? new Types.ObjectId(domain.duplicate_of)
+        : undefined,
       upvotes_count: domain.upvotes_count,
       downvotes_count: domain.downvotes_count,
       comments_count: domain.comments_count,

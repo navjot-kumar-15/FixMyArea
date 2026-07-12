@@ -81,8 +81,6 @@ export class AiAnalysis {
   toxicity_score: number;
 }
 
-ReportLocationSchema.index({ coordinates: '2dsphere' }, { name: '2dsphere' });
-
 export const AiAnalysisSchema = SchemaFactory.createForClass(AiAnalysis);
 
 @Schema({ _id: false })
@@ -150,7 +148,7 @@ export class Report extends Document {
     ref: 'Category',
     required: true,
   })
-  category: Types.ObjectId;
+  category_id: Types.ObjectId;
 
   /* ------------------------------ IMAGES ------------------------------ */
 

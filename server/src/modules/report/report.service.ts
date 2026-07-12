@@ -25,9 +25,7 @@ export class ReportService {
   async create(createReportDto: CreateReportDto): Promise<IReport> {
     let resolvedLocationId: Types.ObjectId | null = null;
 
-    if (createReportDto.location_id) {
-      resolvedLocationId = new Types.ObjectId(createReportDto.location_id);
-    } else if (
+    if (
       createReportDto.location &&
       createReportDto.location.coordinates &&
       createReportDto.location.coordinates.length === 2
@@ -96,19 +94,99 @@ export class ReportService {
       query.status = status as ReportStatus;
     }
 
-    if (location_id) {
-      query.location_id = new Types.ObjectId(location_id);
-    }
+    const result = await this.reportModel.aggregate([
+      {
+        $match: query,
+      },
+      {
+        $facet: {
+          metadata: [{ $count: 'total' }],
+          data: [
+            {
+              $lookup: {
+                from: 'categories',
+                localField: 'category_id',
+                foreignField: '_id',
+                as: 'category',
+              },
+            },
+            {
+              $unwind: {
+                path: '$category',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'created_by',
+                foreignField: '_id',
+                as: 'userDetail',
+              },
+            },
+            {
+              $unwind: {
+                path: '$userDetail',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
 
-    const [reports, total] = await Promise.all([
-      this.reportModel
-        .find(query)
-        .skip(skip)
-        .limit(limit)
-        .populate('category')
-        .populate('location_id'),
-      this.reportModel.countDocuments(query),
+            {
+              $project: {
+                // === Required properties (exactly what you showed in JSON) ===
+                id: { $toString: '$_id' }, // convert ObjectId to string
+                title: '$title',
+                description: '$description',
+                images: '$images',
+                location: '$location',
+                category: {
+                  name: '$category.name',
+                  icon: '$category.icon',
+                  description: '$category.description',
+                  color: '$category.color',
+                },
+                status: '$status',
+                priority: '$priority',
+                severity_score: '$severity_score',
+                created_by: {
+                  id: '$userDetail._id',
+                  email: '$userDetail.email',
+                },
+                upvotes_count: '$upvotes_count',
+                downvotes_count: '$downvotes_count',
+                comments_count: '$comments_count',
+                views_count: '$views_count',
+                supporters_count: '$supporters_count',
+                is_verified: '$is_verified',
+                is_resolved: '$is_resolved',
+                tags: '$tags',
+                moderation: {
+                  is_flagged: '$moderation.is_flagged',
+                  flagged_reason: '$moderation.flagged_reason',
+                },
+                visibility: '$visibility',
+                is_deleted: '$is_deleted',
+                createdAt: '$createdAt',
+                updatedAt: '$updatedAt',
+
+                // === Optional but commonly used fields (add if needed) ===
+                // _id: 0,                    // remove ObjectId if you only want 'id'
+                // __v: 0,                    // remove MongoDB version key
+              },
+            },
+            {
+              $skip: skip,
+            },
+            {
+              $limit: limit,
+            },
+          ],
+        },
+      },
     ]);
+
+    const total = result[0]?.metadata[0]?.total || 0;
+    const reports = result[0]?.data || [];
 
     return {
       data: ReportMapper.toDomainList(reports),
@@ -139,11 +217,7 @@ export class ReportService {
   async update(id: string, updateReportDto: UpdateReportDto): Promise<IReport> {
     let resolvedLocationId: Types.ObjectId | null | undefined = undefined;
 
-    if (updateReportDto.location_id !== undefined) {
-      resolvedLocationId = updateReportDto.location_id
-        ? new Types.ObjectId(updateReportDto.location_id)
-        : null;
-    } else if (
+    if (
       updateReportDto.location &&
       updateReportDto.location.coordinates &&
       updateReportDto.location.coordinates.length === 2
