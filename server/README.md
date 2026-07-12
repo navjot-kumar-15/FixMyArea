@@ -2,6 +2,23 @@
 
 FixMyArea is a robust, modular civic problem-reporting backend API built on **NestJS** and **Mongoose (MongoDB)**. It provides a structured workflow connecting Citizens, Local Authorities, and Field Workers to report, assign, track, and resolve local public issues (potholes, street light failures, water leaks, etc.).
 
+> [!IMPORTANT]
+> **Project Status: Under Process (Work in Progress)**
+> This project is currently under active development. Certain components, such as Redis caching, production-ready storage integrations (AWS S3/Cloudinary), and strict role-based route guard validations are currently in-progress and utilize mocks or stubs to simplify local developer onboarding.
+
+---
+
+## 🎯 Why FixMyArea? (Project Purpose)
+
+In modern cities, public infrastructure issues like potholes, broken street lights, garbage pileups, and water leaks often go unresolved for weeks because of a gap in communication. Citizens don't know where or how to report them, municipal authorities lack a streamlined way to triage reports and dispatch workers, and workers lack a structured workflow to report progress.
+
+**FixMyArea** is designed to solve this by creating a direct, transparent loop:
+
+- **Empowering Citizens**: Enables any resident to report a civic issue instantly, upload photo evidence, provide automatic GPS coordinate resolution, and monitor the ticket's lifecycle.
+- **Streamlining Administration**: Provides city administrators with a central dashboard to analyze reports, classify categories/tags, verify issues, compute severity scores, and assign tasks to the correct municipal departments.
+- **Organizing Field Operations**: Gives field workers a structured queue to receive assignments, submit step-by-step progress updates (0% to 100%) with photo proof, and mark tickets as resolved for admin review.
+- **Fostering Accountability**: Promotes community oversight by allowing citizens to comment, upvote, downvote, and track public issues in their area.
+
 ---
 
 ## 🏗️ Project Architecture & Design Pattern
@@ -45,7 +62,11 @@ src/
 │   └── index.ts             # Exports loaded configurations
 ├── database/                # Database modules and connections
 │   ├── schemas/             # Mongoose schemas (snake_case collections and fields)
-│   ├── seeders/             # Database seeders (Roles, Categories)
+│   │   └── tag.schema.ts    # Tag database schema [NEW]
+│   ├── seeders/             # Database seeders
+│   │   ├── category.seeder.ts
+│   │   ├── role.seeder.ts
+│   │   └── tag.seeder.ts    # Seeds default tags [NEW]
 │   ├── database.module.ts
 │   ├── database.service.ts  # Database connection listeners and error helpers
 │   └── utils/
@@ -63,7 +84,8 @@ src/
 │   ├── comment/             # Threaded issue comments & conversations
 │   ├── assignment/          # Worker assignment workflows
 │   ├── progress-update/     # Multi-step progress tracking with image attachments
-│   └── media/               # File upload & storage (AWS S3 / Cloudinary)
+│   ├── media/               # File upload & storage (AWS S3 / Cloudinary)
+│   └── tag/                 # Tag management & labels (seeded automatically) [NEW]
 ├── setup/                   # NestJS bootstrap setup files
 │   ├── swagger.setup.ts     # Swagger UI documentation setup
 │   └── validation.setup.ts  # Global validation pipe setup
@@ -78,7 +100,7 @@ src/
 
 Instead of manually registering every schema in the database module, a custom `schema-loader.ts` dynamically parses files inside `src/database/schemas/`.
 
-- **Case Normalization**: It automatically extracts the file base name (e.g., `progress-update.schema.ts` or `user-role.schema.ts`), converts kebab-case/snake_case names into PascalCase (`ProgressUpdate`, `UserRole`), and registers them dynamically as Mongoose models.
+- **Case Normalization**: It automatically extracts the file base name (e.g., `progress-update.schema.ts` or `tag.schema.ts`), converts kebab-case/snake_case names into PascalCase (`ProgressUpdate`, `Tag`), and registers them dynamically as Mongoose models.
 - **Auto-Registration**: To define a new collection, simply add a `<name>.schema.ts` in `src/database/schemas/`. It will automatically be registered under the key `PascalCaseName` for `@InjectModel('PascalCaseName')`.
 
 ### 2. Controller-Service-Mapper Pattern
@@ -87,7 +109,7 @@ Instead of manually registering every schema in the database module, a custom `s
 - **Service**: Contains business rules, database transactions, state-tracking logic, and coordinates database operations.
 - **Mapper**: Sanitizes database models before sending them back. It defines:
   - `toDomain`: Converts MongoDB documents into domain interfaces.
-  - `toResponse`: Map domain data structures to clean Response DTO objects, purging internal system fields and converting database ObjectIds to string formats.
+  - `toResponse`: Maps domain data structures to clean Response DTO objects, purging internal system fields and converting database ObjectIds to string formats.
 
 ### 3. Automatic Location Resolution for Reports
 
@@ -111,14 +133,16 @@ erDiagram
     Report ||--o{ Assignment : "has"
     Report ||--o{ Comment : "receives"
     Report ||--o{ ProgressUpdate : "tracks"
+    Report ||--o{ Tag : "contains"
 ```
 
 - **`User`**: Linked to specific Roles. Can be an Admin, User (Citizen), or Worker.
 - **`Location`**: Represents administrative levels (country, state, city, area) with hierarchical parent-child relationships and GeoJSON coordinates.
-- **`Report`**: Has a direct link to `user_id` (Citizen creator), `category_id`, and `location_id` (identifying the administrative Location).
+- **`Report`**: Has a direct link to `user_id` (Citizen creator), `category_id`, `location_id`, and lists of `tags`.
 - **`Assignment`**: Connects a `report_id` to a `worker_id` (User) and tracks who assigned it (`assigned_by` Admin User ID).
 - **`Comment`**: Connects `report_id` to the author `user_id`. Supports threading via optional `parent_comment_id`.
 - **`ProgressUpdate`**: Posted by the assigned `worker_id` for a specific `report_id`. Optionally verified by an Admin via `verified_by`.
+- **`Tag`**: General-purpose labeling entity used to organize and query reports (e.g. "Urgent", "Hazard").
 
 ---
 
@@ -134,6 +158,7 @@ erDiagram
 8. **`progress-update`**: Tracks repair progress (0-100%) posted by field workers, storing notes and attachments.
 9. **`media`**: General-purpose upload/delete helper. Instantiates either AWS S3 or Cloudinary provider strategies depending on env configurations.
 10. **`location`**: Manages administrative levels (e.g. Area, City, State, Country) via a hierarchical structure and handles geospatial queries for mapping reports to specific service areas.
+11. **`tag`**: Handles issue labels and categorization (e.g. `Urgent`, `Hazard`, `Road Safety`). Populated automatically on application bootstrap.
 
 ---
 
@@ -149,7 +174,7 @@ For easier local development, some integrations are mocked or fall back to simul
   - Currently, these providers are mock implementations for development, returning mock image URLs and public IDs.
 - **Redis (`RedisService`)**:
   - A stub implementation is provided with key-value set/get placeholders. Actual Redis integration is pending.
-- **Role & Category Seeders**:
+- **Role, Category & Tag Seeders**:
   - Run on application startup using Nest's `OnApplicationBootstrap` interface. They automatically seed default database collections, updating them if configuration changes.
 
 ---
@@ -215,7 +240,7 @@ Start the application in development watch mode:
 npm run start:dev
 ```
 
-Once started, the application will automatically seed the roles and categories into the MongoDB database.
+Once started, the application will automatically seed the roles, categories, and tags into the MongoDB database.
 
 ### 4. Interactive Swagger Documentation
 
