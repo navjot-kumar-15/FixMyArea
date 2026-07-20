@@ -38,13 +38,14 @@ export const DEMO_USERS: Record<Exclude<UserRole, 'guest'>, User> = {
   },
 };
 
-const savedUser = localStorage.getItem('civic_user');
+const savedUserStr = localStorage.getItem('civic_user');
 const savedToken = localStorage.getItem('civic_access_token');
+const savedUser = savedUserStr ? JSON.parse(savedUserStr) : null;
 
 const initialState: AuthState = {
-  user: savedUser ? JSON.parse(savedUser) : DEMO_USERS.citizen, // Default to demo citizen
-  token: savedToken || 'demo-jwt-token-12345',
-  isAuthenticated: true,
+  user: savedUser,
+  token: savedToken,
+  isAuthenticated: !!(savedUser && savedToken),
   loading: false,
   error: null,
 };

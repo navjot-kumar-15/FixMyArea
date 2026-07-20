@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 // Layouts
 import { GuestLayout } from '@/layouts/GuestLayout';
@@ -12,37 +13,37 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 import { RoleBasedRoute } from '@/routes/RoleBasedRoute';
 
-// Pages
-import { LandingPage } from '@/features/guest/pages/LandingPage';
-import { LoginPage } from '@/features/auth/pages/LoginPage';
-import { RegisterPage } from '@/features/auth/pages/RegisterPage';
-import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage';
+// Lazy Loaded Pages
+const LandingPage = lazy(() => import('@/features/guest/pages/LandingPage').then((m) => ({ default: m.LandingPage })));
+const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('@/features/auth/pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
+const ForgotPasswordPage = lazy(() => import('@/features/auth/pages/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage })));
 
 // Citizen Pages
-import { CitizenDashboard } from '@/features/reports/pages/CitizenDashboard';
-import { CreateReportWizard } from '@/features/reports/pages/CreateReportWizard';
-import { ReportDetailsPage } from '@/features/reports/pages/ReportDetailsPage';
-import { MyReportsPage } from '@/features/reports/pages/MyReportsPage';
-import { NearbyIssuesMapPage } from '@/features/reports/pages/NearbyIssuesMapPage';
-import { BookmarksPage } from '@/features/reports/pages/BookmarksPage';
-import { ProfilePage } from '@/features/reports/pages/ProfilePage';
-import { HelpCenterPage } from '@/features/reports/pages/HelpCenterPage';
+const CitizenDashboard = lazy(() => import('@/features/reports/pages/CitizenDashboard').then((m) => ({ default: m.CitizenDashboard })));
+const CreateReportWizard = lazy(() => import('@/features/reports/pages/CreateReportWizard').then((m) => ({ default: m.CreateReportWizard })));
+const ReportDetailsPage = lazy(() => import('@/features/reports/pages/ReportDetailsPage').then((m) => ({ default: m.ReportDetailsPage })));
+const MyReportsPage = lazy(() => import('@/features/reports/pages/MyReportsPage').then((m) => ({ default: m.MyReportsPage })));
+const NearbyIssuesMapPage = lazy(() => import('@/features/reports/pages/NearbyIssuesMapPage').then((m) => ({ default: m.NearbyIssuesMapPage })));
+const BookmarksPage = lazy(() => import('@/features/reports/pages/BookmarksPage').then((m) => ({ default: m.BookmarksPage })));
+const ProfilePage = lazy(() => import('@/features/reports/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const HelpCenterPage = lazy(() => import('@/features/reports/pages/HelpCenterPage').then((m) => ({ default: m.HelpCenterPage })));
 
 // Worker Pages
-import { WorkerDashboard } from '@/features/workers/pages/WorkerDashboard';
-import { WorkerTasksPage } from '@/features/workers/pages/WorkerTasksPage';
-import { WorkerCalendarPage } from '@/features/workers/pages/WorkerCalendarPage';
-import { WorkerHistoryPage } from '@/features/workers/pages/WorkerHistoryPage';
+const WorkerDashboard = lazy(() => import('@/features/workers/pages/WorkerDashboard').then((m) => ({ default: m.WorkerDashboard })));
+const WorkerTasksPage = lazy(() => import('@/features/workers/pages/WorkerTasksPage').then((m) => ({ default: m.WorkerTasksPage })));
+const WorkerCalendarPage = lazy(() => import('@/features/workers/pages/WorkerCalendarPage').then((m) => ({ default: m.WorkerCalendarPage })));
+const WorkerHistoryPage = lazy(() => import('@/features/workers/pages/WorkerHistoryPage').then((m) => ({ default: m.WorkerHistoryPage })));
 
 // Admin Pages
-import { AdminDashboard } from '@/features/admin/pages/AdminDashboard';
-import { AdminReportsPage } from '@/features/admin/pages/AdminReportsPage';
-import { AdminWorkersPage } from '@/features/admin/pages/AdminWorkersPage';
-import { AdminUsersPage } from '@/features/admin/pages/AdminUsersPage';
-import { AdminServiceAreasPage } from '@/features/admin/pages/AdminServiceAreasPage';
-import { AdminAnalyticsPage } from '@/features/admin/pages/AdminAnalyticsPage';
-import { AdminAuditLogsPage } from '@/features/admin/pages/AdminAuditLogsPage';
-import { AdminSettingsPage } from '@/features/admin/pages/AdminSettingsPage';
+const AdminDashboard = lazy(() => import('@/features/admin/pages/AdminDashboard').then((m) => ({ default: m.AdminDashboard })));
+const AdminReportsPage = lazy(() => import('@/features/admin/pages/AdminReportsPage').then((m) => ({ default: m.AdminReportsPage })));
+const AdminWorkersPage = lazy(() => import('@/features/admin/pages/AdminWorkersPage').then((m) => ({ default: m.AdminWorkersPage })));
+const AdminUsersPage = lazy(() => import('@/features/admin/pages/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
+const AdminServiceAreasPage = lazy(() => import('@/features/admin/pages/AdminServiceAreasPage').then((m) => ({ default: m.AdminServiceAreasPage })));
+const AdminAnalyticsPage = lazy(() => import('@/features/admin/pages/AdminAnalyticsPage').then((m) => ({ default: m.AdminAnalyticsPage })));
+const AdminAuditLogsPage = lazy(() => import('@/features/admin/pages/AdminAuditLogsPage').then((m) => ({ default: m.AdminAuditLogsPage })));
+const AdminSettingsPage = lazy(() => import('@/features/admin/pages/AdminSettingsPage').then((m) => ({ default: m.AdminSettingsPage })));
 
 const router = createBrowserRouter([
   // Public Landing Page
@@ -50,7 +51,9 @@ const router = createBrowserRouter([
     path: '/',
     element: (
       <GuestLayout>
-        <LandingPage />
+        <Suspense fallback={<PageLoader />}>
+          <LandingPage />
+        </Suspense>
       </GuestLayout>
     ),
   },
@@ -60,7 +63,9 @@ const router = createBrowserRouter([
     path: '/login',
     element: (
       <AuthLayout>
-        <LoginPage />
+        <Suspense fallback={<PageLoader />}>
+          <LoginPage />
+        </Suspense>
       </AuthLayout>
     ),
   },
@@ -68,7 +73,9 @@ const router = createBrowserRouter([
     path: '/register',
     element: (
       <AuthLayout>
-        <RegisterPage />
+        <Suspense fallback={<PageLoader />}>
+          <RegisterPage />
+        </Suspense>
       </AuthLayout>
     ),
   },
@@ -76,7 +83,9 @@ const router = createBrowserRouter([
     path: '/forgot-password',
     element: (
       <AuthLayout>
-        <ForgotPasswordPage />
+        <Suspense fallback={<PageLoader />}>
+          <ForgotPasswordPage />
+        </Suspense>
       </AuthLayout>
     ),
   },
@@ -87,7 +96,9 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CitizenLayout>
-          <CitizenDashboard />
+          <Suspense fallback={<PageLoader />}>
+            <CitizenDashboard />
+          </Suspense>
         </CitizenLayout>
       </ProtectedRoute>
     ),
@@ -97,7 +108,9 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CitizenLayout>
-          <CreateReportWizard />
+          <Suspense fallback={<PageLoader />}>
+            <CreateReportWizard />
+          </Suspense>
         </CitizenLayout>
       </ProtectedRoute>
     ),
@@ -107,7 +120,9 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CitizenLayout>
-          <ReportDetailsPage />
+          <Suspense fallback={<PageLoader />}>
+            <ReportDetailsPage />
+          </Suspense>
         </CitizenLayout>
       </ProtectedRoute>
     ),
@@ -117,7 +132,9 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CitizenLayout>
-          <MyReportsPage />
+          <Suspense fallback={<PageLoader />}>
+            <MyReportsPage />
+          </Suspense>
         </CitizenLayout>
       </ProtectedRoute>
     ),
@@ -127,7 +144,9 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CitizenLayout>
-          <NearbyIssuesMapPage />
+          <Suspense fallback={<PageLoader />}>
+            <NearbyIssuesMapPage />
+          </Suspense>
         </CitizenLayout>
       </ProtectedRoute>
     ),
@@ -137,7 +156,9 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CitizenLayout>
-          <BookmarksPage />
+          <Suspense fallback={<PageLoader />}>
+            <BookmarksPage />
+          </Suspense>
         </CitizenLayout>
       </ProtectedRoute>
     ),
@@ -147,7 +168,9 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CitizenLayout>
-          <ProfilePage />
+          <Suspense fallback={<PageLoader />}>
+            <ProfilePage />
+          </Suspense>
         </CitizenLayout>
       </ProtectedRoute>
     ),
@@ -157,7 +180,9 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CitizenLayout>
-          <HelpCenterPage />
+          <Suspense fallback={<PageLoader />}>
+            <HelpCenterPage />
+          </Suspense>
         </CitizenLayout>
       </ProtectedRoute>
     ),
@@ -170,7 +195,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['worker', 'admin']}>
           <WorkerLayout>
-            <WorkerDashboard />
+            <Suspense fallback={<PageLoader />}>
+              <WorkerDashboard />
+            </Suspense>
           </WorkerLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
@@ -182,7 +209,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['worker', 'admin']}>
           <WorkerLayout>
-            <WorkerTasksPage />
+            <Suspense fallback={<PageLoader />}>
+              <WorkerTasksPage />
+            </Suspense>
           </WorkerLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
@@ -194,7 +223,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['worker', 'admin']}>
           <WorkerLayout>
-            <WorkerCalendarPage />
+            <Suspense fallback={<PageLoader />}>
+              <WorkerCalendarPage />
+            </Suspense>
           </WorkerLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
@@ -206,7 +237,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['worker', 'admin']}>
           <WorkerLayout>
-            <WorkerHistoryPage />
+            <Suspense fallback={<PageLoader />}>
+              <WorkerHistoryPage />
+            </Suspense>
           </WorkerLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
@@ -220,7 +253,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['admin']}>
           <AdminLayout>
-            <AdminDashboard />
+            <Suspense fallback={<PageLoader />}>
+              <AdminDashboard />
+            </Suspense>
           </AdminLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
@@ -232,7 +267,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['admin']}>
           <AdminLayout>
-            <AdminReportsPage />
+            <Suspense fallback={<PageLoader />}>
+              <AdminReportsPage />
+            </Suspense>
           </AdminLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
@@ -244,7 +281,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['admin']}>
           <AdminLayout>
-            <AdminWorkersPage />
+            <Suspense fallback={<PageLoader />}>
+              <AdminWorkersPage />
+            </Suspense>
           </AdminLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
@@ -256,7 +295,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['admin']}>
           <AdminLayout>
-            <AdminUsersPage />
+            <Suspense fallback={<PageLoader />}>
+              <AdminUsersPage />
+            </Suspense>
           </AdminLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
@@ -268,7 +309,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['admin']}>
           <AdminLayout>
-            <AdminServiceAreasPage />
+            <Suspense fallback={<PageLoader />}>
+              <AdminServiceAreasPage />
+            </Suspense>
           </AdminLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
@@ -280,7 +323,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['admin']}>
           <AdminLayout>
-            <AdminAnalyticsPage />
+            <Suspense fallback={<PageLoader />}>
+              <AdminAnalyticsPage />
+            </Suspense>
           </AdminLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
@@ -292,7 +337,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['admin']}>
           <AdminLayout>
-            <AdminAuditLogsPage />
+            <Suspense fallback={<PageLoader />}>
+              <AdminAuditLogsPage />
+            </Suspense>
           </AdminLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
@@ -304,7 +351,9 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <RoleBasedRoute allowedRoles={['admin']}>
           <AdminLayout>
-            <AdminSettingsPage />
+            <Suspense fallback={<PageLoader />}>
+              <AdminSettingsPage />
+            </Suspense>
           </AdminLayout>
         </RoleBasedRoute>
       </ProtectedRoute>
