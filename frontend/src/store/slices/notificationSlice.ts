@@ -34,11 +34,13 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
 interface NotificationState {
   items: NotificationItem[];
   isOpen: boolean;
+  isDrawerOpen: boolean;
 }
 
 const initialState: NotificationState = {
   items: INITIAL_NOTIFICATIONS,
   isOpen: false,
+  isDrawerOpen: false,
 };
 
 export const notificationSlice = createSlice({
@@ -47,6 +49,11 @@ export const notificationSlice = createSlice({
   reducers: {
     toggleNotificationDrawer: (state) => {
       state.isOpen = !state.isOpen;
+      state.isDrawerOpen = state.isOpen;
+    },
+    closeNotificationDrawer: (state) => {
+      state.isOpen = false;
+      state.isDrawerOpen = false;
     },
     markAsRead: (state, action: PayloadAction<string>) => {
       const item = state.items.find((n) => n.id === action.payload);
@@ -76,6 +83,7 @@ export const notificationSlice = createSlice({
 
 export const {
   toggleNotificationDrawer,
+  closeNotificationDrawer,
   markAsRead,
   markAllAsRead,
   addNotification,

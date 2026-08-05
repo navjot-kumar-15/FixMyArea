@@ -1,9 +1,9 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { RootState } from '@/store';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { StatusChip, PriorityChip } from '@/components/ui/StatusChip';
+import { GlassCard, MagneticButton, StatWidget, StatusBadge } from '@/components/ui/DesignSystem';
 import { Avatar } from '@/components/ui/Avatar';
 import {
   FileText,
@@ -12,10 +12,15 @@ import {
   AlertTriangle,
   TrendingUp,
   ShieldCheck,
-  Layers,
-  BarChart2,
   Radio,
   Sparkles,
+  PieChart as PieIcon,
+  Activity,
+  Layers,
+  MapPin,
+  PlusCircle,
+  Briefcase,
+  BarChart3,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -30,6 +35,7 @@ import {
 } from 'recharts';
 
 export const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const reports = useSelector((state: RootState) => state.reports.reports);
   const workers = useSelector((state: RootState) => state.workers.workers);
 
@@ -46,174 +52,211 @@ export const AdminDashboard: React.FC = () => {
   ];
 
   const categoryDistribution = [
-    { name: 'Pothole', value: 35, color: '#6366f1' },
-    { name: 'Streetlight', value: 25, color: '#a855f7' },
+    { name: 'Potholes', value: 35, color: '#6366f1' },
+    { name: 'Streetlights', value: 25, color: '#a855f7' },
     { name: 'Water Leak', value: 20, color: '#10b981' },
-    { name: 'Garbage', value: 15, color: '#f59e0b' },
-    { name: 'Other', value: 5, color: '#64748b' },
+    { name: 'Sanitation', value: 15, color: '#f59e0b' },
+    { name: 'Parks', value: 5, color: '#06b6d4' },
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
-  };
-
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="space-y-8 pb-16"
-    >
-      {/* Executive Command Header Banner */}
-      <motion.div
-        variants={itemVariants}
-        className="rounded-3xl bg-slate-950 p-8 text-white shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-slate-800 relative overflow-hidden shimmer-card"
-      >
-        <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-extrabold animate-pulse">
-          <Radio className="w-3.5 h-3.5" /> LIVE TELEMETRY STREAM
+    <div className="space-y-8 pb-16">
+      {/* Operations Command Header */}
+      <GlassCard className="p-6 md:p-8 border border-indigo-500/30 glow-card relative overflow-hidden">
+        <div className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold font-display animate-pulse">
+          <Radio className="w-4 h-4 text-emerald-500" /> LIVE DISPATCH MATRIX
         </div>
 
-        <div className="space-y-2 z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-xs font-bold text-indigo-300">
-            <ShieldCheck className="w-4 h-4 text-indigo-400" /> Executive Command Center
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-bold text-indigo-600 dark:text-indigo-300 font-display">
+              <ShieldCheck className="w-4 h-4 text-indigo-500" /> Executive Operations Command
+            </div>
+
+            <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight font-display">
+              City Operations Console
+            </h1>
+
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+              Real-time municipal telemetry stream, worker load balancing, emergency dispatch management, and SLA compliance.
+            </p>
           </div>
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">CivicConnect Console</h1>
-          <p className="text-xs text-slate-400 max-w-lg font-medium">
-            Real-time municipal telemetry, dispatch orchestration, worker load balancing, and SLA compliance metrics.
-          </p>
+
+          {/* Quick Command Buttons */}
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <MagneticButton
+              variant="accent"
+              size="md"
+              icon={PlusCircle}
+              onClick={() => navigate('/report')}
+            >
+              Report Issue
+            </MagneticButton>
+
+            <MagneticButton
+              variant="primary"
+              size="md"
+              icon={Users}
+              onClick={() => navigate('/admin/users')}
+            >
+              Add/Manage Users
+            </MagneticButton>
+          </div>
         </div>
-      </motion.div>
+      </GlassCard>
 
       {/* Metrics Row */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {[
-          { label: 'Total System Reports', val: reports.length, icon: FileText, color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
-          { label: 'Pending Dispatch', val: pendingCount, icon: AlertTriangle, color: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-          { label: 'Verified Resolved', val: resolvedCount, icon: CheckCircle2, color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
-          { label: 'Active Field Crews', val: workers.length, icon: Users, color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
-        ].map((item, idx) => {
-          const Icon = item.icon;
-          return (
-            <Card key={idx} glass hoverEffect className={`p-5 border ${item.color}`}>
-              <CardContent className="p-0 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0">
-                  <Icon className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{item.val}</div>
-                  <div className="text-xs font-extrabold text-slate-400">{item.label}</div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </motion.div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <StatWidget
+          title="Total System Reports"
+          value={reports.length}
+          subtitle="All Municipal Sectors"
+          trend="+14% this month"
+          trendDirection="up"
+          icon={FileText}
+          gradient="from-indigo-600 to-indigo-500"
+        />
+
+        <StatWidget
+          title="Pending Dispatch"
+          value={pendingCount}
+          subtitle="Awaiting Field Unit"
+          trend="-2 unassigned"
+          trendDirection="down"
+          icon={AlertTriangle}
+          gradient="from-amber-500 to-orange-600"
+        />
+
+        <StatWidget
+          title="Verified Resolved"
+          value={resolvedCount}
+          subtitle="Community Confirmed"
+          trend="98.2% Resolution SLA"
+          trendDirection="up"
+          icon={CheckCircle2}
+          gradient="from-emerald-500 to-teal-600"
+        />
+
+        <StatWidget
+          title="Active Field Units"
+          value={workers.length}
+          subtitle="Patrolling Sector 4"
+          trend="100% Active Duty"
+          trendDirection="up"
+          icon={Users}
+          gradient="from-purple-600 to-pink-600"
+        />
+      </div>
 
       {/* Analytics Charts Grid */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Issue Trends Area Chart */}
-        <Card glass className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-indigo-400" /> Monthly Issue Inflow & Resolution Velocity
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="h-72">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Area Chart: Report Inflow vs Velocity */}
+        <GlassCard className="lg:col-span-2 p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/60 pb-4">
+            <h3 className="text-lg font-extrabold text-slate-900 dark:text-white font-display flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-indigo-500" /> Monthly Report Inflow & Resolution Velocity
+            </h3>
+            <span className="text-xs font-bold text-slate-500">2026 Q1-Q2</span>
+          </div>
+
+          <div className="h-72 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={monthlyData}>
                 <defs>
                   <linearGradient id="colorReports" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8} />
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.7} />
                     <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorResolved" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.7} />
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="month" stroke="#64748b" fontSize={11} tickLine={false} />
                 <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#090d1a', borderColor: '#1e293b', borderRadius: '12px' }} />
-                <Area type="monotone" dataKey="reports" stroke="#6366f1" strokeWidth={2.5} fillOpacity={1} fill="url(#colorReports)" />
-                <Area type="monotone" dataKey="resolved" stroke="#10b981" strokeWidth={2.5} fillOpacity={1} fill="url(#colorResolved)" />
+                <Tooltip contentStyle={{ backgroundColor: '#090d1a', borderColor: '#1e293b', borderRadius: '14px', color: '#fff' }} />
+                <Area type="monotone" dataKey="reports" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorReports)" />
+                <Area type="monotone" dataKey="resolved" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorResolved)" />
               </AreaChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          </div>
+        </GlassCard>
 
-        {/* Category Breakdown Pie Chart */}
-        <Card glass>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <BarChart2 className="w-5 h-5 text-purple-400" /> Category Breakdown
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="h-72 flex flex-col items-center justify-center">
-            <ResponsiveContainer width="100%" height="80%">
+        {/* Pie Chart: Issue Category Density */}
+        <GlassCard className="p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/60 pb-4">
+            <h3 className="text-lg font-extrabold text-slate-900 dark:text-white font-display flex items-center gap-2">
+              <PieIcon className="w-5 h-5 text-purple-500" /> Category Density
+            </h3>
+          </div>
+
+          <div className="h-64 w-full flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={categoryDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} labelLine={false}>
+                <Pie data={categoryDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} innerRadius={45} paddingAngle={4} labelLine={false}>
                   {categoryDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: '#090d1a', borderColor: '#1e293b', borderRadius: '12px' }} />
+                <Tooltip contentStyle={{ backgroundColor: '#090d1a', borderColor: '#1e293b', borderRadius: '14px', color: '#fff' }} />
               </PieChart>
             </ResponsiveContainer>
-            <div className="flex flex-wrap justify-center gap-3 text-[10px] text-slate-400">
-              {categoryDistribution.map((cat) => (
-                <span key={cat.name} className="flex items-center gap-1 font-extrabold">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
-                  {cat.name}
-                </span>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+          </div>
 
-      {/* Field Worker Workload Monitor */}
-      <motion.div variants={itemVariants}>
-        <Card glass>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Users className="w-5 h-5 text-emerald-400" /> Active Field Workers & Dispatch Workload
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="divide-y divide-slate-100 dark:divide-slate-850">
-              {workers.map((worker) => (
-                <div key={worker.id} className="py-4 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar src={worker.avatarUrl} name={worker.name} size="md" />
-                    <div>
-                      <div className="text-sm font-extrabold text-slate-900 dark:text-white">{worker.name}</div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                        {worker.specialization} • <span className="text-indigo-400 font-semibold">{worker.assignedArea}</span>
-                      </div>
-                    </div>
-                  </div>
+          <div className="flex flex-wrap justify-center gap-3 text-xs text-slate-600 dark:text-slate-400">
+            {categoryDistribution.map((cat) => (
+              <span key={cat.name} className="flex items-center gap-1 font-semibold">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
+                {cat.name}
+              </span>
+            ))}
+          </div>
+        </GlassCard>
+      </div>
 
-                  <div className="flex items-center gap-6">
-                    <div className="text-right">
-                      <div className="text-xs font-black text-slate-900 dark:text-white">{worker.activeTasksCount} Active Orders</div>
-                      <div className="text-[11px] text-slate-400 font-bold">{worker.completedTasksCount} Resolved</div>
-                    </div>
-                    <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
-                      <Radio className="w-3 h-3 text-amber-400 animate-pulse" /> {worker.rating} Rating
-                    </span>
-                  </div>
+      {/* Field Worker Workload Command Monitor */}
+      <GlassCard className="p-6 space-y-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/60 dark:border-slate-800/60 pb-4">
+          <h3 className="text-lg font-extrabold text-slate-900 dark:text-white font-display flex items-center gap-2">
+            <Activity className="w-5 h-5 text-emerald-500" /> Active Field Dispatch & Workload Balance
+          </h3>
+          <MagneticButton
+            variant="glass"
+            size="sm"
+            icon={Briefcase}
+            onClick={() => navigate('/admin/workers')}
+          >
+            Roster Details
+          </MagneticButton>
+        </div>
+
+        <div className="divide-y divide-slate-200/60 dark:divide-slate-800/60">
+          {workers.map((worker) => (
+            <div key={worker.id} className="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Avatar src={worker.avatarUrl} name={worker.name} size="md" />
+                <div>
+                  <h4 className="text-base font-extrabold text-slate-900 dark:text-white font-display">{worker.name}</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    {worker.specialization} • Sector: <span className="text-indigo-500 font-semibold">{worker.assignedArea}</span>
+                  </p>
                 </div>
-              ))}
+              </div>
+
+              <div className="flex items-center gap-6">
+                <div className="text-right">
+                  <div className="text-sm font-extrabold text-slate-900 dark:text-white font-display">{worker.activeTasksCount} Active Dispatch</div>
+                  <div className="text-xs text-slate-400 font-medium">{worker.completedTasksCount} Resolved Total</div>
+                </div>
+
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-display">
+                  ⭐ {worker.rating} Rating
+                </span>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </motion.div>
+          ))}
+        </div>
+      </GlassCard>
+    </div>
   );
 };

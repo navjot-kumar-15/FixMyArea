@@ -1,6 +1,7 @@
-import React, { Suspense, lazy } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { CommandPalette } from '@/components/ui/CommandPalette';
 
 // Layouts
 import { GuestLayout } from '@/layouts/GuestLayout';
@@ -45,319 +46,346 @@ const AdminAnalyticsPage = lazy(() => import('@/features/admin/pages/AdminAnalyt
 const AdminAuditLogsPage = lazy(() => import('@/features/admin/pages/AdminAuditLogsPage').then((m) => ({ default: m.AdminAuditLogsPage })));
 const AdminSettingsPage = lazy(() => import('@/features/admin/pages/AdminSettingsPage').then((m) => ({ default: m.AdminSettingsPage })));
 
+const RootLayout: React.FC = () => {
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  return (
+    <>
+      <Outlet />
+      <CommandPalette isOpen={isCommandOpen} onClose={() => setIsCommandOpen(false)} />
+    </>
+  );
+};
+
 const router = createBrowserRouter([
-  // Public Landing Page
   {
-    path: '/',
-    element: (
-      <GuestLayout>
-        <Suspense fallback={<PageLoader />}>
-          <LandingPage />
-        </Suspense>
-      </GuestLayout>
-    ),
-  },
+    element: <RootLayout />,
+    children: [
+      // Public Landing Page
+      {
+        path: '/',
+        element: (
+          <GuestLayout>
+            <Suspense fallback={<PageLoader />}>
+              <LandingPage />
+            </Suspense>
+          </GuestLayout>
+        ),
+      },
 
-  // Auth Routes
-  {
-    path: '/login',
-    element: (
-      <AuthLayout>
-        <Suspense fallback={<PageLoader />}>
-          <LoginPage />
-        </Suspense>
-      </AuthLayout>
-    ),
-  },
-  {
-    path: '/register',
-    element: (
-      <AuthLayout>
-        <Suspense fallback={<PageLoader />}>
-          <RegisterPage />
-        </Suspense>
-      </AuthLayout>
-    ),
-  },
-  {
-    path: '/forgot-password',
-    element: (
-      <AuthLayout>
-        <Suspense fallback={<PageLoader />}>
-          <ForgotPasswordPage />
-        </Suspense>
-      </AuthLayout>
-    ),
-  },
+      // Auth Routes
+      {
+        path: '/login',
+        element: (
+          <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <LoginPage />
+            </Suspense>
+          </AuthLayout>
+        ),
+      },
+      {
+        path: '/register',
+        element: (
+          <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <RegisterPage />
+            </Suspense>
+          </AuthLayout>
+        ),
+      },
+      {
+        path: '/forgot-password',
+        element: (
+          <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <ForgotPasswordPage />
+            </Suspense>
+          </AuthLayout>
+        ),
+      },
 
-  // Citizen Domain Routes
-  {
-    path: '/dashboard',
-    element: (
-      <ProtectedRoute>
-        <CitizenLayout>
-          <Suspense fallback={<PageLoader />}>
-            <CitizenDashboard />
-          </Suspense>
-        </CitizenLayout>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/report',
-    element: (
-      <ProtectedRoute>
-        <CitizenLayout>
-          <Suspense fallback={<PageLoader />}>
-            <CreateReportWizard />
-          </Suspense>
-        </CitizenLayout>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/report/:id',
-    element: (
-      <ProtectedRoute>
-        <CitizenLayout>
-          <Suspense fallback={<PageLoader />}>
-            <ReportDetailsPage />
-          </Suspense>
-        </CitizenLayout>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/my-reports',
-    element: (
-      <ProtectedRoute>
-        <CitizenLayout>
-          <Suspense fallback={<PageLoader />}>
-            <MyReportsPage />
-          </Suspense>
-        </CitizenLayout>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/map',
-    element: (
-      <ProtectedRoute>
-        <CitizenLayout>
-          <Suspense fallback={<PageLoader />}>
-            <NearbyIssuesMapPage />
-          </Suspense>
-        </CitizenLayout>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/bookmarks',
-    element: (
-      <ProtectedRoute>
-        <CitizenLayout>
-          <Suspense fallback={<PageLoader />}>
-            <BookmarksPage />
-          </Suspense>
-        </CitizenLayout>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/profile',
-    element: (
-      <ProtectedRoute>
-        <CitizenLayout>
-          <Suspense fallback={<PageLoader />}>
-            <ProfilePage />
-          </Suspense>
-        </CitizenLayout>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/help',
-    element: (
-      <ProtectedRoute>
-        <CitizenLayout>
-          <Suspense fallback={<PageLoader />}>
-            <HelpCenterPage />
-          </Suspense>
-        </CitizenLayout>
-      </ProtectedRoute>
-    ),
-  },
+      // Citizen Domain Routes
+      {
+        path: '/dashboard',
+        element: (
+          <ProtectedRoute>
+            <CitizenLayout>
+              <Suspense fallback={<PageLoader />}>
+                <CitizenDashboard />
+              </Suspense>
+            </CitizenLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/report',
+        element: (
+          <ProtectedRoute>
+            <CitizenLayout>
+              <Suspense fallback={<PageLoader />}>
+                <CreateReportWizard />
+              </Suspense>
+            </CitizenLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/report/:id',
+        element: (
+          <ProtectedRoute>
+            <CitizenLayout>
+              <Suspense fallback={<PageLoader />}>
+                <ReportDetailsPage />
+              </Suspense>
+            </CitizenLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my-reports',
+        element: (
+          <ProtectedRoute>
+            <CitizenLayout>
+              <Suspense fallback={<PageLoader />}>
+                <MyReportsPage />
+              </Suspense>
+            </CitizenLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/map',
+        element: (
+          <ProtectedRoute>
+            <CitizenLayout>
+              <Suspense fallback={<PageLoader />}>
+                <NearbyIssuesMapPage />
+              </Suspense>
+            </CitizenLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/bookmarks',
+        element: (
+          <ProtectedRoute>
+            <CitizenLayout>
+              <Suspense fallback={<PageLoader />}>
+                <BookmarksPage />
+              </Suspense>
+            </CitizenLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/profile',
+        element: (
+          <ProtectedRoute>
+            <CitizenLayout>
+              <Suspense fallback={<PageLoader />}>
+                <ProfilePage />
+              </Suspense>
+            </CitizenLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/help',
+        element: (
+          <ProtectedRoute>
+            <CitizenLayout>
+              <Suspense fallback={<PageLoader />}>
+                <HelpCenterPage />
+              </Suspense>
+            </CitizenLayout>
+          </ProtectedRoute>
+        ),
+      },
 
-  // Worker Domain Routes
-  {
-    path: '/worker/dashboard',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['worker', 'admin']}>
-          <WorkerLayout>
-            <Suspense fallback={<PageLoader />}>
-              <WorkerDashboard />
-            </Suspense>
-          </WorkerLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/worker/tasks',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['worker', 'admin']}>
-          <WorkerLayout>
-            <Suspense fallback={<PageLoader />}>
-              <WorkerTasksPage />
-            </Suspense>
-          </WorkerLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/worker/calendar',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['worker', 'admin']}>
-          <WorkerLayout>
-            <Suspense fallback={<PageLoader />}>
-              <WorkerCalendarPage />
-            </Suspense>
-          </WorkerLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/worker/history',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['worker', 'admin']}>
-          <WorkerLayout>
-            <Suspense fallback={<PageLoader />}>
-              <WorkerHistoryPage />
-            </Suspense>
-          </WorkerLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
-  },
+      // Worker Domain Routes
+      {
+        path: '/worker/dashboard',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['worker', 'admin']}>
+              <WorkerLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <WorkerDashboard />
+                </Suspense>
+              </WorkerLayout>
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/worker/tasks',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['worker', 'admin']}>
+              <WorkerLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <WorkerTasksPage />
+                </Suspense>
+              </WorkerLayout>
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/worker/calendar',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['worker', 'admin']}>
+              <WorkerLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <WorkerCalendarPage />
+                </Suspense>
+              </WorkerLayout>
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/worker/history',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['worker', 'admin']}>
+              <WorkerLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <WorkerHistoryPage />
+                </Suspense>
+              </WorkerLayout>
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
 
-  // Admin Domain Routes
-  {
-    path: '/admin/dashboard',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['admin']}>
-          <AdminLayout>
-            <Suspense fallback={<PageLoader />}>
-              <AdminDashboard />
-            </Suspense>
-          </AdminLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/admin/reports',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['admin']}>
-          <AdminLayout>
-            <Suspense fallback={<PageLoader />}>
-              <AdminReportsPage />
-            </Suspense>
-          </AdminLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/admin/workers',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['admin']}>
-          <AdminLayout>
-            <Suspense fallback={<PageLoader />}>
-              <AdminWorkersPage />
-            </Suspense>
-          </AdminLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/admin/users',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['admin']}>
-          <AdminLayout>
-            <Suspense fallback={<PageLoader />}>
-              <AdminUsersPage />
-            </Suspense>
-          </AdminLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/admin/areas',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['admin']}>
-          <AdminLayout>
-            <Suspense fallback={<PageLoader />}>
-              <AdminServiceAreasPage />
-            </Suspense>
-          </AdminLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/admin/analytics',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['admin']}>
-          <AdminLayout>
-            <Suspense fallback={<PageLoader />}>
-              <AdminAnalyticsPage />
-            </Suspense>
-          </AdminLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/admin/audit',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['admin']}>
-          <AdminLayout>
-            <Suspense fallback={<PageLoader />}>
-              <AdminAuditLogsPage />
-            </Suspense>
-          </AdminLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/admin/settings',
-    element: (
-      <ProtectedRoute>
-        <RoleBasedRoute allowedRoles={['admin']}>
-          <AdminLayout>
-            <Suspense fallback={<PageLoader />}>
-              <AdminSettingsPage />
-            </Suspense>
-          </AdminLayout>
-        </RoleBasedRoute>
-      </ProtectedRoute>
-    ),
+      // Admin Domain Routes
+      {
+        path: '/admin/dashboard',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <AdminLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <AdminDashboard />
+                </Suspense>
+                </AdminLayout>
+              </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/reports',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <AdminLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <AdminReportsPage />
+                </Suspense>
+              </AdminLayout>
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/workers',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <AdminLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <AdminWorkersPage />
+                </Suspense>
+              </AdminLayout>
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/users',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <AdminLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <AdminUsersPage />
+                </Suspense>
+              </AdminLayout>
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/areas',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <AdminLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <AdminServiceAreasPage />
+                </Suspense>
+              </AdminLayout>
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/analytics',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <AdminLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <AdminAnalyticsPage />
+                </Suspense>
+              </AdminLayout>
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/audit',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <AdminLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <AdminAuditLogsPage />
+                </Suspense>
+              </AdminLayout>
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/settings',
+        element: (
+          <ProtectedRoute>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <AdminLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <AdminSettingsPage />
+                </Suspense>
+              </AdminLayout>
+            </RoleBasedRoute>
+          </ProtectedRoute>
+        ),
+      },
+    ],
   },
 ]);
 

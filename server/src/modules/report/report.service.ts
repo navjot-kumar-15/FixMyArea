@@ -28,20 +28,20 @@ export class ReportService {
     if (
       createReportDto.location &&
       createReportDto.location.coordinates &&
-      createReportDto.location.coordinates.length === 2
+      typeof createReportDto.location.coordinates.lat === 'number' &&
+      typeof createReportDto.location.coordinates.lng === 'number'
     ) {
       const closest = await this.locationModel.findOne({
-        location: {
-          // $nearSphere: {
-          // $geometry: {
-          type: 'Point',
-          coordinates: [
-            createReportDto.location.coordinates[0],
-            createReportDto.location.coordinates[1],
-          ],
-          // },
-          // $maxDistance: 5000,
-          // },
+        geo_location: {
+          $nearSphere: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [
+                createReportDto.location.coordinates.lng,
+                createReportDto.location.coordinates.lat,
+              ],
+            },
+          },
         },
       });
       if (closest) {
@@ -220,7 +220,8 @@ export class ReportService {
     if (
       updateReportDto.location &&
       updateReportDto.location.coordinates &&
-      updateReportDto.location.coordinates.length === 2
+      typeof updateReportDto.location.coordinates.lat === 'number' &&
+      typeof updateReportDto.location.coordinates.lng === 'number'
     ) {
       const closest = await this.locationModel
         .findOne({
@@ -229,8 +230,8 @@ export class ReportService {
               $geometry: {
                 type: 'Point',
                 coordinates: [
-                  updateReportDto.location.coordinates[0],
-                  updateReportDto.location.coordinates[1],
+                  updateReportDto.location.coordinates.lng,
+                  updateReportDto.location.coordinates.lat,
                 ],
               },
             },

@@ -1,10 +1,14 @@
 export type UserRole = 'guest' | 'citizen' | 'worker' | 'admin';
+export type UserStatus = 'ACTIVE' | 'SUSPENDED' | 'BANNED';
 
 export interface User {
   id: string;
   name: string;
   email: string;
   role: UserRole;
+  status?: UserStatus;
+  banReason?: string;
+  pincode?: string;
   avatarUrl?: string;
   phone?: string;
   areaId?: string;
@@ -85,10 +89,36 @@ export interface WorkerProfile {
   avatarUrl?: string;
   specialization: string;
   assignedArea: string;
+  pincode?: string;
+  locationDetails?: string;
   activeTasksCount: number;
   completedTasksCount: number;
   rating: number;
   status: 'AVAILABLE' | 'ON_TASK' | 'OFF_DUTY';
+}
+
+export type Worker = WorkerProfile;
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+}
+
+export interface CreateReportInput {
+  title: string;
+  description: string;
+  category: ReportCategory;
+  priority: ReportPriority;
+  locationName: string;
+  coordinates: LocationCoordinates;
+  images: string[];
 }
 
 export interface ServiceArea {

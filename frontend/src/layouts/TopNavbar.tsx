@@ -10,6 +10,7 @@ import {
   Sun,
   Moon,
   Bell,
+  Search,
   User as UserIcon,
   LogOut,
   Shield,
@@ -130,6 +131,25 @@ export const TopNavbar: React.FC = () => {
               </span>
             </div>
           </a>
+        </div>
+
+        {/* Central Search Bar / Command Palette Trigger */}
+        <div className="hidden lg:flex items-center flex-1 max-w-md mx-8">
+          <button
+            onClick={() => {
+              const event = new KeyboardEvent('keydown', { key: 'k', metaKey: true });
+              window.dispatchEvent(event);
+            }}
+            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 text-slate-400 text-xs font-medium hover:border-indigo-500/50 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all cursor-pointer shadow-inner"
+          >
+            <span className="flex items-center gap-2">
+              <Search className="w-4 h-4 text-indigo-500" />
+              <span>Search reports, pages, worker tasks...</span>
+            </span>
+            <span className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-700">
+              ⌘K
+            </span>
+          </button>
         </div>
 
         {/* Right Controls */}

@@ -20,6 +20,14 @@ export class ReportImageResponseDto {
   public_id?: string;
 }
 
+export class CoordinatesResponseDto {
+  @ApiProperty({ example: 12.9716, description: 'Latitude' })
+  lat: number;
+
+  @ApiProperty({ example: 77.5946, description: 'Longitude' })
+  lng: number;
+}
+
 export class ReportLocationResponseDto {
   @ApiProperty({
     example: 'Point',
@@ -29,11 +37,10 @@ export class ReportLocationResponseDto {
   type: string;
 
   @ApiProperty({
-    example: [77.5946, 12.9716],
-    type: [Number],
-    description: 'Coordinates [longitude, latitude]',
+    type: CoordinatesResponseDto,
+    description: 'Coordinates object with lat and lng properties',
   })
-  coordinates: number[];
+  coordinates: CoordinatesResponseDto;
 }
 
 export class AiAnalysisResponseDto {

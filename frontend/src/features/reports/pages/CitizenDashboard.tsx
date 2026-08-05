@@ -1,225 +1,277 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RootState } from '@/store';
-import { setSelectedReport } from '@/store/slices/reportSlice';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { StatusChip, PriorityChip } from '@/components/ui/StatusChip';
+import { setSelectedReport, toggleUpvote } from '@/store/slices/reportSlice';
+import { GlassCard, MagneticButton, StatusBadge, StatWidget } from '@/components/ui/DesignSystem';
 import { ReportsMap } from '@/components/map/ReportsMap';
 import {
-  FileText,
-  PlusCircle,
-  CheckCircle2,
-  Clock,
+  Sparkles,
+  MapPin,
   ThumbsUp,
-  ArrowRight,
+  MessageSquare,
+  PlusCircle,
   TrendingUp,
   Award,
   Zap,
-  Sparkles,
-  MapPin,
+  CheckCircle2,
+  Clock,
+  ChevronRight,
+  ShieldCheck,
+  Flame,
 } from 'lucide-react';
 
 export const CitizenDashboard: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state: RootState) => state.auth);
+
+  const user = useSelector((state: RootState) => state.auth.user);
   const reports = useSelector((state: RootState) => state.reports.reports);
+  const selectedReport = useSelector((state: RootState) => state.reports.selectedReport);
 
+  const [activeCategory, setActiveCategory] = useState<string>('ALL');
+
+  const myReports = reports.filter((r) => r.reportedBy?.id === user?.id || r.reportedBy?.name === user?.name);
+  const totalUpvotesReceived = myReports.reduce((acc, r) => acc + (r.upvotesCount || 0), 0);
   const resolvedCount = reports.filter((r) => r.status === 'RESOLVED').length;
-  const activeCount = reports.filter((r) => r.status === 'IN_PROGRESS' || r.status === 'PENDING').length;
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-  };
+  const categories = [
+    { id: 'ALL', label: 'All Telemetry' },
+    { id: 'POTHOLE', label: 'Road & Potholes' },
+    { id: 'STREET_LIGHT', label: 'Lighting Grid' },
+    { id: 'WATER_LEAKAGE', label: 'Water Infrastructure' },
+    { id: 'GARBAGE', label: 'Sanitation' },
+  ];
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
-  };
+  const filteredReports = activeCategory === 'ALL'
+    ? reports
+    : reports.filter((r) => r.category === activeCategory);
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="space-y-8 pb-12"
-    >
-      {/* Welcome Hero Banner */}
-      <motion.div
-        variants={itemVariants}
-        className="relative rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-8 md:p-10 text-white shadow-2xl overflow-hidden shimmer-card border border-indigo-400/30"
-      >
-        <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-white/15 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-purple-500/25 blur-3xl pointer-events-none" />
+    <div className="space-y-8 pb-16">
+      {/* Hero Welcome Banner with Gamification Pill */}
+      <GlassCard className="p-8 border border-indigo-500/30 glow-card relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 space-y-4 max-w-xl">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-xs font-extrabold text-indigo-100 shadow-sm">
-            <Award className="w-4 h-4 text-yellow-300 fill-yellow-300" />
-            <span>Community Protector • Level 4</span>
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-bold text-indigo-600 dark:text-indigo-300 font-display">
+              <Sparkles className="w-4 h-4 text-amber-400 fill-amber-400" /> Civic Impact Hub • Tier 3 Pioneer
+            </div>
+
+            <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight font-display">
+              Welcome back, {user?.name || 'Citizen'}
+            </h1>
+
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+              Track neighborhood issues, verify field repair quality, and upvote critical infrastructure repairs in real time.
+            </p>
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
-            Welcome back, {user?.name || 'Citizen'}!
-          </h1>
-
-          <p className="text-indigo-100 text-sm leading-relaxed max-w-md font-medium">
-            Track reported issues, upvote neighborhood fixes, and help keep municipal services running smoothly.
-          </p>
-
-          <div className="pt-3 flex flex-wrap gap-3">
-            <Button
-              variant="secondary"
-              className="bg-white text-indigo-700 hover:bg-slate-50 font-extrabold shadow-lg shadow-indigo-900/30 border-none"
+          <div className="flex items-center gap-3 shrink-0">
+            <MagneticButton
+              variant="primary"
+              size="lg"
+              icon={PlusCircle}
               onClick={() => navigate('/report')}
-              leftIcon={<PlusCircle className="w-4.5 h-4.5" />}
             >
               Report New Issue
-            </Button>
-            <Button
-              variant="outline"
-              className="border-white/40 text-white hover:bg-white/15 backdrop-blur-md font-bold"
-              onClick={() => navigate('/map')}
-              leftIcon={<Zap className="w-4 h-4 text-yellow-300 fill-yellow-300" />}
-            >
-              Live Heatmap
-            </Button>
+            </MagneticButton>
           </div>
         </div>
-      </motion.div>
+      </GlassCard>
 
-      {/* Progress XP Bar */}
-      <motion.div variants={itemVariants}>
-        <Card glass className="p-5 border border-indigo-500/20 shadow-md">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="space-y-1 text-center md:text-left">
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center justify-center md:justify-start gap-1.5">
-                <Sparkles className="w-4 h-4 text-indigo-500 fill-indigo-500" /> Neighborhood Impact Progress
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Earn impact XP by logging valid reports and verifying resolutions.</p>
+      {/* Gamified Impact XP Radar Bar */}
+      <GlassCard className="p-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-amber-500/20 font-display">
+              🏆
             </div>
-            <div className="flex-1 w-full max-w-md space-y-1.5">
-              <div className="flex justify-between text-[11px] font-extrabold text-slate-600 dark:text-slate-400">
-                <span>750 XP</span>
-                <span className="text-indigo-600 dark:text-indigo-400">1000 XP (Level 5)</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-extrabold text-slate-900 dark:text-white font-display">Civic Level 5: Neighborhood Guardian</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold font-display">
+                  TOP 5% CONTRIBUTOR
+                </span>
               </div>
-              <div className="w-full h-3 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden p-0.5 border border-slate-300/40 dark:border-slate-700">
-                <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-sm" style={{ width: '75%' }} />
-              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Earned 1,420 Impact XP this month across 8 dispatches.</p>
             </div>
           </div>
-        </Card>
-      </motion.div>
 
-      {/* Metrics Row */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {[
-          { label: 'Total City Reports', val: reports.length, icon: FileText, bg: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' },
-          { label: 'Active In-Progress', val: activeCount, icon: Clock, bg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
-          { label: 'Successfully Resolved', val: resolvedCount, icon: CheckCircle2, bg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
-          { label: 'Resolution Rate', val: '98.2%', icon: TrendingUp, bg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400' },
-        ].map((item, idx) => {
-          const Icon = item.icon;
-          return (
-            <Card key={idx} glass hoverEffect className="p-5">
-              <CardContent className="p-0 flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-2xl ${item.bg} flex items-center justify-center shrink-0`}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{item.val}</div>
-                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400">{item.label}</div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </motion.div>
+          <div className="w-full md:w-64 space-y-1.5">
+            <div className="flex justify-between text-xs font-bold text-slate-500 dark:text-slate-400 font-display">
+              <span>Next Rank: Civic Champion</span>
+              <span>1,420 / 2,000 XP</span>
+            </div>
+            <div className="w-full h-2.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden p-0.5">
+              <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-400 w-3/4 shadow-sm" />
+            </div>
+          </div>
+        </div>
+      </GlassCard>
 
-      {/* Main Grid: Interactive Map & Recent Reports */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Recent Issues List */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Recent Reported Issues</h3>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/my-reports')} rightIcon={<ArrowRight className="w-4 h-4" />}>
-              View My Reports
-            </Button>
+      {/* Bento Grid Metrics Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <StatWidget
+          title="Active City Telemetry"
+          value={reports.length}
+          subtitle="Real-time Reports"
+          trend="+12% vs last week"
+          trendDirection="up"
+          icon={TrendingUp}
+          gradient="from-indigo-600 to-indigo-500"
+        />
+
+        <StatWidget
+          title="Verified Resolved"
+          value={resolvedCount}
+          subtitle="Fixed by Field Crews"
+          trend="96.8% SLA rate"
+          trendDirection="up"
+          icon={CheckCircle2}
+          gradient="from-emerald-500 to-teal-600"
+        />
+
+        <StatWidget
+          title="My Dispatched Issues"
+          value={myReports.length}
+          subtitle="Tracked by you"
+          trend="2 currently active"
+          trendDirection="up"
+          icon={MapPin}
+          gradient="from-purple-600 to-purple-500"
+        />
+
+        <StatWidget
+          title="Community Impact Upvotes"
+          value={totalUpvotesReceived}
+          subtitle="Voices amplified"
+          trend="Top Neighborhood Support"
+          trendDirection="up"
+          icon={Flame}
+          gradient="from-amber-500 to-orange-600"
+        />
+      </div>
+
+      {/* Main Content Layout: Stream + Live Interactive Map */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* Left 2 Columns: Category Stream */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight font-display flex items-center gap-2">
+              <Flame className="w-6 h-6 text-amber-500" /> Neighborhood Activity Stream
+            </h2>
+
+            {/* Category Filter Pills */}
+            <div className="flex flex-wrap gap-1.5 bg-slate-200/50 dark:bg-slate-900/50 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-800/60">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`
+                    px-3 py-1 rounded-xl text-xs font-bold transition-all font-display
+                    ${activeCategory === cat.id
+                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}
+                  `}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
           </div>
 
+          {/* Cards List */}
           <div className="space-y-4">
-            {reports.slice(0, 4).map((report) => (
-              <Card
+            {filteredReports.map((report) => (
+              <GlassCard
                 key={report.id}
-                glass
-                hoverEffect
-                className="cursor-pointer overflow-hidden border-slate-200/80 dark:border-slate-850"
                 onClick={() => {
                   dispatch(setSelectedReport(report));
                   navigate(`/report/${report.id}`);
                 }}
+                className="p-6 transition-all cursor-pointer"
               >
-                <CardContent className="p-5">
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    {report.images[0] && (
-                      <div className="w-full sm:w-36 h-28 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shrink-0">
-                        <img
-                          src={report.images[0]}
-                          alt={report.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    <div className="flex-1 space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <StatusChip status={report.status} />
-                          <PriorityChip priority={report.priority} />
-                        </div>
-                        <span className="text-[10px] text-slate-400 font-bold">
-                          {new Date(report.createdAt).toLocaleDateString()}
+                <div className="flex flex-col md:flex-row gap-5">
+                  {report.images && report.images[0] && (
+                    <div className="w-full md:w-44 h-32 rounded-2xl overflow-hidden shrink-0 border border-slate-200/60 dark:border-slate-800">
+                      <img src={report.images[0]} alt={report.title} className="w-full h-full object-cover" />
+                    </div>
+                  )}
+
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <StatusBadge status={report.status} />
+                        <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider font-display">
+                          {report.category}
                         </span>
                       </div>
-                      <h4 className="text-base font-extrabold text-slate-900 dark:text-white line-clamp-1">
-                        {report.title}
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium">
-                        {report.description}
-                      </p>
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-850 text-xs text-slate-500">
-                        <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400 font-medium">
-                          <MapPin className="w-3.5 h-3.5 text-indigo-500" /> {report.locationName}
-                        </span>
-                        <div className="flex items-center gap-3">
-                          <span className="flex items-center gap-1 font-extrabold text-indigo-600 dark:text-indigo-400">
-                            <ThumbsUp className="w-3.5 h-3.5" /> {report.upvotesCount}
-                          </span>
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        {new Date(report.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-extrabold text-slate-900 dark:text-white font-display leading-snug">
+                      {report.title}
+                    </h3>
+
+                    <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium">
+                      {report.description}
+                    </p>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-semibold">
+                        <MapPin className="w-3.5 h-3.5 text-indigo-500" />
+                        <span>{report.locationName}</span>
+                      </div>
+
+                      <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => dispatch(toggleUpvote(report.id))}
+                          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all font-display ${
+                            report.isUpvoted
+                              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                              : 'bg-slate-200/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 hover:bg-indigo-500/10'
+                          }`}
+                        >
+                          <ThumbsUp className="w-3.5 h-3.5" />
+                          <span>{report.upvotesCount}</span>
+                        </button>
+
+                        <div className="flex items-center gap-1 text-xs text-slate-500 font-semibold font-display">
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          <span>{report.commentsCount}</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </GlassCard>
             ))}
           </div>
         </div>
 
-        {/* Right Column: Live Map Widget */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Live Area Map</h3>
-          <ReportsMap
-            reports={reports}
-            height="460px"
-            onSelectReport={(r) => {
-              dispatch(setSelectedReport(r));
-              navigate(`/report/${r.id}`);
-            }}
-          />
+        {/* Right 1 Column: Live Interactive Map Widget */}
+        <div className="space-y-4 sticky top-6">
+          <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight font-display flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-indigo-500" /> Live GIS Radar Map
+          </h3>
+
+          <GlassCard className="p-2 overflow-hidden border border-indigo-500/20">
+            <ReportsMap
+              reports={filteredReports}
+              height="450px"
+              onSelectReport={(r) => {
+                dispatch(setSelectedReport(r));
+                navigate(`/report/${r.id}`);
+              }}
+            />
+          </GlassCard>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
