@@ -16,16 +16,17 @@ export class CommentService {
   ) {}
 
   // CREATE
-  async create(createCommentDto: CreateCommentDto): Promise<IComment> {
+  async create(createCommentDto: CreateCommentDto): Promise<any> {
     const newComment = new this.commentModel(createCommentDto);
     const savedComment = await newComment.save();
-    return CommentMapper.toDomain(savedComment) as IComment;
+    const domain = CommentMapper.toDomain(savedComment);
+    return CommentMapper.toResponse(domain);
   }
 
   // READ ALL
   async findAll(
     filterCommentDto: FilterCommentDto,
-  ): Promise<PaginatedResult<IComment>> {
+  ): Promise<PaginatedResult<any>> {
     const { page = 1, limit = 10, report_id, user_id } = filterCommentDto || {};
     const skip = (page - 1) * limit;
 
@@ -47,8 +48,10 @@ export class CommentService {
       this.commentModel.countDocuments(query),
     ]);
 
+    const domainList = CommentMapper.toDomainList(comments);
+
     return {
-      data: CommentMapper.toDomainList(comments),
+      data: CommentMapper.toResponseList(domainList),
       total,
       page,
       limit,
@@ -57,19 +60,20 @@ export class CommentService {
   }
 
   // READ ONE
-  async findOne(id: string): Promise<IComment> {
+  async findOne(id: string): Promise<any> {
     const comment = await this.commentModel.findById(id);
     if (!comment || comment.is_deleted) {
       throw new NotFoundException(`Comment with ID ${id} not found`);
     }
-    return CommentMapper.toDomain(comment) as IComment;
+    const domain = CommentMapper.toDomain(comment);
+    return CommentMapper.toResponse(domain);
   }
 
   // UPDATE
   async update(
     id: string,
     updateCommentDto: UpdateCommentDto,
-  ): Promise<IComment> {
+  ): Promise<any> {
     const updatedComment = await this.commentModel.findByIdAndUpdate(
       id,
       {
@@ -83,11 +87,12 @@ export class CommentService {
     if (!updatedComment) {
       throw new NotFoundException(`Comment with ID ${id} not found`);
     }
-    return CommentMapper.toDomain(updatedComment) as IComment;
+    const domain = CommentMapper.toDomain(updatedComment);
+    return CommentMapper.toResponse(domain);
   }
 
   // DELETE (SOFT)
-  async remove(id: string): Promise<IComment> {
+  async remove(id: string): Promise<any> {
     const deletedComment = await this.commentModel.findByIdAndUpdate(
       id,
       {
@@ -100,6 +105,7 @@ export class CommentService {
     if (!deletedComment) {
       throw new NotFoundException(`Comment with ID ${id} not found`);
     }
-    return CommentMapper.toDomain(deletedComment) as IComment;
+    const domain = CommentMapper.toDomain(deletedComment);
+    return CommentMapper.toResponse(domain);
   }
 }

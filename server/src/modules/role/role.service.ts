@@ -15,7 +15,7 @@ import { RoleMapper } from './mapper/role.mapper';
 export class RoleService {
   constructor(@InjectModel('Role') private readonly roleModel: Model<Role>) {}
 
-  async create(createRoleDto: CreateRoleDto): Promise<IRole> {
+  async create(createRoleDto: CreateRoleDto): Promise<any> {
     const nameNormalized = createRoleDto.name.toLowerCase().trim();
     const existing = await this.roleModel
       .findOne({ name: nameNormalized })
@@ -31,23 +31,26 @@ export class RoleService {
       name: nameNormalized,
     });
     const saved = await newRole.save();
-    return RoleMapper.toDomain(saved) as IRole;
+    const domain = RoleMapper.toDomain(saved);
+    return RoleMapper.toResponse(domain);
   }
 
-  async findAll(): Promise<IRole[]> {
+  async findAll(): Promise<any> {
     const roles = await this.roleModel.find().exec();
-    return RoleMapper.toDomainList(roles);
+    const domainList = RoleMapper.toDomainList(roles);
+    return RoleMapper.toResponseList(domainList);
   }
 
-  async findOne(id: string): Promise<IRole> {
+  async findOne(id: string): Promise<any> {
     const role = await this.roleModel.findById(id).exec();
     if (!role) {
       throw new NotFoundException(`Role with ID "${id}" not found.`);
     }
-    return RoleMapper.toDomain(role) as IRole;
+    const domain = RoleMapper.toDomain(role);
+    return RoleMapper.toResponse(domain);
   }
 
-  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<IRole> {
+  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<any> {
     if (updateRoleDto.name) {
       updateRoleDto.name = updateRoleDto.name.toLowerCase().trim();
       const existing = await this.roleModel
@@ -66,14 +69,16 @@ export class RoleService {
     if (!updated) {
       throw new NotFoundException(`Role with ID "${id}" not found.`);
     }
-    return RoleMapper.toDomain(updated) as IRole;
+    const domain = RoleMapper.toDomain(updated);
+    return RoleMapper.toResponse(domain);
   }
 
-  async remove(id: string): Promise<IRole> {
+  async remove(id: string): Promise<any> {
     const deleted = await this.roleModel.findByIdAndDelete(id).exec();
     if (!deleted) {
       throw new NotFoundException(`Role with ID "${id}" not found.`);
     }
-    return RoleMapper.toDomain(deleted) as IRole;
+    const domain = RoleMapper.toDomain(deleted);
+    return RoleMapper.toResponse(domain);
   }
 }

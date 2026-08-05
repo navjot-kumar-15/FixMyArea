@@ -26,7 +26,6 @@ import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { UserMapper } from '../user/mapper/user.mapper';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -44,7 +43,7 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto) {
     const user = await this.authService.register(registerDto);
     return CustomResponse.success(
-      UserMapper.toDomain(user),
+      user,
       MESSAGES.AUTH.REGISTER_SUCCESS,
       201,
     );
@@ -58,10 +57,7 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto) {
     const result = await this.authService.login(loginDto);
     return CustomResponse.success(
-      {
-        user: UserMapper.toDomain(result.user),
-        tokens: result.tokens,
-      },
+      result,
       MESSAGES.AUTH.LOGIN_SUCCESS,
       // 200,
     );

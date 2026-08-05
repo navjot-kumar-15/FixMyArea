@@ -60,13 +60,13 @@ export class ReportService {
     if (!domain) {
       throw new BadRequestException('Failed to map saved report');
     }
-    return domain;
+    return ReportMapper.toResponse(domain) as any;
   }
 
   // READ ALL
   async findAll(
     filterReportDto: FilterReportDto,
-  ): Promise<PaginatedResult<IReport>> {
+  ): Promise<PaginatedResult<any>> {
     const {
       page = 1,
       limit = 10,
@@ -92,6 +92,9 @@ export class ReportService {
 
     if (status) {
       query.status = status as ReportStatus;
+    }
+    if (location_id) {
+      query.location_id = new Types.ObjectId(location_id);
     }
 
     const result = await this.reportModel.aggregate([
@@ -139,6 +142,7 @@ export class ReportService {
                 description: '$description',
                 images: '$images',
                 location: '$location',
+                location_id: '$location_id',
                 category: {
                   name: '$category.name',
                   icon: '$category.icon',
@@ -188,8 +192,10 @@ export class ReportService {
     const total = result[0]?.metadata[0]?.total || 0;
     const reports = result[0]?.data || [];
 
+    const domainList = ReportMapper.toDomainList(reports);
+
     return {
-      data: ReportMapper.toDomainList(reports),
+      data: ReportMapper.toResponseList(domainList),
       total,
       page,
       limit,
@@ -198,7 +204,7 @@ export class ReportService {
   }
 
   // READ ONE
-  async findOne(id: string): Promise<IReport> {
+  async findOne(id: string): Promise<any> {
     const report = await this.reportModel
       .findById(id)
       .populate('category')
@@ -210,11 +216,11 @@ export class ReportService {
     if (!domain) {
       throw new NotFoundException(`Report with ID ${id} could not be loaded`);
     }
-    return domain;
+    return ReportMapper.toResponse(domain);
   }
 
   // UPDATE
-  async update(id: string, updateReportDto: UpdateReportDto): Promise<IReport> {
+  async update(id: string, updateReportDto: UpdateReportDto): Promise<any> {
     let resolvedLocationId: Types.ObjectId | null | undefined = undefined;
 
     if (
@@ -266,11 +272,11 @@ export class ReportService {
         `Updated report with ID ${id} could not be loaded`,
       );
     }
-    return domain;
+    return ReportMapper.toResponse(domain);
   }
 
   // DELETE
-  async remove(id: string): Promise<IReport> {
+  async remove(id: string): Promise<any> {
     const deletedReport = await this.reportModel.findByIdAndUpdate(
       id,
       { is_deleted: true },
@@ -285,6 +291,6 @@ export class ReportService {
         `Deleted report with ID ${id} could not be loaded`,
       );
     }
-    return domain;
+    return ReportMapper.toResponse(domain);
   }
 }

@@ -6,11 +6,15 @@ import { Layers, MapPin, Users, PlusCircle, X, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const AdminServiceAreasPage: React.FC = () => {
+  const [selectedCountry, setSelectedCountry] = useState('United States');
+  const [selectedState, setSelectedState] = useState('California');
+  const [selectedCity, setSelectedCity] = useState('San Francisco');
+
   const [areas, setAreas] = useState([
-    { id: 'area-1', name: 'Downtown North', code: 'DT-N01', activeReports: 14, workers: 3, status: 'OPTIMAL' },
-    { id: 'area-2', name: 'Westside Heights', code: 'WS-H02', activeReports: 8, workers: 2, status: 'OPTIMAL' },
-    { id: 'area-3', name: 'East Commercial Grid', code: 'EC-G03', activeReports: 22, workers: 4, status: 'HIGH_LOAD' },
-    { id: 'area-4', name: 'South Bay Waterfront', code: 'SB-W04', activeReports: 5, workers: 2, status: 'OPTIMAL' },
+    { id: 'area-1', name: 'Downtown North', code: 'DT-N01', city: 'San Francisco', activeReports: 14, workers: 3, status: 'OPTIMAL' },
+    { id: 'area-2', name: 'Westside Heights', code: 'WS-H02', city: 'San Francisco', activeReports: 8, workers: 2, status: 'OPTIMAL' },
+    { id: 'area-3', name: 'East Commercial Grid', code: 'EC-G03', city: 'San Francisco', activeReports: 22, workers: 4, status: 'HIGH_LOAD' },
+    { id: 'area-4', name: 'South Bay Waterfront', code: 'SB-W04', city: 'San Francisco', activeReports: 5, workers: 2, status: 'OPTIMAL' },
   ]);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -29,13 +33,14 @@ export const AdminServiceAreasPage: React.FC = () => {
       id: `area-${areas.length + 1}`,
       name: newName.trim(),
       code: newCode.trim().toUpperCase(),
+      city: selectedCity,
       activeReports: 0,
       workers: Number(newWorkers),
       status: 'OPTIMAL',
     };
 
     setAreas((prev) => [areaObj, ...prev]);
-    toast.success(`District ${newName} defined successfully!`);
+    toast.success(`District ${newName} defined in ${selectedCity}, ${selectedState}!`);
     setIsAddModalOpen(false);
     setNewName('');
     setNewCode('');
@@ -47,16 +52,60 @@ export const AdminServiceAreasPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <Layers className="w-6 h-6 text-indigo-650" /> Municipal Service Areas & Boundaries
+            <Layers className="w-6 h-6 text-indigo-650" /> Geographic Territory & Service Areas
           </h1>
           <p className="text-xs text-slate-400">
-            Define geofenced districts, allocate worker teams, and track neighborhood issue density.
+            Multi-jurisdiction hierarchy: Country → State → City → Service Areas.
           </p>
         </div>
         <Button variant="primary" onClick={() => setIsAddModalOpen(true)} leftIcon={<PlusCircle className="w-4 h-4" />}>
           Define New District
         </Button>
       </div>
+
+      {/* Country / State / City Filter Selector */}
+      <Card glass className="p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label className="text-[10px] font-extrabold uppercase text-slate-400 block mb-1">Country</label>
+            <select
+              value={selectedCountry}
+              onChange={(e) => setSelectedCountry(e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white"
+            >
+              <option value="United States">United States</option>
+              <option value="Canada">Canada</option>
+              <option value="United Kingdom">United Kingdom</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-extrabold uppercase text-slate-400 block mb-1">State / Province</label>
+            <select
+              value={selectedState}
+              onChange={(e) => setSelectedState(e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white"
+            >
+              <option value="California">California</option>
+              <option value="New York">New York</option>
+              <option value="Texas">Texas</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-extrabold uppercase text-slate-400 block mb-1">City / Municipality</label>
+            <select
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white"
+            >
+              <option value="San Francisco">San Francisco</option>
+              <option value="Los Angeles">Los Angeles</option>
+              <option value="San Jose">San Jose</option>
+            </select>
+          </div>
+        </div>
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {areas.map((area) => (

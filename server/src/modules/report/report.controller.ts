@@ -27,8 +27,6 @@ import {
   ReportResponseDto,
   PaginatedReportResponseDto,
 } from './dto/report-response.dto';
-import { ReportMapper } from './mapper/report.mapper';
-import { PaginatedResult } from 'src/common/interfaces/paginated-result.interface';
 
 @ApiTags('Report')
 @Controller('report')
@@ -51,8 +49,7 @@ export class ReportController {
   async create(@Body() createReportDto: CreateReportDto) {
     try {
       const report = await this.reportService.create(createReportDto);
-      const mapped = ReportMapper.toResponse(report);
-      return CustomResponse.success(mapped, MESSAGES.REPORT.CREATED, 201);
+      return CustomResponse.success(report, MESSAGES.REPORT.CREATED, 201);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof BadRequestException) {
@@ -72,17 +69,8 @@ export class ReportController {
   async findAll(@Query() filterReportDto: FilterReportDto): Promise<any> {
     try {
       const paginatedResult = await this.reportService.findAll(filterReportDto);
-      const { data, total, page, limit, totalPages } = paginatedResult;
-      // TODO:Need to fix the paginated response
-      let finalResult = {
-        data,
-        total,
-        page,
-        limit,
-        totalPages,
-      } as any;
       return CustomResponse.pagination(
-        finalResult,
+        paginatedResult,
         MESSAGES.REPORT.FETCHED_ALL,
       );
     } catch (error) {
@@ -107,8 +95,7 @@ export class ReportController {
   async findOne(@Param('id') id: string) {
     try {
       const report = await this.reportService.findOne(id);
-      const mapped = ReportMapper.toResponse(report);
-      return CustomResponse.success(mapped, MESSAGES.REPORT.FETCHED);
+      return CustomResponse.success(report, MESSAGES.REPORT.FETCHED);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof NotFoundException) {
@@ -142,8 +129,7 @@ export class ReportController {
   ) {
     try {
       const report = await this.reportService.update(id, updateReportDto);
-      const mapped = ReportMapper.toResponse(report);
-      return CustomResponse.success(mapped, MESSAGES.REPORT.UPDATED);
+      return CustomResponse.success(report, MESSAGES.REPORT.UPDATED);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof BadRequestException) {
@@ -172,8 +158,7 @@ export class ReportController {
   async remove(@Param('id') id: string) {
     try {
       const report = await this.reportService.remove(id);
-      const mapped = ReportMapper.toResponse(report);
-      return CustomResponse.success(mapped, MESSAGES.REPORT.DELETED);
+      return CustomResponse.success(report, MESSAGES.REPORT.DELETED);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       if (error instanceof NotFoundException) {

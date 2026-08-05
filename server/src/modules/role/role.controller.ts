@@ -21,7 +21,6 @@ import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { RoleResponseDto } from './dto/role-response.dto';
-import { RoleMapper } from './mapper/role.mapper';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
 
@@ -44,7 +43,7 @@ export class RoleController {
     try {
       const role = await this.roleService.create(createRoleDto);
       return CustomResponse.success(
-        RoleMapper.toResponse(role),
+        role,
         MESSAGES.ROLE.CREATED,
       );
     } catch (error) {
@@ -69,7 +68,7 @@ export class RoleController {
     try {
       const roles = await this.roleService.findAll();
       return CustomResponse.success(
-        RoleMapper.toResponseList(roles),
+        roles,
         MESSAGES.ROLE.FETCHED_ALL,
       );
     } catch (error) {
@@ -90,7 +89,7 @@ export class RoleController {
     try {
       const role = await this.roleService.findOne(id);
       return CustomResponse.success(
-        RoleMapper.toResponse(role),
+        role,
         MESSAGES.ROLE.FETCHED,
       );
     } catch (error) {
@@ -116,7 +115,7 @@ export class RoleController {
     try {
       const role = await this.roleService.update(id, updateRoleDto);
       return CustomResponse.success(
-        RoleMapper.toResponse(role),
+        role,
         MESSAGES.ROLE.UPDATED,
       );
     } catch (error) {
@@ -143,7 +142,7 @@ export class RoleController {
     try {
       const role = await this.roleService.remove(id);
       return CustomResponse.success(
-        RoleMapper.toResponse(role),
+        role,
         MESSAGES.ROLE.DELETED,
       );
     } catch (error) {

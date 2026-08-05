@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { RoleSeeder } from './seeders/role.seeder';
 import { CategorySeeder } from './seeders/category.seeder';
 import { TagSeeder } from './seeders/tag.seeder';
+import { LocationSeeder } from './seeders/location.seeder';
 import { ReportSeeder } from './seeders/report.seeder';
 
 @Global()
@@ -32,6 +33,7 @@ import { ReportSeeder } from './seeders/report.seeder';
     RoleSeeder,
     CategorySeeder,
     TagSeeder,
+    LocationSeeder,
     ReportSeeder,
   ],
   exports: [
@@ -40,6 +42,7 @@ import { ReportSeeder } from './seeders/report.seeder';
     RoleSeeder,
     CategorySeeder,
     TagSeeder,
+    LocationSeeder,
     ReportSeeder,
   ],
 })

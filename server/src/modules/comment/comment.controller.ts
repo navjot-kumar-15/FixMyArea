@@ -25,7 +25,6 @@ import {
   CommentResponseDto,
   PaginatedCommentResponseDto,
 } from './dto/comment-response.dto';
-import { CommentMapper } from './mapper/comment.mapper';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
 
@@ -46,8 +45,7 @@ export class CommentController {
   async create(@Body() createCommentDto: CreateCommentDto) {
     try {
       const comment = await this.commentService.create(createCommentDto);
-      const mapped = CommentMapper.toResponse(comment);
-      return CustomResponse.success(mapped, MESSAGES.COMMENT.CREATED, 201);
+      return CustomResponse.success(comment, MESSAGES.COMMENT.CREATED, 201);
     } catch (error) {
       if (error instanceof BadRequestException) {
         return CustomResponse.error(error.message, null, 400);
@@ -67,11 +65,7 @@ export class CommentController {
     try {
       const paginatedResult =
         await this.commentService.findAll(filterCommentDto);
-      const mappedResult: PaginatedCommentResponseDto = {
-        ...paginatedResult,
-        data: CommentMapper.toResponseList(paginatedResult.data),
-      };
-      return CustomResponse.success(mappedResult, MESSAGES.COMMENT.FETCHED_ALL);
+      return CustomResponse.success(paginatedResult, MESSAGES.COMMENT.FETCHED_ALL);
     } catch (error) {
       return CustomResponse.error(error.message, null, 500);
     }
@@ -89,8 +83,7 @@ export class CommentController {
   async findOne(@Param('id') id: string) {
     try {
       const comment = await this.commentService.findOne(id);
-      const mapped = CommentMapper.toResponse(comment);
-      return CustomResponse.success(mapped, MESSAGES.COMMENT.FETCHED);
+      return CustomResponse.success(comment, MESSAGES.COMMENT.FETCHED);
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);
@@ -115,8 +108,7 @@ export class CommentController {
   ) {
     try {
       const comment = await this.commentService.update(id, updateCommentDto);
-      const mapped = CommentMapper.toResponse(comment);
-      return CustomResponse.success(mapped, MESSAGES.COMMENT.UPDATED);
+      return CustomResponse.success(comment, MESSAGES.COMMENT.UPDATED);
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);
@@ -137,8 +129,7 @@ export class CommentController {
   async remove(@Param('id') id: string) {
     try {
       const comment = await this.commentService.remove(id);
-      const mapped = CommentMapper.toResponse(comment);
-      return CustomResponse.success(mapped, MESSAGES.COMMENT.DELETED);
+      return CustomResponse.success(comment, MESSAGES.COMMENT.DELETED);
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);

@@ -106,6 +106,41 @@ export const ProfilePage: React.FC = () => {
           </form>
         </CardContent>
       </Card>
+
+      {/* Notification & Alert Preferences Card */}
+      <Card glass>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Shield className="w-5 h-5 text-indigo-500" /> Notification & Alert Preferences
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white">Push Notifications</div>
+              <div className="text-[10px] text-slate-400">Receive instant status updates when your report is dispatched or resolved</div>
+            </div>
+            <input type="checkbox" defaultChecked className="toggle-checkbox w-5 h-5 accent-indigo-600 rounded cursor-pointer" />
+          </div>
+
+          <div className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white">SMS Critical Alerts</div>
+              <div className="text-[10px] text-slate-400">Get text message notifications for severe hazard warnings in your district</div>
+            </div>
+            <input type="checkbox" defaultChecked className="toggle-checkbox w-5 h-5 accent-indigo-600 rounded cursor-pointer" />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white">Weekly Neighborhood Activity Digest</div>
+              <div className="text-[10px] text-slate-400">Receive a weekly summary email of resolved municipal issues near your home</div>
+            </div>
+            <input type="checkbox" defaultChecked className="toggle-checkbox w-5 h-5 accent-indigo-600 rounded cursor-pointer" />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
+

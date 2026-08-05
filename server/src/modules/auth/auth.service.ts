@@ -16,6 +16,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { generateUniqueDigits } from 'src/common/utils/number';
 import { MailerService } from 'src/infrastructure/nodemailer/mailer.service';
+import { UserMapper } from '../user/mapper/user.mapper';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +42,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    return user;
+    return UserMapper.toDomain(user);
   }
 
   async login(loginDto: LoginDto) {
@@ -66,7 +67,7 @@ export class AuthService {
 
     const { password, ...data } = user.toObject();
     return {
-      user: data,
+      user: UserMapper.toDomain(data),
       tokens: {
         access_token,
         refresh_token,

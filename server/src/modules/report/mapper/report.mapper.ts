@@ -105,6 +105,7 @@ export class ReportMapper {
         type: raw.location?.type || 'Point',
         coordinates: coords,
       },
+      location_id: raw.location_id ? raw.location_id.toString() : undefined,
       address: raw.address,
       category: raw.category || {},
       city: raw.city,
@@ -179,6 +180,9 @@ export class ReportMapper {
             },
           }
         : { type: 'Point', coordinates: { lat: 0, lng: 0 } },
+      location_id: domain.location_id
+        ? domain.location_id.toString()
+        : undefined,
       address: domain.address,
       city: domain.city,
       state: domain.state,

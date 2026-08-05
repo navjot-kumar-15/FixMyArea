@@ -1,15 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FloatingHudDock } from '@/components/navigation/FloatingHudDock';
+import { RoleDock } from '@/components/ui/RoleDock';
 import { WorkspaceHeader } from '@/components/navigation/WorkspaceHeader';
 import { NotificationDrawer } from './NotificationDrawer';
 
 export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-[#f6f8fd] dark:bg-[#030712] text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors relative overflow-x-hidden bg-grid-pattern pb-32 sm:pb-36">
-      <div className="aurora-blob aurora-2 pointer-events-none" />
-      <div className="aurora-blob aurora-3 pointer-events-none" />
-
+    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col font-sans transition-colors relative overflow-x-hidden pb-32 sm:pb-36">
       <WorkspaceHeader />
 
       <motion.main
@@ -22,7 +19,7 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
         {children}
       </motion.main>
 
-      <FloatingHudDock />
+      <RoleDock />
       <NotificationDrawer />
     </div>
   );

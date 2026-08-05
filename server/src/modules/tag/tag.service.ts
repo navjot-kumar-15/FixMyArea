@@ -17,7 +17,7 @@ export class TagService {
     @InjectModel('Tag') private readonly tagModel: Model<Tag>,
   ) {}
 
-  async create(createTagDto: CreateTagDto): Promise<ITag> {
+  async create(createTagDto: CreateTagDto): Promise<any> {
     const nameTrimmed = createTagDto.name.trim();
     const existing = await this.tagModel
       .findOne({ name: { $regex: new RegExp(`^${nameTrimmed}$`, 'i') } })
@@ -33,27 +33,30 @@ export class TagService {
       name: nameTrimmed,
     });
     const saved = await newTag.save();
-    return TagMapper.toDomain(saved) as ITag;
+    const domain = TagMapper.toDomain(saved);
+    return TagMapper.toResponse(domain);
   }
 
-  async findAll(onlyActive = true): Promise<ITag[]> {
+  async findAll(onlyActive = true): Promise<any> {
     const filter = onlyActive ? { is_active: true } : {};
     const tags = await this.tagModel.find(filter).exec();
-    return TagMapper.toDomainList(tags);
+    const domainList = TagMapper.toDomainList(tags);
+    return TagMapper.toResponseList(domainList);
   }
 
-  async findOne(id: string): Promise<ITag> {
+  async findOne(id: string): Promise<any> {
     const tag = await this.tagModel.findById(id).exec();
     if (!tag) {
       throw new NotFoundException(`Tag with ID "${id}" not found.`);
     }
-    return TagMapper.toDomain(tag) as ITag;
+    const domain = TagMapper.toDomain(tag);
+    return TagMapper.toResponse(domain);
   }
 
   async update(
     id: string,
     updateTagDto: UpdateTagDto,
-  ): Promise<ITag> {
+  ): Promise<any> {
     if (updateTagDto.name) {
       const nameTrimmed = updateTagDto.name.trim();
       const existing = await this.tagModel
@@ -76,14 +79,16 @@ export class TagService {
     if (!updated) {
       throw new NotFoundException(`Tag with ID "${id}" not found.`);
     }
-    return TagMapper.toDomain(updated) as ITag;
+    const domain = TagMapper.toDomain(updated);
+    return TagMapper.toResponse(domain);
   }
 
-  async remove(id: string): Promise<ITag> {
+  async remove(id: string): Promise<any> {
     const deleted = await this.tagModel.findByIdAndDelete(id).exec();
     if (!deleted) {
       throw new NotFoundException(`Tag with ID "${id}" not found.`);
     }
-    return TagMapper.toDomain(deleted) as ITag;
+    const domain = TagMapper.toDomain(deleted);
+    return TagMapper.toResponse(domain);
   }
 }
