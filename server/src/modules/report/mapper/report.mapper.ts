@@ -14,7 +14,7 @@ interface RawReport {
     | string
     | null;
   images?: Array<{ url: string; public_id: string }>;
-  location?: { type: string; coordinates: number[] };
+  location?: { type: string; coordinates: any };
   location_id?:
     | { _id?: { toString(): string }; toString(): string }
     | string
@@ -80,12 +80,31 @@ export class ReportMapper {
       }
     }
 
+    let coords = { lat: 0, lng: 0 };
+    if (raw.location && raw.location.coordinates) {
+      if (Array.isArray(raw.location.coordinates)) {
+        coords = {
+          lng: Number(raw.location.coordinates[0]) || 0,
+          lat: Number(raw.location.coordinates[1]) || 0,
+        };
+      } else if (typeof raw.location.coordinates === 'object') {
+        const c = raw.location.coordinates as any;
+        coords = {
+          lat: Number(c.lat) || 0,
+          lng: Number(c.lng ?? c.lan ?? c.lon) || 0,
+        };
+      }
+    }
+
     return {
       id: raw.id ? raw.id : raw._id ? raw._id.toString() : '',
       title: raw.title || '',
       description: raw.description || '',
       images: raw.images || [],
-      location: raw.location || { type: 'Point', coordinates: [] },
+      location: {
+        type: raw.location?.type || 'Point',
+        coordinates: coords,
+      },
       address: raw.address,
       category: raw.category || {},
       city: raw.city,
@@ -154,9 +173,12 @@ export class ReportMapper {
       location: domain.location
         ? {
             type: domain.location.type,
-            coordinates: domain.location.coordinates,
+            coordinates: {
+              lat: domain.location.coordinates?.lat ?? 0,
+              lng: domain.location.coordinates?.lng ?? 0,
+            },
           }
-        : { type: 'Point', coordinates: [] },
+        : { type: 'Point', coordinates: { lat: 0, lng: 0 } },
       address: domain.address,
       city: domain.city,
       state: domain.state,

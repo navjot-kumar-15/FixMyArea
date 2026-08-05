@@ -38,6 +38,18 @@ export class ReportImage {
 export const ReportImageSchema = SchemaFactory.createForClass(ReportImage);
 
 @Schema({ _id: false })
+export class ReportLocationCoordinates {
+  @Prop({ required: true, type: Number })
+  lat: number;
+
+  @Prop({ required: true, type: Number })
+  lng: number;
+}
+
+export const ReportLocationCoordinatesSchema =
+  SchemaFactory.createForClass(ReportLocationCoordinates);
+
+@Schema({ _id: false })
 export class ReportLocation {
   @Prop({
     type: String,
@@ -47,18 +59,10 @@ export class ReportLocation {
   type: string;
 
   @Prop({
-    type: [Number],
+    type: ReportLocationCoordinatesSchema,
     required: true,
-    index: {
-      name: '2dsphere',
-      sparse: true,
-    },
-    validate: {
-      validator: (value: number[]) => value.length === 2,
-      message: 'Coordinates must contain [longitude, latitude]',
-    },
   })
-  coordinates: number[];
+  coordinates: ReportLocationCoordinates;
 }
 
 export const ReportLocationSchema =

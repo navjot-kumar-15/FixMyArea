@@ -4,7 +4,7 @@ import { store, RootState } from '@/store';
 import { AppRouter } from '@/app/router';
 import { Toaster } from 'react-hot-toast';
 
-const ThemeAppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const GlobalAppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const mode = useSelector((state: RootState) => state.theme.mode);
 
   useEffect(() => {
@@ -21,10 +21,21 @@ const ThemeAppInitializer: React.FC<{ children: React.ReactNode }> = ({ children
 export default function App() {
   return (
     <Provider store={store}>
-      <ThemeAppInitializer>
+      <GlobalAppInitializer>
         <AppRouter />
-        <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
-      </ThemeAppInitializer>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: 'var(--bg-surface-elevated)',
+              color: 'var(--text-primary)',
+              borderRadius: '1rem',
+              border: '1px solid var(--border-color)',
+            },
+          }}
+        />
+      </GlobalAppInitializer>
     </Provider>
   );
 }

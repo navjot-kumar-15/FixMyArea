@@ -10,9 +10,14 @@ export interface IReportImage {
   public_id?: string;
 }
 
+export interface ICoordinates {
+  lat: number;
+  lng: number;
+}
+
 export interface IReportLocation {
   type: string;
-  coordinates: number[]; // [longitude, latitude]
+  coordinates: ICoordinates;
 }
 
 export interface IAiAnalysis {

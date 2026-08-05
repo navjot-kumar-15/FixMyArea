@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { RoleSeeder } from './seeders/role.seeder';
 import { CategorySeeder } from './seeders/category.seeder';
 import { TagSeeder } from './seeders/tag.seeder';
+import { ReportSeeder } from './seeders/report.seeder';
 
 @Global()
 @Module({
@@ -26,7 +27,20 @@ import { TagSeeder } from './seeders/tag.seeder';
     // Automatically loads and registers all schemas found in the application
     MongooseModule.forFeature(getAutoLoadSchemas()),
   ],
-  providers: [DatabaseService, RoleSeeder, CategorySeeder, TagSeeder],
-  exports: [MongooseModule, DatabaseService, RoleSeeder, CategorySeeder, TagSeeder],
+  providers: [
+    DatabaseService,
+    RoleSeeder,
+    CategorySeeder,
+    TagSeeder,
+    ReportSeeder,
+  ],
+  exports: [
+    MongooseModule,
+    DatabaseService,
+    RoleSeeder,
+    CategorySeeder,
+    TagSeeder,
+    ReportSeeder,
+  ],
 })
 export class DatabaseModule {}

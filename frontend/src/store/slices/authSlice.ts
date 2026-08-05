@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuthState, User, UserRole } from '@/types';
 
-// Pre-defined demo users for immediate testing across all roles
+// Pre-defined demo users for immediate testing
 export const DEMO_USERS: Record<Exclude<UserRole, 'guest'>, User> = {
   citizen: {
     id: 'usr-citizen-1',
@@ -38,12 +38,14 @@ export const DEMO_USERS: Record<Exclude<UserRole, 'guest'>, User> = {
   },
 };
 
-const savedUser = localStorage.getItem('civic_user');
+const savedUserStr = localStorage.getItem('civic_user');
 const savedToken = localStorage.getItem('civic_access_token');
+const savedUser = savedUserStr ? JSON.parse(savedUserStr) : DEMO_USERS.admin;
+const defaultToken = savedToken || 'demo-admin-token';
 
 const initialState: AuthState = {
-  user: savedUser ? JSON.parse(savedUser) : DEMO_USERS.citizen, // Default to demo citizen
-  token: savedToken || 'demo-jwt-token-12345',
+  user: savedUser,
+  token: defaultToken,
   isAuthenticated: true,
   loading: false,
   error: null,
@@ -78,7 +80,7 @@ export const authSlice = createSlice({
         localStorage.removeItem('civic_user');
         localStorage.removeItem('civic_access_token');
       } else {
-        const selectedUser = DEMO_USERS[action.payload];
+        const selectedUser = DEMO_USERS[action.payload] || DEMO_USERS.admin;
         state.user = selectedUser;
         state.token = `demo-${action.payload}-token`;
         state.isAuthenticated = true;
@@ -107,5 +109,7 @@ export const authSlice = createSlice({
 
 export const { loginStart, loginSuccess, loginFailure, switchRole, logout, updateProfile } =
   authSlice.actions;
+
+export const setRole = switchRole;
 
 export default authSlice.reducer;

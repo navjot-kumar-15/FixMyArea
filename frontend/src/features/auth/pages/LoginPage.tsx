@@ -3,10 +3,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginStart, loginSuccess, loginFailure, switchRole } from '@/store/slices/authSlice';
+import { useNavigate } from 'react-router-dom';
+import { loginStart, switchRole, loginFailure } from '@/store/slices/authSlice';
 import { RootState } from '@/store';
 import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
+import { GlassCard, MagneticButton } from '@/components/ui/DesignSystem';
 import { UserRole } from '@/types';
 import { Mail, Lock, LogIn, Sparkles, UserCheck, Briefcase, Shield, User, Fingerprint } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -20,10 +21,8 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const LoginPage: React.FC = () => {
-  const dispatch = dispatchTarget();
-  function dispatchTarget() {
-    return useDispatch();
-  }
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.auth);
 
   const {
@@ -40,6 +39,19 @@ export const LoginPage: React.FC = () => {
     },
   });
 
+  const getDashboardRoute = (role: UserRole) => {
+    switch (role) {
+      case 'admin':
+        return '/admin/dashboard';
+      case 'worker':
+        return '/worker/dashboard';
+      case 'citizen':
+        return '/dashboard';
+      default:
+        return '/';
+    }
+  };
+
   const onSubmit = async (data: LoginFormValues) => {
     try {
       dispatch(loginStart());
@@ -51,7 +63,7 @@ export const LoginPage: React.FC = () => {
 
       dispatch(switchRole(role));
       toast.success(`Signed in as ${role.toUpperCase()} successfully!`);
-      window.location.href = role === 'admin' ? '/admin/dashboard' : role === 'worker' ? '/worker/dashboard' : '/dashboard';
+      navigate(getDashboardRoute(role));
     } catch (err: any) {
       dispatch(loginFailure('Invalid email or password'));
       toast.error('Login failed. Please check credentials.');
@@ -72,50 +84,46 @@ export const LoginPage: React.FC = () => {
 
     dispatch(switchRole(role));
     toast.success(`Logged in as ${target.label}! Redirecting...`);
-    window.location.href = role === 'admin' ? '/admin/dashboard' : role === 'worker' ? '/worker/dashboard' : role === 'guest' ? '/' : '/dashboard';
+    navigate(getDashboardRoute(role));
   };
 
   return (
-    <div className="space-y-6">
+    <GlassCard className="p-8 space-y-6 max-w-md mx-auto border border-indigo-500/30 glow-card">
       <div className="space-y-2 text-center">
-        <div className="inline-flex p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 border border-indigo-150 dark:border-indigo-900/40 mx-auto">
-          <Fingerprint className="w-8 h-8 animate-pulse" />
+        <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mx-auto border border-indigo-500/20 shadow-md">
+          <Fingerprint className="w-7 h-7" />
         </div>
-        <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-          System Verification
+        <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight font-display">
+          System Access
         </h2>
-        <p className="text-xs text-slate-400 max-w-xs mx-auto">
-          Select an identity card for instant 1-click authentication.
+        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto font-medium">
+          Select a role to instantly sign in or enter credentials.
         </p>
       </div>
 
       {/* 1-Click Instant Role Login Cards */}
       <div className="space-y-3">
-        <div className="flex items-center gap-1.5 text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
-          <Sparkles className="w-3.5 h-3.5 animate-spin" /> Interactive Quick Bypass
+        <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider font-display">
+          <Sparkles className="w-4 h-4 text-indigo-500" /> 1-Click Role Selection
         </div>
         <div className="grid grid-cols-2 gap-3">
           {/* Citizen Card */}
           <button
             type="button"
             onClick={() => handleQuickLogin('citizen')}
-            className="p-4 rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 hover:border-blue-500/60 dark:hover:border-blue-500/60 text-left transition-all group shadow-sm flex flex-col justify-between h-32 hover:-translate-y-1 hover:shadow-md"
+            className="p-3.5 rounded-2xl border border-indigo-500/20 bg-indigo-500/5 hover:border-indigo-500/50 text-left transition-all group flex flex-col justify-between h-28 cursor-pointer font-display"
           >
             <div className="flex items-center justify-between w-full">
-              <span className="p-2 rounded-xl bg-blue-600 text-white group-hover:scale-110 transition-transform">
-                <UserCheck className="w-4.5 h-4.5" />
+              <span className="p-2 rounded-xl bg-indigo-600 text-white group-hover:scale-110 transition-transform">
+                <UserCheck className="w-4 h-4" />
               </span>
-              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
                 Citizen
               </span>
             </div>
             <div>
-              <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                Alex Johnson
-              </div>
-              <div className="text-[10px] text-slate-400 truncate max-w-[120px]">
-                citizen@civicconnect.org
-              </div>
+              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Alex Johnson</div>
+              <div className="text-[10px] text-slate-400 truncate">citizen@civicconnect.org</div>
             </div>
           </button>
 
@@ -123,23 +131,19 @@ export const LoginPage: React.FC = () => {
           <button
             type="button"
             onClick={() => handleQuickLogin('worker')}
-            className="p-4 rounded-2xl border border-purple-200 dark:border-purple-900 bg-purple-50/40 dark:bg-purple-950/20 hover:border-purple-500/60 dark:hover:border-purple-500/60 text-left transition-all group shadow-sm flex flex-col justify-between h-32 hover:-translate-y-1 hover:shadow-md"
+            className="p-3.5 rounded-2xl border border-purple-500/20 bg-purple-500/5 hover:border-purple-500/50 text-left transition-all group flex flex-col justify-between h-28 cursor-pointer font-display"
           >
             <div className="flex items-center justify-between w-full">
               <span className="p-2 rounded-xl bg-purple-600 text-white group-hover:scale-110 transition-transform">
-                <Briefcase className="w-4.5 h-4.5" />
+                <Briefcase className="w-4 h-4" />
               </span>
-              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
+              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-purple-500/10 text-purple-600 dark:text-purple-300">
                 Worker
               </span>
             </div>
             <div>
-              <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                Marcus Vance
-              </div>
-              <div className="text-[10px] text-slate-400 truncate max-w-[120px]">
-                worker@civicconnect.org
-              </div>
+              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Marcus Vance</div>
+              <div className="text-[10px] text-slate-400 truncate">worker@civicconnect.org</div>
             </div>
           </button>
 
@@ -147,23 +151,19 @@ export const LoginPage: React.FC = () => {
           <button
             type="button"
             onClick={() => handleQuickLogin('admin')}
-            className="p-4 rounded-2xl border border-rose-200 dark:border-rose-900 bg-rose-50/40 dark:bg-rose-950/20 hover:border-rose-500/60 dark:hover:border-rose-500/60 text-left transition-all group shadow-sm flex flex-col justify-between h-32 hover:-translate-y-1 hover:shadow-md"
+            className="p-3.5 rounded-2xl border border-rose-500/20 bg-rose-500/5 hover:border-rose-500/50 text-left transition-all group flex flex-col justify-between h-28 cursor-pointer font-display"
           >
             <div className="flex items-center justify-between w-full">
               <span className="p-2 rounded-xl bg-rose-600 text-white group-hover:scale-110 transition-transform">
-                <Shield className="w-4.5 h-4.5" />
+                <Shield className="w-4 h-4" />
               </span>
-              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200">
+              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-300">
                 Admin
               </span>
             </div>
             <div>
-              <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
-                Eleanor Vance
-              </div>
-              <div className="text-[10px] text-slate-400 truncate max-w-[120px]">
-                admin@civicconnect.org
-              </div>
+              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Eleanor Vance</div>
+              <div className="text-[10px] text-slate-400 truncate">admin@civicconnect.org</div>
             </div>
           </button>
 
@@ -171,38 +171,34 @@ export const LoginPage: React.FC = () => {
           <button
             type="button"
             onClick={() => handleQuickLogin('guest')}
-            className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 hover:border-slate-500/60 dark:hover:border-slate-700/80 text-left transition-all group shadow-sm flex flex-col justify-between h-32 hover:-translate-y-1 hover:shadow-md"
+            className="p-3.5 rounded-2xl border border-slate-500/20 bg-slate-500/5 hover:border-slate-500/50 text-left transition-all group flex flex-col justify-between h-28 cursor-pointer font-display"
           >
             <div className="flex items-center justify-between w-full">
               <span className="p-2 rounded-xl bg-slate-700 text-white group-hover:scale-110 transition-transform">
-                <User className="w-4.5 h-4.5" />
+                <User className="w-4 h-4" />
               </span>
-              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+              <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-slate-500/10 text-slate-600 dark:text-slate-300">
                 Guest
               </span>
             </div>
             <div>
-              <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                Anonymous
-              </div>
-              <div className="text-[10px] text-slate-400 truncate max-w-[120px]">
-                Public Landing
-              </div>
+              <div className="text-xs font-extrabold text-slate-900 dark:text-white">Anonymous</div>
+              <div className="text-[10px] text-slate-400 truncate">Public Landing</div>
             </div>
           </button>
         </div>
       </div>
 
       <div className="relative flex py-2 items-center">
-        <div className="flex-grow border-t border-slate-200 dark:border-slate-850"></div>
-        <span className="flex-shrink mx-4 text-[9px] font-extrabold uppercase text-slate-400 tracking-widest">
-          Secure Terminal Bypass
+        <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+        <span className="flex-shrink mx-4 text-[10px] font-bold uppercase text-slate-400 tracking-wider font-display">
+          Or Enter Credentials
         </span>
-        <div className="flex-grow border-t border-slate-200 dark:border-slate-850"></div>
+        <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
       </div>
 
       {error && (
-        <div className="p-3.5 rounded-xl bg-rose-500/10 dark:bg-rose-950/40 border border-rose-500/25 text-xs text-rose-600 dark:text-rose-400 font-bold">
+        <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-600 dark:text-rose-400 font-bold">
           {error}
         </div>
       )}
@@ -212,51 +208,31 @@ export const LoginPage: React.FC = () => {
           label="Verification Email"
           type="email"
           placeholder="user@civicconnect.org"
-          leftIcon={<Mail className="w-4 h-4" />}
+          leftIcon={<Mail className="w-4 h-4 text-indigo-500" />}
           error={errors.email?.message}
           {...register('email')}
         />
 
         <Input
-          label="Terminal Keyphrase"
+          label="Password"
           type="password"
           placeholder="••••••••"
-          leftIcon={<Lock className="w-4 h-4" />}
+          leftIcon={<Lock className="w-4 h-4 text-indigo-500" />}
           error={errors.password?.message}
           {...register('password')}
         />
 
-        <div className="flex items-center justify-between text-xs pt-1">
-          <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-500">
-            <input
-              type="checkbox"
-              className="rounded border-slate-350 dark:border-slate-800 text-indigo-600 focus:ring-indigo-500 bg-transparent"
-              {...register('rememberMe')}
-            />
-            Keep Authenticated
-          </label>
-          <a href="/forgot-password" className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-            Recover Access
-          </a>
-        </div>
-
-        <Button
+        <MagneticButton
           type="submit"
           variant="primary"
-          className="w-full py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 font-bold"
+          size="lg"
+          className="w-full mt-2"
           isLoading={loading}
-          leftIcon={<LogIn className="w-4.5 h-4.5" />}
+          icon={LogIn}
         >
-          Verify Credentials
-        </Button>
+          Sign In
+        </MagneticButton>
       </form>
-
-      <div className="text-center text-xs text-slate-500 font-medium">
-        Need system access?{' '}
-        <a href="/register" className="font-bold text-indigo-600 hover:underline">
-          Create Account
-        </a>
-      </div>
-    </div>
+    </GlassCard>
   );
 };

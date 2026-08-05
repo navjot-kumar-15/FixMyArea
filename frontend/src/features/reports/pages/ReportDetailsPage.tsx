@@ -10,6 +10,7 @@ import {
   assignWorkerToReport,
 } from '@/store/slices/reportSlice';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Timeline } from '@/components/ui/Timeline';
 import { Button } from '@/components/ui/Button';
 import { StatusChip, PriorityChip } from '@/components/ui/StatusChip';
 import { Avatar } from '@/components/ui/Avatar';
@@ -198,6 +199,52 @@ export const ReportDetailsPage: React.FC = () => {
               )}
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Lifecycle Timeline Visualizer */}
+      <Card glass>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Clock className="w-5 h-5 text-indigo-500" /> Issue Progress Lifecycle
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Timeline
+            steps={[
+              {
+                id: 'step-1',
+                title: 'Issue Reported by Citizen',
+                description: 'Initial geotagged report submitted with photo evidence.',
+                timestamp: new Date(report.createdAt).toLocaleString(),
+                status: 'completed',
+                actorName: report.reportedBy.name,
+                actorRole: 'Citizen',
+              },
+              {
+                id: 'step-2',
+                title: report.assignedWorker ? 'Dispatched to Worker' : 'Under Control Center Review',
+                description: report.assignedWorker
+                  ? `Assigned to ${report.assignedWorker.name} for field inspection.`
+                  : 'Telemetry routed to municipal operations team.',
+                timestamp: report.assignedWorker ? '10 mins after report' : 'Pending',
+                status: report.assignedWorker ? 'completed' : report.status === 'PENDING' ? 'current' : 'completed',
+                actorName: report.assignedWorker ? report.assignedWorker.name : 'System Routing AI',
+                actorRole: report.assignedWorker ? 'Field Technician' : 'System',
+              },
+              {
+                id: 'step-3',
+                title: report.status === 'RESOLVED' ? 'Issue Verified & Resolved' : 'Work Order In Progress',
+                description: report.status === 'RESOLVED'
+                  ? 'Field repair completed and verified with photographic proof.'
+                  : 'Crew en route or performing on-site maintenance.',
+                timestamp: report.status === 'RESOLVED' ? 'Recently' : 'Estimated 2 hours',
+                status: report.status === 'RESOLVED' ? 'completed' : report.status === 'IN_PROGRESS' ? 'current' : 'upcoming',
+                proofImage: report.completionProof?.imageUrl,
+                notes: report.completionProof?.notes,
+              },
+            ]}
+          />
         </CardContent>
       </Card>
 

@@ -31,6 +31,33 @@ class ReportImageDto {
   public_id?: string;
 }
 
+export class CoordinatesDto {
+  @ApiProperty({
+    description: 'Latitude',
+    example: 12.9716,
+    required: true,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  lat: number;
+
+  @ApiProperty({
+    description: 'Longitude',
+    example: 77.5946,
+    required: true,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  @Transform(({ value, obj }: { value: any; obj: any }) => {
+    if (value !== undefined && value !== null) return value;
+    if (obj && (obj.lan !== undefined || obj.lon !== undefined)) {
+      return obj.lan ?? obj.lon;
+    }
+    return value;
+  })
+  lng: number;
+}
+
 class ReportLocationDto {
   @ApiPropertyOptional({
     description: 'Type of location',
@@ -43,14 +70,14 @@ class ReportLocationDto {
   type?: string = 'Point';
 
   @ApiProperty({
-    description: 'Coordinates [longitude, latitude]',
-    type: [Number],
+    description: 'Coordinates object with lat and lng properties',
+    type: CoordinatesDto,
     required: true,
   })
-  @IsArray()
-  @IsNumber({}, { each: true })
   @IsNotEmpty()
-  coordinates: number[];
+  @ValidateNested()
+  @Type(() => CoordinatesDto)
+  coordinates: CoordinatesDto;
 }
 
 export class CreateReportDto {

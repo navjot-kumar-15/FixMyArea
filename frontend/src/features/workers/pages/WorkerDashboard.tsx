@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '@/store';
-import { setSelectedReport } from '@/store/slices/reportSlice';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { StatusChip, PriorityChip } from '@/components/ui/StatusChip';
-import { Avatar } from '@/components/ui/Avatar';
-import { Briefcase, CheckCircle2, Clock, Star, MapPin, ArrowRight, Zap, Target } from 'lucide-react';
+import { setSelectedReport, updateReportStatus } from '@/store/slices/reportSlice';
+import { GlassCard, MagneticButton, StatusBadge, StatWidget } from '@/components/ui/DesignSystem';
+import { ReportsMap } from '@/components/map/ReportsMap';
+import {
+  Briefcase,
+  CheckCircle2,
+  Clock,
+  Star,
+  MapPin,
+  Zap,
+  Target,
+  Navigation,
+  Power,
+} from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export const WorkerDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -16,127 +25,195 @@ export const WorkerDashboard: React.FC = () => {
   const reports = useSelector((state: RootState) => state.reports.reports);
   const workers = useSelector((state: RootState) => state.workers.workers);
 
+  const [isOnDuty, setIsOnDuty] = useState(true);
+
   const workerProfile = workers.find((w) => w.id === user?.id || w.name === user?.name) || workers[0];
 
   const assignedTasks = reports.filter(
     (r) => r.assignedWorker?.id === workerProfile.id || r.assignedWorker?.name === workerProfile.name
   );
-  const pendingTasks = assignedTasks.filter((r) => r.status === 'IN_PROGRESS' || r.status === 'PENDING');
+  const activeTasks = assignedTasks.filter((r) => r.status === 'IN_PROGRESS' || r.status === 'PENDING');
+
+  const handleStatusChange = (id: string, newStatus: 'IN_PROGRESS' | 'RESOLVED', e: React.MouseEvent) => {
+    e.stopPropagation();
+    dispatch(updateReportStatus({ reportId: id, status: newStatus }));
+    toast.success(`Task status updated to ${newStatus.replace('_', ' ')}`);
+  };
 
   return (
-    <div className="space-y-8 pb-12">
-      {/* Worker Banner */}
-      <div className="rounded-3xl bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-800 p-8 text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 shimmer-card">
-        <div className="flex items-center gap-4">
-          <Avatar src={workerProfile.avatarUrl} name={workerProfile.name} size="xl" />
-          <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-white/20 text-white">
-                {workerProfile.specialization}
-              </span>
-              <span className="text-[11px] font-bold text-yellow-300 flex items-center gap-1">
-                <Star className="w-3.5 h-3.5 fill-yellow-300" /> {workerProfile.rating} Rating
-              </span>
-            </div>
-            <h1 className="text-2xl md:text-4xl font-black tracking-tight">{workerProfile.name}</h1>
-            <p className="text-xs text-indigo-100">
-              Assigned Patrol District: <strong>{workerProfile.assignedArea}</strong>
-            </p>
-          </div>
-        </div>
+    <div className="space-y-8 pb-16">
+      {/* Tactical Duty Header */}
+      <GlassCard className="p-8 border border-purple-500/30 glow-card relative overflow-hidden">
+        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-gradient-to-br from-purple-600/30 to-indigo-600/10 blur-3xl pointer-events-none" />
 
-        <div className="flex items-center gap-3">
-          <Button
-            variant="primary"
-            className="bg-white text-indigo-600 hover:bg-slate-50 font-bold border-none shadow-lg"
-            onClick={() => navigate('/worker/tasks')}
-            leftIcon={<Briefcase className="w-4 h-4" />}
-          >
-            Assigned Tasks ({pendingTasks.length})
-          </Button>
-        </div>
-      </div>
-
-      {/* Target Meter Progress */}
-      <Card glass className="p-5 border border-indigo-500/10">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="space-y-1">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-              <Target className="w-4 h-4 text-purple-600" /> Weekly Resolution Target
-            </h3>
-            <p className="text-xs text-slate-400">Aim for 95% SLA completion speed on safety dispatches.</p>
-          </div>
-          <div className="flex-grow max-w-md w-full space-y-1">
-            <div className="flex justify-between text-[11px] font-bold text-slate-500">
-              <span>SLA Target: 95%</span>
-              <span className="text-emerald-500 font-extrabold">Current: 97.4%</span>
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-extrabold text-2xl shadow-lg shadow-purple-500/30 font-display">
+              {workerProfile.name[0]}
             </div>
-            <div className="w-full h-3 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden p-0.5">
-              <div className="h-full rounded-full bg-gradient-to-r from-purple-500 to-indigo-600" style={{ width: '97.4%' }} />
+
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-300 text-xs font-bold font-display">
+                  {workerProfile.specialization} Unit
+                </span>
+                <span className="text-xs font-bold text-amber-500 flex items-center gap-1 font-display">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {workerProfile.rating} Rating
+                </span>
+              </div>
+
+              <h1 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight font-display">
+                {workerProfile.name}
+              </h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Assigned Patrol Sector: <strong className="text-slate-900 dark:text-white font-bold">{workerProfile.assignedArea}</strong>
+              </p>
             </div>
           </div>
-        </div>
-      </Card>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        {[
-          { label: 'Active Work Tasks', val: pendingTasks.length, icon: Briefcase, color: 'bg-purple-500/10 text-purple-600' },
-          { label: 'Total Completed Repairs', val: workerProfile.completedTasksCount, icon: CheckCircle2, color: 'bg-emerald-500/10 text-emerald-600' },
-          { label: 'Avg Resolution Speed', val: '4.2 Hours', icon: Clock, color: 'bg-blue-500/10 text-blue-600' },
-        ].map((item, idx) => {
-          const Icon = item.icon;
-          return (
-            <Card key={idx} glass className="p-5 hover:shadow-glow hover:-translate-y-1 transition-all border">
-              <CardContent className="p-0 flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-2xl ${item.color} flex items-center justify-center`}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{item.val}</div>
-                  <div className="text-xs font-semibold text-slate-400">{item.label}</div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Assigned Tasks Table / Cards */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">Active Dispatch Queue</h3>
-
-        <div className="space-y-4">
-          {assignedTasks.map((task) => (
-            <Card
-              key={task.id}
-              glass
-              className="cursor-pointer hover:border-purple-500/50 transition-all"
-              onClick={() => {
-                dispatch(setSelectedReport(task));
-                navigate(`/report/${task.id}`);
-              }}
+          {/* Duty Toggle Button */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsOnDuty(!isOnDuty)}
+              className={`
+                px-5 py-2.5 rounded-2xl text-xs font-extrabold flex items-center gap-2 transition-all font-display shadow-md
+                ${isOnDuty
+                  ? 'bg-emerald-500 text-white shadow-emerald-500/30'
+                  : 'bg-rose-500 text-white shadow-rose-500/30'}
+              `}
             >
-              <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="space-y-2 flex-1">
-                  <div className="flex items-center gap-2">
-                    <StatusChip status={task.status} />
-                    <PriorityChip priority={task.priority} />
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{task.category}</span>
+              <Power className="w-4 h-4" />
+              <span>{isOnDuty ? 'ACTIVE ON DUTY' : 'OFF DUTY'}</span>
+            </button>
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* Target Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <StatWidget
+          title="Active Dispatch Queue"
+          value={activeTasks.length}
+          subtitle="En Route Tasks"
+          trend="Immediate Priority"
+          trendDirection="up"
+          icon={Briefcase}
+          gradient="from-purple-600 to-indigo-600"
+        />
+
+        <StatWidget
+          title="Completed Repairs"
+          value={workerProfile.completedTasksCount}
+          subtitle="This Month"
+          trend="+8 resolved this week"
+          trendDirection="up"
+          icon={CheckCircle2}
+          gradient="from-emerald-500 to-teal-600"
+        />
+
+        <StatWidget
+          title="Avg SLA Repair Time"
+          value="3.8 Hours"
+          subtitle="Target 4.5 Hours"
+          trend="SLA Compliant"
+          trendDirection="up"
+          icon={Clock}
+          gradient="from-cyan-500 to-blue-600"
+        />
+      </div>
+
+      {/* Tactical Waypoint Radar & Queue Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* Left Column: Active Tasks List */}
+        <div className="lg:col-span-2 space-y-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight font-display flex items-center gap-2">
+              <Navigation className="w-6 h-6 text-purple-500" /> Active Dispatch Tasks
+            </h2>
+            <span className="text-xs font-bold text-slate-500">
+              {activeTasks.length} Assigned Items
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {assignedTasks.map((task) => (
+              <GlassCard
+                key={task.id}
+                onClick={() => {
+                  dispatch(setSelectedReport(task));
+                  navigate(`/report/${task.id}`);
+                }}
+                className="p-5"
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-2">
+                      <StatusBadge status={task.status} />
+                      <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider font-display">
+                        {task.category}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-extrabold text-slate-900 dark:text-white font-display">
+                      {task.title}
+                    </h3>
+
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium line-clamp-2">
+                      {task.description}
+                    </p>
+
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold pt-1">
+                      <MapPin className="w-4 h-4 text-purple-500" />
+                      <span>{task.locationName}</span>
+                    </div>
                   </div>
-                  <h4 className="text-base font-bold text-slate-900 dark:text-white">{task.title}</h4>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                    <MapPin className="w-3.5 h-3.5 text-indigo-500" />
-                    <span>{task.locationName}</span>
+
+                  {/* Task Action Controls */}
+                  <div className="flex flex-wrap sm:flex-col gap-2 shrink-0 w-full sm:w-auto">
+                    {task.status !== 'RESOLVED' && (
+                      <MagneticButton
+                        variant="primary"
+                        size="sm"
+                        icon={Zap}
+                        onClick={(e) => handleStatusChange(task.id, 'IN_PROGRESS', e)}
+                      >
+                        Start Repair
+                      </MagneticButton>
+                    )}
+
+                    {task.status !== 'RESOLVED' && (
+                      <MagneticButton
+                        variant="accent"
+                        size="sm"
+                        icon={CheckCircle2}
+                        onClick={(e) => handleStatusChange(task.id, 'RESOLVED', e)}
+                      >
+                        Mark Complete
+                      </MagneticButton>
+                    )}
                   </div>
                 </div>
+              </GlassCard>
+            ))}
+          </div>
+        </div>
 
-                <Button variant="outline" size="sm" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                  Inspect Task
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Right Column: Tactical Field Radar Map */}
+        <div className="space-y-4 sticky top-6">
+          <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight font-display flex items-center gap-2">
+            <Target className="w-5 h-5 text-purple-500" /> Tactical Patrol Radar
+          </h3>
+
+          <GlassCard className="p-2 overflow-hidden border border-purple-500/20">
+            <ReportsMap
+              reports={assignedTasks}
+              height="480px"
+              onSelectReport={(r) => {
+                dispatch(setSelectedReport(r));
+                navigate(`/report/${r.id}`);
+              }}
+            />
+          </GlassCard>
         </div>
       </div>
     </div>

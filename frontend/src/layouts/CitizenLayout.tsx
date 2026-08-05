@@ -1,16 +1,34 @@
 import React from 'react';
-import { TopNavbar } from './TopNavbar';
-import { Sidebar } from './Sidebar';
-import { NotificationDrawer } from '@/components/feedback/NotificationDrawer';
+import { motion } from 'framer-motion';
+import { FloatingHudDock } from '@/components/navigation/FloatingHudDock';
+import { WorkspaceHeader } from '@/components/navigation/WorkspaceHeader';
+import { NotificationDrawer } from './NotificationDrawer';
 
 export const CitizenLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans transition-colors">
-      <TopNavbar />
-      <div className="flex flex-1 w-full max-w-7xl mx-auto">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto min-w-0">{children}</main>
-      </div>
+    <div className="min-h-screen bg-[#f6f8fd] dark:bg-[#030712] text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors relative overflow-x-hidden bg-grid-pattern pb-32 sm:pb-36">
+      {/* Ambient Backdrop Aurora Blobs */}
+      <div className="aurora-blob aurora-1 pointer-events-none" />
+      <div className="aurora-blob aurora-2 pointer-events-none" />
+
+      {/* Workspace Header */}
+      <WorkspaceHeader />
+
+      {/* Main Content View with Smooth Route Transition */}
+      <motion.main
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -12 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-8 py-4 relative z-10"
+      >
+        {children}
+      </motion.main>
+
+      {/* Floating HUD Navigation Dock */}
+      <FloatingHudDock />
+
+      {/* Notifications Drawer */}
       <NotificationDrawer />
     </div>
   );
