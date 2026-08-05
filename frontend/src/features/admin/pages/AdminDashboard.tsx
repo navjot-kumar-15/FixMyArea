@@ -1,10 +1,11 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { RootState } from '@/store';
-import { GlassCard, MagneticButton, StatWidget, StatusBadge } from '@/components/ui/DesignSystem';
+import { VelvetCard } from '@/components/ui/VelvetCard';
+import { StatPulseWidget } from '@/components/ui/StatPulseWidget';
 import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
 import {
   FileText,
   Users,
@@ -13,14 +14,10 @@ import {
   TrendingUp,
   ShieldCheck,
   Radio,
-  Sparkles,
-  PieChart as PieIcon,
-  Activity,
-  Layers,
-  MapPin,
   PlusCircle,
   Briefcase,
-  BarChart3,
+  PieChart as PieIcon,
+  Activity,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -60,103 +57,83 @@ export const AdminDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8 pb-16">
-      {/* Operations Command Header */}
-      <GlassCard className="p-6 md:p-8 border border-indigo-500/30 glow-card relative overflow-hidden">
-        <div className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold font-display animate-pulse">
-          <Radio className="w-4 h-4 text-emerald-500" /> LIVE DISPATCH MATRIX
+    <div className="space-y-8 pb-20">
+      {/* Executive Command Header */}
+      <VelvetCard glow="indigo" className="p-8 relative overflow-hidden">
+        <div className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold font-mono">
+          <Radio className="w-4 h-4 text-emerald-400 animate-pulse" /> LIVE DISPATCH MATRIX
         </div>
 
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-bold text-indigo-600 dark:text-indigo-300 font-display">
-              <ShieldCheck className="w-4 h-4 text-indigo-500" /> Executive Operations Command
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-bold text-indigo-400">
+              <ShieldCheck className="w-4 h-4" /> Municipal Governance Desk
             </div>
 
-            <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight font-display">
+            <h1 className="text-3xl md:text-5xl font-black text-white font-display tracking-tight">
               City Operations Console
             </h1>
 
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
-              Real-time municipal telemetry stream, worker load balancing, emergency dispatch management, and SLA compliance.
+            <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
+              Real-time municipal telemetry stream, field worker load balancing, emergency triage, and SLA enforcement.
             </p>
           </div>
 
-          {/* Quick Command Buttons */}
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
-            <MagneticButton
-              variant="accent"
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              variant="gradient"
               size="md"
-              icon={PlusCircle}
-              onClick={() => navigate('/report')}
-            >
-              Report Issue
-            </MagneticButton>
-
-            <MagneticButton
-              variant="primary"
-              size="md"
-              icon={Users}
               onClick={() => navigate('/admin/users')}
+              leftIcon={<Users className="w-4 h-4" />}
             >
-              Add/Manage Users
-            </MagneticButton>
+              Manage Users
+            </Button>
           </div>
         </div>
-      </GlassCard>
+      </VelvetCard>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <StatWidget
+      {/* Telemetry Stats Widgets */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatPulseWidget
           title="Total System Reports"
           value={reports.length}
           subtitle="All Municipal Sectors"
           trend="+14% this month"
-          trendDirection="up"
-          icon={FileText}
-          gradient="from-indigo-600 to-indigo-500"
+          glow="indigo"
+          icon={<FileText className="w-6 h-6" />}
         />
-
-        <StatWidget
+        <StatPulseWidget
           title="Pending Dispatch"
           value={pendingCount}
           subtitle="Awaiting Field Unit"
-          trend="-2 unassigned"
-          trendDirection="down"
-          icon={AlertTriangle}
-          gradient="from-amber-500 to-orange-600"
+          glow="amber"
+          icon={<AlertTriangle className="w-6 h-6" />}
         />
-
-        <StatWidget
+        <StatPulseWidget
           title="Verified Resolved"
           value={resolvedCount}
           subtitle="Community Confirmed"
-          trend="98.2% Resolution SLA"
-          trendDirection="up"
-          icon={CheckCircle2}
-          gradient="from-emerald-500 to-teal-600"
+          glow="emerald"
+          icon={<CheckCircle2 className="w-6 h-6" />}
         />
-
-        <StatWidget
+        <StatPulseWidget
           title="Active Field Units"
           value={workers.length}
-          subtitle="Patrolling Sector 4"
-          trend="100% Active Duty"
-          trendDirection="up"
-          icon={Users}
-          gradient="from-purple-600 to-pink-600"
+          subtitle="Patrolling District 4"
+          glow="cyan"
+          icon={<Users className="w-6 h-6" />}
         />
       </div>
 
       {/* Analytics Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Area Chart: Report Inflow vs Velocity */}
-        <GlassCard className="lg:col-span-2 p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/60 pb-4">
-            <h3 className="text-lg font-extrabold text-slate-900 dark:text-white font-display flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-indigo-500" /> Monthly Report Inflow & Resolution Velocity
+        {/* Area Chart */}
+        <VelvetCard glow="cyan" className="lg:col-span-2 p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+            <h3 className="text-lg font-bold text-white font-display flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-indigo-400" /> Monthly Inflow & Resolution Velocity
             </h3>
-            <span className="text-xs font-bold text-slate-500">2026 Q1-Q2</span>
+            <span className="text-xs font-bold text-slate-500 font-mono">2026 Q1-Q2</span>
           </div>
 
           <div className="h-72 w-full pt-2">
@@ -180,13 +157,13 @@ export const AdminDashboard: React.FC = () => {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </GlassCard>
+        </VelvetCard>
 
-        {/* Pie Chart: Issue Category Density */}
-        <GlassCard className="p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/60 pb-4">
-            <h3 className="text-lg font-extrabold text-slate-900 dark:text-white font-display flex items-center gap-2">
-              <PieIcon className="w-5 h-5 text-purple-500" /> Category Density
+        {/* Category Density */}
+        <VelvetCard glow="amber" className="p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+            <h3 className="text-lg font-bold text-white font-display flex items-center gap-2">
+              <PieIcon className="w-5 h-5 text-purple-400" /> Category Density
             </h3>
           </div>
 
@@ -203,7 +180,7 @@ export const AdminDashboard: React.FC = () => {
             </ResponsiveContainer>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-3 text-xs text-slate-600 dark:text-slate-400">
+          <div className="flex flex-wrap justify-center gap-3 text-xs text-slate-400">
             {categoryDistribution.map((cat) => (
               <span key={cat.name} className="flex items-center gap-1 font-semibold">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
@@ -211,52 +188,52 @@ export const AdminDashboard: React.FC = () => {
               </span>
             ))}
           </div>
-        </GlassCard>
+        </VelvetCard>
       </div>
 
-      {/* Field Worker Workload Command Monitor */}
-      <GlassCard className="p-6 space-y-5">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200/60 dark:border-slate-800/60 pb-4">
-          <h3 className="text-lg font-extrabold text-slate-900 dark:text-white font-display flex items-center gap-2">
-            <Activity className="w-5 h-5 text-emerald-500" /> Active Field Dispatch & Workload Balance
+      {/* Field Worker Roster Overview */}
+      <VelvetCard glow="indigo" className="p-6 space-y-5">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <h3 className="text-lg font-bold text-white font-display flex items-center gap-2">
+            <Activity className="w-5 h-5 text-emerald-400" /> Field Dispatch Roster
           </h3>
-          <MagneticButton
-            variant="glass"
+          <Button
+            variant="secondary"
             size="sm"
-            icon={Briefcase}
             onClick={() => navigate('/admin/workers')}
+            leftIcon={<Briefcase className="w-4 h-4" />}
           >
-            Roster Details
-          </MagneticButton>
+            Manage Roster
+          </Button>
         </div>
 
-        <div className="divide-y divide-slate-200/60 dark:divide-slate-800/60">
+        <div className="divide-y divide-slate-800">
           {workers.map((worker) => (
-            <div key={worker.id} className="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div key={worker.id} className="py-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <Avatar src={worker.avatarUrl} name={worker.name} size="md" />
                 <div>
-                  <h4 className="text-base font-extrabold text-slate-900 dark:text-white font-display">{worker.name}</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    {worker.specialization} • Sector: <span className="text-indigo-500 font-semibold">{worker.assignedArea}</span>
+                  <h4 className="text-base font-bold text-white">{worker.name}</h4>
+                  <p className="text-xs text-slate-400">
+                    {worker.specialization} • District: <span className="text-indigo-400 font-semibold">{worker.assignedArea}</span>
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-6">
                 <div className="text-right">
-                  <div className="text-sm font-extrabold text-slate-900 dark:text-white font-display">{worker.activeTasksCount} Active Dispatch</div>
-                  <div className="text-xs text-slate-400 font-medium">{worker.completedTasksCount} Resolved Total</div>
+                  <div className="text-sm font-bold text-white">{worker.activeTasksCount} Active Dispatch</div>
+                  <div className="text-xs text-slate-500">{worker.completedTasksCount} Resolved</div>
                 </div>
 
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-display">
-                  ⭐ {worker.rating} Rating
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  ⭐ {worker.rating}
                 </span>
               </div>
             </div>
           ))}
         </div>
-      </GlassCard>
+      </VelvetCard>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { switchRole, logout } from '@/store/slices/authSlice';
 import { toggleTheme } from '@/store/slices/themeSlice';
 import { toggleNotificationDrawer } from '@/store/slices/notificationSlice';
 import { UserRole } from '@/types';
+import { filterNavItems } from '@/permissions/navigation';
 import {
   Sun,
   Moon,
@@ -20,18 +21,6 @@ import {
   Layers,
   Menu,
   X,
-  LayoutDashboard,
-  PlusCircle,
-  FileText,
-  MapPin,
-  Bookmark,
-  Users,
-  BarChart3,
-  ShieldCheck,
-  Settings,
-  HelpCircle,
-  Calendar,
-  CheckCircle,
   ArrowRight,
 } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
@@ -50,7 +39,7 @@ export const TopNavbar: React.FC = () => {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const role = user?.role || 'guest';
+  const role: UserRole = user?.role || 'guest';
   const isHomePage = location.pathname === '/';
 
   const roleBadges: Record<UserRole, { label: string; variant: any; icon: any }> = {
@@ -70,38 +59,8 @@ export const TopNavbar: React.FC = () => {
       ? '/worker/dashboard'
       : '/dashboard';
 
-  // Mobile Nav Items
-  const citizenNav = [
-    { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-    { label: 'Report New Issue', icon: PlusCircle, path: '/report' },
-    { label: 'My Reports', icon: FileText, path: '/my-reports' },
-    { label: 'Nearby Map', icon: MapPin, path: '/map' },
-    { label: 'Bookmarks', icon: Bookmark, path: '/bookmarks' },
-    { label: 'Profile Settings', icon: UserIcon, path: '/profile' },
-    { label: 'Help & FAQ', icon: HelpCircle, path: '/help' },
-  ];
-
-  const workerNav = [
-    { label: 'Worker Overview', icon: LayoutDashboard, path: '/worker/dashboard' },
-    { label: 'Assigned Work Orders', icon: Briefcase, path: '/worker/tasks' },
-    { label: 'Shift Calendar', icon: Calendar, path: '/worker/calendar' },
-    { label: 'Resolved History', icon: CheckCircle, path: '/worker/history' },
-    { label: 'Profile Settings', icon: UserIcon, path: '/profile' },
-  ];
-
-  const adminNav = [
-    { label: 'Admin Overview', icon: LayoutDashboard, path: '/admin/dashboard' },
-    { label: 'Reports Directory', icon: FileText, path: '/admin/reports' },
-    { label: 'Worker Roster', icon: Briefcase, path: '/admin/workers' },
-    { label: 'User Accounts', icon: Users, path: '/admin/users' },
-    { label: 'Service Areas', icon: Layers, path: '/admin/areas' },
-    { label: 'Analytics', icon: BarChart3, path: '/admin/analytics' },
-    { label: 'System Audit Logs', icon: ShieldCheck, path: '/admin/audit' },
-    { label: 'System Settings', icon: Settings, path: '/admin/settings' },
-  ];
-
-  const currentNav =
-    role === 'admin' ? adminNav : role === 'worker' ? workerNav : citizenNav;
+  // Dynamic mobile nav items generated from permission matrix
+  const currentNav = filterNavItems(role, 'navbar');
 
   return (
     <>
@@ -144,7 +103,7 @@ export const TopNavbar: React.FC = () => {
           >
             <span className="flex items-center gap-2">
               <Search className="w-4 h-4 text-indigo-500" />
-              <span>Search reports, pages, worker tasks...</span>
+              <span>Search authorized modules & actions...</span>
             </span>
             <span className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-700">
               ⌘K
@@ -154,7 +113,7 @@ export const TopNavbar: React.FC = () => {
 
         {/* Right Controls */}
         <div className="flex items-center gap-2 md:gap-4">
-          {/* Identity Switcher Dropdown - Only shown inside protected dashboard views, NOT on public home page */}
+          {/* Identity Switcher Dropdown - Only shown inside protected views */}
           {!isHomePage && isAuthenticated && (
             <div className="relative">
               <button
@@ -204,7 +163,7 @@ export const TopNavbar: React.FC = () => {
               onClick={() => navigate(dashboardPath)}
               className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition-all"
             >
-              <span>Go to Dashboard</span>
+              <span>Go to Console</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           )}
@@ -338,7 +297,7 @@ export const TopNavbar: React.FC = () => {
                     const isActive = location.pathname === item.path;
                     return (
                       <NavLink
-                        key={item.path}
+                        key={item.id}
                         to={item.path}
                         onClick={() => setMobileMenuOpen(false)}
                         className={`flex items-center gap-3 px-3.5 py-3.5 rounded-xl text-xs font-semibold transition-all ${

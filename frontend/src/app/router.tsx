@@ -46,6 +46,9 @@ const AdminAnalyticsPage = lazy(() => import('@/features/admin/pages/AdminAnalyt
 const AdminAuditLogsPage = lazy(() => import('@/features/admin/pages/AdminAuditLogsPage').then((m) => ({ default: m.AdminAuditLogsPage })));
 const AdminSettingsPage = lazy(() => import('@/features/admin/pages/AdminSettingsPage').then((m) => ({ default: m.AdminSettingsPage })));
 
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { RoleDock } from '@/components/ui/RoleDock';
+
 const RootLayout: React.FC = () => {
   const [isCommandOpen, setIsCommandOpen] = useState(false);
 
@@ -61,12 +64,15 @@ const RootLayout: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <ErrorBoundary>
       <Outlet />
+      <RoleDock />
       <CommandPalette isOpen={isCommandOpen} onClose={() => setIsCommandOpen(false)} />
-    </>
+    </ErrorBoundary>
   );
 };
+
+
 
 const router = createBrowserRouter([
   {
@@ -79,6 +85,18 @@ const router = createBrowserRouter([
           <GuestLayout>
             <Suspense fallback={<PageLoader />}>
               <LandingPage />
+            </Suspense>
+          </GuestLayout>
+        ),
+      },
+
+      // Public Spatial Explorer Route
+      {
+        path: '/explore',
+        element: (
+          <GuestLayout>
+            <Suspense fallback={<PageLoader />}>
+              <NearbyIssuesMapPage />
             </Suspense>
           </GuestLayout>
         ),
@@ -121,11 +139,13 @@ const router = createBrowserRouter([
         path: '/dashboard',
         element: (
           <ProtectedRoute>
-            <CitizenLayout>
-              <Suspense fallback={<PageLoader />}>
-                <CitizenDashboard />
-              </Suspense>
-            </CitizenLayout>
+            <RoleBasedRoute allowedRoles={['citizen', 'admin']}>
+              <CitizenLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <CitizenDashboard />
+                </Suspense>
+              </CitizenLayout>
+            </RoleBasedRoute>
           </ProtectedRoute>
         ),
       },
@@ -133,11 +153,13 @@ const router = createBrowserRouter([
         path: '/report',
         element: (
           <ProtectedRoute>
-            <CitizenLayout>
-              <Suspense fallback={<PageLoader />}>
-                <CreateReportWizard />
-              </Suspense>
-            </CitizenLayout>
+            <RoleBasedRoute allowedRoles={['citizen', 'admin']} permission="canCreateReport">
+              <CitizenLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <CreateReportWizard />
+                </Suspense>
+              </CitizenLayout>
+            </RoleBasedRoute>
           </ProtectedRoute>
         ),
       },
@@ -157,11 +179,13 @@ const router = createBrowserRouter([
         path: '/my-reports',
         element: (
           <ProtectedRoute>
-            <CitizenLayout>
-              <Suspense fallback={<PageLoader />}>
-                <MyReportsPage />
-              </Suspense>
-            </CitizenLayout>
+            <RoleBasedRoute allowedRoles={['citizen', 'admin']}>
+              <CitizenLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <MyReportsPage />
+                </Suspense>
+              </CitizenLayout>
+            </RoleBasedRoute>
           </ProtectedRoute>
         ),
       },
@@ -181,11 +205,13 @@ const router = createBrowserRouter([
         path: '/bookmarks',
         element: (
           <ProtectedRoute>
-            <CitizenLayout>
-              <Suspense fallback={<PageLoader />}>
-                <BookmarksPage />
-              </Suspense>
-            </CitizenLayout>
+            <RoleBasedRoute allowedRoles={['citizen', 'admin']}>
+              <CitizenLayout>
+                <Suspense fallback={<PageLoader />}>
+                  <BookmarksPage />
+                </Suspense>
+              </CitizenLayout>
+            </RoleBasedRoute>
           </ProtectedRoute>
         ),
       },
@@ -204,13 +230,11 @@ const router = createBrowserRouter([
       {
         path: '/help',
         element: (
-          <ProtectedRoute>
-            <CitizenLayout>
-              <Suspense fallback={<PageLoader />}>
-                <HelpCenterPage />
-              </Suspense>
-            </CitizenLayout>
-          </ProtectedRoute>
+          <CitizenLayout>
+            <Suspense fallback={<PageLoader />}>
+              <HelpCenterPage />
+            </Suspense>
+          </CitizenLayout>
         ),
       },
 
@@ -219,7 +243,7 @@ const router = createBrowserRouter([
         path: '/worker/dashboard',
         element: (
           <ProtectedRoute>
-            <RoleBasedRoute allowedRoles={['worker', 'admin']}>
+            <RoleBasedRoute allowedRoles={['worker']} permission="canViewWorkerDashboard">
               <WorkerLayout>
                 <Suspense fallback={<PageLoader />}>
                   <WorkerDashboard />
@@ -233,7 +257,7 @@ const router = createBrowserRouter([
         path: '/worker/tasks',
         element: (
           <ProtectedRoute>
-            <RoleBasedRoute allowedRoles={['worker', 'admin']}>
+            <RoleBasedRoute allowedRoles={['worker']} permission="canUpdateProgress">
               <WorkerLayout>
                 <Suspense fallback={<PageLoader />}>
                   <WorkerTasksPage />
@@ -247,7 +271,7 @@ const router = createBrowserRouter([
         path: '/worker/calendar',
         element: (
           <ProtectedRoute>
-            <RoleBasedRoute allowedRoles={['worker', 'admin']}>
+            <RoleBasedRoute allowedRoles={['worker']}>
               <WorkerLayout>
                 <Suspense fallback={<PageLoader />}>
                   <WorkerCalendarPage />
@@ -261,7 +285,7 @@ const router = createBrowserRouter([
         path: '/worker/history',
         element: (
           <ProtectedRoute>
-            <RoleBasedRoute allowedRoles={['worker', 'admin']}>
+            <RoleBasedRoute allowedRoles={['worker']}>
               <WorkerLayout>
                 <Suspense fallback={<PageLoader />}>
                   <WorkerHistoryPage />
@@ -271,6 +295,7 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+
 
       // Admin Domain Routes
       {

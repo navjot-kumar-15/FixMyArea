@@ -11,4 +11,21 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('recharts')) return 'vendor-charts';
+            if (id.includes('leaflet')) return 'vendor-maps';
+            if (id.includes('framer-motion') || id.includes('lucide-react')) return 'vendor-ui';
+            if (id.includes('react') || id.includes('redux')) return 'vendor-react';
+          }
+        },
+      },
+    },
+  },
 })
+
+

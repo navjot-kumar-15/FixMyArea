@@ -93,6 +93,9 @@ export class ReportService {
     if (status) {
       query.status = status as ReportStatus;
     }
+    if (location_id) {
+      query.location_id = new Types.ObjectId(location_id);
+    }
 
     const result = await this.reportModel.aggregate([
       {
@@ -139,6 +142,7 @@ export class ReportService {
                 description: '$description',
                 images: '$images',
                 location: '$location',
+                location_id: '$location_id',
                 category: {
                   name: '$category.name',
                   icon: '$category.icon',

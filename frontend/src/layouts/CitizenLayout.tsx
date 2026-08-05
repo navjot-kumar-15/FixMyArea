@@ -1,20 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FloatingHudDock } from '@/components/navigation/FloatingHudDock';
+import { RoleDock } from '@/components/ui/RoleDock';
 import { WorkspaceHeader } from '@/components/navigation/WorkspaceHeader';
 import { NotificationDrawer } from './NotificationDrawer';
 
 export const CitizenLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-[#f6f8fd] dark:bg-[#030712] text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors relative overflow-x-hidden bg-grid-pattern pb-32 sm:pb-36">
-      {/* Ambient Backdrop Aurora Blobs */}
-      <div className="aurora-blob aurora-1 pointer-events-none" />
-      <div className="aurora-blob aurora-2 pointer-events-none" />
-
-      {/* Workspace Header */}
+    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col font-sans transition-colors relative overflow-x-hidden pb-32 sm:pb-36">
       <WorkspaceHeader />
 
-      {/* Main Content View with Smooth Route Transition */}
       <motion.main
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -25,10 +19,7 @@ export const CitizenLayout: React.FC<{ children: React.ReactNode }> = ({ childre
         {children}
       </motion.main>
 
-      {/* Floating HUD Navigation Dock */}
-      <FloatingHudDock />
-
-      {/* Notifications Drawer */}
+      <RoleDock />
       <NotificationDrawer />
     </div>
   );
