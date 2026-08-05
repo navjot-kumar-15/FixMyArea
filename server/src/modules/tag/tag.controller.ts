@@ -23,7 +23,6 @@ import { TagService } from './tag.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { TagResponseDto } from './dto/tag-response.dto';
-import { TagMapper } from './mapper/tag.mapper';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
 
@@ -46,7 +45,7 @@ export class TagController {
     try {
       const tag = await this.tagService.create(createTagDto);
       return CustomResponse.success(
-        TagMapper.toResponse(tag),
+        tag,
         MESSAGES.TAG.CREATED,
         201,
       );
@@ -80,7 +79,7 @@ export class TagController {
       const onlyActive = all !== 'true';
       const tags = await this.tagService.findAll(onlyActive);
       return CustomResponse.success(
-        TagMapper.toResponseList(tags),
+        tags,
         MESSAGES.TAG.FETCHED_ALL,
       );
     } catch (error) {
@@ -102,7 +101,7 @@ export class TagController {
     try {
       const tag = await this.tagService.findOne(id);
       return CustomResponse.success(
-        TagMapper.toResponse(tag),
+        tag,
         MESSAGES.TAG.FETCHED,
       );
     } catch (error) {
@@ -132,7 +131,7 @@ export class TagController {
     try {
       const tag = await this.tagService.update(id, updateTagDto);
       return CustomResponse.success(
-        TagMapper.toResponse(tag),
+        tag,
         MESSAGES.TAG.UPDATED,
       );
     } catch (error) {
@@ -160,7 +159,7 @@ export class TagController {
     try {
       const tag = await this.tagService.remove(id);
       return CustomResponse.success(
-        TagMapper.toResponse(tag),
+        tag,
         MESSAGES.TAG.DELETED,
       );
     } catch (error) {

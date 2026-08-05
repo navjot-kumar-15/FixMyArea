@@ -25,7 +25,6 @@ import {
   ProgressUpdateResponseDto,
   PaginatedProgressUpdateResponseDto,
 } from './dto/progress-update-response.dto';
-import { ProgressUpdateMapper } from './mapper/progress-update.mapper';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
 
@@ -48,9 +47,8 @@ export class ProgressUpdateController {
       const update = await this.progressUpdateService.create(
         createProgressUpdateDto,
       );
-      const mapped = ProgressUpdateMapper.toResponse(update);
       return CustomResponse.success(
-        mapped,
+        update,
         MESSAGES.PROGRESS_UPDATE.CREATED,
         201,
       );
@@ -74,12 +72,8 @@ export class ProgressUpdateController {
       const paginatedResult = await this.progressUpdateService.findAll(
         filterProgressUpdateDto,
       );
-      const mappedResult: PaginatedProgressUpdateResponseDto = {
-        ...paginatedResult,
-        data: ProgressUpdateMapper.toResponseList(paginatedResult.data),
-      };
       return CustomResponse.success(
-        mappedResult,
+        paginatedResult,
         MESSAGES.PROGRESS_UPDATE.FETCHED_ALL,
       );
     } catch (error) {
@@ -103,8 +97,7 @@ export class ProgressUpdateController {
   async findOne(@Param('id') id: string) {
     try {
       const update = await this.progressUpdateService.findOne(id);
-      const mapped = ProgressUpdateMapper.toResponse(update);
-      return CustomResponse.success(mapped, MESSAGES.PROGRESS_UPDATE.FETCHED);
+      return CustomResponse.success(update, MESSAGES.PROGRESS_UPDATE.FETCHED);
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);
@@ -136,8 +129,7 @@ export class ProgressUpdateController {
         id,
         updateProgressUpdateDto,
       );
-      const mapped = ProgressUpdateMapper.toResponse(update);
-      return CustomResponse.success(mapped, MESSAGES.PROGRESS_UPDATE.UPDATED);
+      return CustomResponse.success(update, MESSAGES.PROGRESS_UPDATE.UPDATED);
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);
@@ -162,8 +154,7 @@ export class ProgressUpdateController {
   async remove(@Param('id') id: string) {
     try {
       const update = await this.progressUpdateService.remove(id);
-      const mapped = ProgressUpdateMapper.toResponse(update);
-      return CustomResponse.success(mapped, MESSAGES.PROGRESS_UPDATE.DELETED);
+      return CustomResponse.success(update, MESSAGES.PROGRESS_UPDATE.DELETED);
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);

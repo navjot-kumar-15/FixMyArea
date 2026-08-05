@@ -20,7 +20,7 @@ export class AssignmentService {
   ) {}
 
   // CREATE
-  async create(createAssignmentDto: CreateAssignmentDto): Promise<IAssignment> {
+  async create(createAssignmentDto: CreateAssignmentDto): Promise<any> {
     const newAssignment = new this.assignmentModel({
       ...createAssignmentDto,
       status: AssignmentStatus.ASSIGNED,
@@ -28,13 +28,14 @@ export class AssignmentService {
       is_active: true,
     });
     const savedAssignment = await newAssignment.save();
-    return AssignmentMapper.toDomain(savedAssignment) as IAssignment;
+    const domain = AssignmentMapper.toDomain(savedAssignment);
+    return AssignmentMapper.toResponse(domain);
   }
 
   // READ ALL
   async findAll(
     filterAssignmentDto: FilterAssignmentDto,
-  ): Promise<PaginatedResult<IAssignment>> {
+  ): Promise<PaginatedResult<any>> {
     const {
       page = 1,
       limit = 10,
@@ -65,8 +66,10 @@ export class AssignmentService {
       this.assignmentModel.countDocuments(query),
     ]);
 
+    const domainList = AssignmentMapper.toDomainList(assignments);
+
     return {
-      data: AssignmentMapper.toDomainList(assignments),
+      data: AssignmentMapper.toResponseList(domainList),
       total,
       page,
       limit,
@@ -75,19 +78,20 @@ export class AssignmentService {
   }
 
   // READ ONE
-  async findOne(id: string): Promise<IAssignment> {
+  async findOne(id: string): Promise<any> {
     const assignment = await this.assignmentModel.findById(id);
     if (!assignment || assignment.is_deleted) {
       throw new NotFoundException(`Assignment with ID ${id} not found`);
     }
-    return AssignmentMapper.toDomain(assignment) as IAssignment;
+    const domain = AssignmentMapper.toDomain(assignment);
+    return AssignmentMapper.toResponse(domain);
   }
 
   // UPDATE
   async update(
     id: string,
     updateAssignmentDto: UpdateAssignmentDto,
-  ): Promise<IAssignment> {
+  ): Promise<any> {
     const updatePayload: any = { ...updateAssignmentDto };
 
     // Set corresponding status date field if changed
@@ -113,11 +117,12 @@ export class AssignmentService {
     if (!updatedAssignment) {
       throw new NotFoundException(`Assignment with ID ${id} not found`);
     }
-    return AssignmentMapper.toDomain(updatedAssignment) as IAssignment;
+    const domain = AssignmentMapper.toDomain(updatedAssignment);
+    return AssignmentMapper.toResponse(domain);
   }
 
   // DELETE
-  async remove(id: string): Promise<IAssignment> {
+  async remove(id: string): Promise<any> {
     const deletedAssignment = await this.assignmentModel.findByIdAndUpdate(
       id,
       {
@@ -131,6 +136,7 @@ export class AssignmentService {
     if (!deletedAssignment) {
       throw new NotFoundException(`Assignment with ID ${id} not found`);
     }
-    return AssignmentMapper.toDomain(deletedAssignment) as IAssignment;
+    const domain = AssignmentMapper.toDomain(deletedAssignment);
+    return AssignmentMapper.toResponse(domain);
   }
 }

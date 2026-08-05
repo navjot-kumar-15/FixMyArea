@@ -23,7 +23,6 @@ import { LocationService } from './location.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { LocationResponseDto } from './dto/location-response.dto';
-import { LocationMapper } from './mapper/location.mapper';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
 import { LocationType } from '../../database/schemas/location.schema';
@@ -61,7 +60,7 @@ export class LocationController {
     try {
       const location = await this.locationService.create(createLocationDto);
       return CustomResponse.success(
-        LocationMapper.toResponse(location),
+        location,
         MESSAGES.LOCATION.CREATED,
       );
     } catch (error) {
@@ -162,7 +161,7 @@ export class LocationController {
 
       const locations = await this.locationService.findAll(filters);
       return CustomResponse.success(
-        LocationMapper.toResponseList(locations),
+        locations,
         MESSAGES.LOCATION.FETCHED_ALL,
       );
     } catch (error) {
@@ -185,7 +184,7 @@ export class LocationController {
     try {
       const location = await this.locationService.findOne(id);
       return CustomResponse.success(
-        LocationMapper.toResponse(location),
+        location,
         MESSAGES.LOCATION.FETCHED,
       );
     } catch (error) {
@@ -219,7 +218,7 @@ export class LocationController {
     try {
       const location = await this.locationService.update(id, updateLocationDto);
       return CustomResponse.success(
-        LocationMapper.toResponse(location),
+        location,
         MESSAGES.LOCATION.UPDATED,
       );
     } catch (error) {
@@ -255,7 +254,7 @@ export class LocationController {
     try {
       const location = await this.locationService.remove(id);
       return CustomResponse.success(
-        LocationMapper.toResponse(location),
+        location,
         MESSAGES.LOCATION.DELETED,
       );
     } catch (error) {

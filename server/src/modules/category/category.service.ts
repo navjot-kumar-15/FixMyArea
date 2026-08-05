@@ -17,7 +17,7 @@ export class CategoryService {
     @InjectModel('Category') private readonly categoryModel: Model<Category>,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto): Promise<ICategory> {
+  async create(createCategoryDto: CreateCategoryDto): Promise<any> {
     const nameTrimmed = createCategoryDto.name.trim();
     const existing = await this.categoryModel
       .findOne({ name: { $regex: new RegExp(`^${nameTrimmed}$`, 'i') } })
@@ -33,27 +33,30 @@ export class CategoryService {
       name: nameTrimmed,
     });
     const saved = await newCategory.save();
-    return CategoryMapper.toDomain(saved) as ICategory;
+    const domain = CategoryMapper.toDomain(saved);
+    return CategoryMapper.toResponse(domain);
   }
 
-  async findAll(onlyActive = true): Promise<ICategory[]> {
+  async findAll(onlyActive = true): Promise<any> {
     const filter = onlyActive ? { is_active: true } : {};
     const categories = await this.categoryModel.find(filter).exec();
-    return CategoryMapper.toDomainList(categories);
+    const domainList = CategoryMapper.toDomainList(categories);
+    return CategoryMapper.toResponseList(domainList);
   }
 
-  async findOne(id: string): Promise<ICategory> {
+  async findOne(id: string): Promise<any> {
     const category = await this.categoryModel.findById(id).exec();
     if (!category) {
       throw new NotFoundException(`Category with ID "${id}" not found.`);
     }
-    return CategoryMapper.toDomain(category) as ICategory;
+    const domain = CategoryMapper.toDomain(category);
+    return CategoryMapper.toResponse(domain);
   }
 
   async update(
     id: string,
     updateCategoryDto: UpdateCategoryDto,
-  ): Promise<ICategory> {
+  ): Promise<any> {
     if (updateCategoryDto.name) {
       const nameTrimmed = updateCategoryDto.name.trim();
       const existing = await this.categoryModel
@@ -76,15 +79,16 @@ export class CategoryService {
     if (!updated) {
       throw new NotFoundException(`Category with ID "${id}" not found.`);
     }
-    return CategoryMapper.toDomain(updated) as ICategory;
+    const domain = CategoryMapper.toDomain(updated);
+    return CategoryMapper.toResponse(domain);
   }
 
-  async remove(id: string): Promise<ICategory> {
-    // Perform a soft delete by marking it inactive, or delete entirely. Let's do a hard delete to match the RoleService remove logic, or soft-delete. Let's make it a hard delete, or update status. Let's do a hard delete as it's standard database cleanup.
+  async remove(id: string): Promise<any> {
     const deleted = await this.categoryModel.findByIdAndDelete(id).exec();
     if (!deleted) {
       throw new NotFoundException(`Category with ID "${id}" not found.`);
     }
-    return CategoryMapper.toDomain(deleted) as ICategory;
+    const domain = CategoryMapper.toDomain(deleted);
+    return CategoryMapper.toResponse(domain);
   }
 }

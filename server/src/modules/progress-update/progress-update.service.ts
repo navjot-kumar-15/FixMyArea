@@ -19,16 +19,17 @@ export class ProgressUpdateService {
   // CREATE
   async create(
     createProgressUpdateDto: CreateProgressUpdateDto,
-  ): Promise<IProgressUpdate> {
+  ): Promise<any> {
     const newUpdate = new this.progressUpdateModel(createProgressUpdateDto);
     const savedUpdate = await newUpdate.save();
-    return ProgressUpdateMapper.toDomain(savedUpdate) as IProgressUpdate;
+    const domain = ProgressUpdateMapper.toDomain(savedUpdate);
+    return ProgressUpdateMapper.toResponse(domain);
   }
 
   // READ ALL
   async findAll(
     filterProgressUpdateDto: FilterProgressUpdateDto,
-  ): Promise<PaginatedResult<IProgressUpdate>> {
+  ): Promise<PaginatedResult<any>> {
     const {
       page = 1,
       limit = 10,
@@ -59,8 +60,10 @@ export class ProgressUpdateService {
       this.progressUpdateModel.countDocuments(query),
     ]);
 
+    const domainList = ProgressUpdateMapper.toDomainList(updates);
+
     return {
-      data: ProgressUpdateMapper.toDomainList(updates),
+      data: ProgressUpdateMapper.toResponseList(domainList),
       total,
       page,
       limit,
@@ -69,19 +72,20 @@ export class ProgressUpdateService {
   }
 
   // READ ONE
-  async findOne(id: string): Promise<IProgressUpdate> {
+  async findOne(id: string): Promise<any> {
     const update = await this.progressUpdateModel.findById(id);
     if (!update || update.is_deleted) {
       throw new NotFoundException(`Progress update with ID ${id} not found`);
     }
-    return ProgressUpdateMapper.toDomain(update) as IProgressUpdate;
+    const domain = ProgressUpdateMapper.toDomain(update);
+    return ProgressUpdateMapper.toResponse(domain);
   }
 
   // UPDATE
   async update(
     id: string,
     updateProgressUpdateDto: UpdateProgressUpdateDto,
-  ): Promise<IProgressUpdate> {
+  ): Promise<any> {
     const updatePayload: any = { ...updateProgressUpdateDto };
 
     if (updateProgressUpdateDto.is_verified === true) {
@@ -97,11 +101,12 @@ export class ProgressUpdateService {
     if (!updatedUpdate) {
       throw new NotFoundException(`Progress update with ID ${id} not found`);
     }
-    return ProgressUpdateMapper.toDomain(updatedUpdate) as IProgressUpdate;
+    const domain = ProgressUpdateMapper.toDomain(updatedUpdate);
+    return ProgressUpdateMapper.toResponse(domain);
   }
 
   // DELETE
-  async remove(id: string): Promise<IProgressUpdate> {
+  async remove(id: string): Promise<any> {
     const deletedUpdate = await this.progressUpdateModel.findByIdAndUpdate(
       id,
       {
@@ -114,6 +119,7 @@ export class ProgressUpdateService {
     if (!deletedUpdate) {
       throw new NotFoundException(`Progress update with ID ${id} not found`);
     }
-    return ProgressUpdateMapper.toDomain(deletedUpdate) as IProgressUpdate;
+    const domain = ProgressUpdateMapper.toDomain(deletedUpdate);
+    return ProgressUpdateMapper.toResponse(domain);
   }
 }

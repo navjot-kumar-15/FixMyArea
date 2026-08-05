@@ -73,7 +73,7 @@ export class LocationService {
     }
   }
 
-  async create(createLocationDto: CreateLocationDto): Promise<ILocation> {
+  async create(createLocationDto: CreateLocationDto): Promise<any> {
     const nameTrimmed = createLocationDto.name.trim();
     const parentId = createLocationDto.parent_id
       ? new Types.ObjectId(createLocationDto.parent_id)
@@ -124,7 +124,8 @@ export class LocationService {
 
     const newLocation = new this.locationModel(dataToSave);
     const saved = await newLocation.save();
-    return LocationMapper.toDomain(saved) as ILocation;
+    const domain = LocationMapper.toDomain(saved);
+    return LocationMapper.toResponse(domain);
   }
 
   async findAll(filters: {
@@ -172,10 +173,11 @@ export class LocationService {
     }
 
     const locations = await this.locationModel.find(query).exec();
-    return LocationMapper.toDomainList(locations);
+    const domainList = LocationMapper.toDomainList(locations);
+    return LocationMapper.toResponseList(domainList);
   }
 
-  async findOne(id: string): Promise<ILocation> {
+  async findOne(id: string): Promise<any> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException(`Invalid MongoDB ID "${id}".`);
     }
@@ -183,13 +185,14 @@ export class LocationService {
     if (!location) {
       throw new NotFoundException(`Location with ID "${id}" not found.`);
     }
-    return LocationMapper.toDomain(location) as ILocation;
+    const domain = LocationMapper.toDomain(location);
+    return LocationMapper.toResponse(domain);
   }
 
   async update(
     id: string,
     updateLocationDto: UpdateLocationDto,
-  ): Promise<ILocation> {
+  ): Promise<any> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException(`Invalid MongoDB ID "${id}".`);
     }
@@ -315,10 +318,11 @@ export class LocationService {
       .findByIdAndUpdate(id, updateData, { new: true })
       .exec();
 
-    return LocationMapper.toDomain(updated) as ILocation;
+    const domain = LocationMapper.toDomain(updated);
+    return LocationMapper.toResponse(domain);
   }
 
-  async remove(id: string): Promise<ILocation> {
+  async remove(id: string): Promise<any> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException(`Invalid MongoDB ID "${id}".`);
     }
@@ -337,6 +341,7 @@ export class LocationService {
     if (!deleted) {
       throw new NotFoundException(`Location with ID "${id}" not found.`);
     }
-    return LocationMapper.toDomain(deleted) as ILocation;
+    const domain = LocationMapper.toDomain(deleted);
+    return LocationMapper.toResponse(domain);
   }
 }

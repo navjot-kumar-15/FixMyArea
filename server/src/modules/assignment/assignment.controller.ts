@@ -25,7 +25,6 @@ import {
   AssignmentResponseDto,
   PaginatedAssignmentResponseDto,
 } from './dto/assignment-response.dto';
-import { AssignmentMapper } from './mapper/assignment.mapper';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
 
@@ -47,8 +46,7 @@ export class AssignmentController {
     try {
       const assignment =
         await this.assignmentService.create(createAssignmentDto);
-      const mapped = AssignmentMapper.toResponse(assignment);
-      return CustomResponse.success(mapped, MESSAGES.ASSIGNMENT.CREATED, 201);
+      return CustomResponse.success(assignment, MESSAGES.ASSIGNMENT.CREATED, 201);
     } catch (error) {
       if (error instanceof BadRequestException) {
         return CustomResponse.error(error.message, null, 400);
@@ -68,12 +66,8 @@ export class AssignmentController {
     try {
       const paginatedResult =
         await this.assignmentService.findAll(filterAssignmentDto);
-      const mappedResult: PaginatedAssignmentResponseDto = {
-        ...paginatedResult,
-        data: AssignmentMapper.toResponseList(paginatedResult.data),
-      };
       return CustomResponse.success(
-        mappedResult,
+        paginatedResult,
         MESSAGES.ASSIGNMENT.FETCHED_ALL,
       );
     } catch (error) {
@@ -97,8 +91,7 @@ export class AssignmentController {
   async findOne(@Param('id') id: string) {
     try {
       const assignment = await this.assignmentService.findOne(id);
-      const mapped = AssignmentMapper.toResponse(assignment);
-      return CustomResponse.success(mapped, MESSAGES.ASSIGNMENT.FETCHED);
+      return CustomResponse.success(assignment, MESSAGES.ASSIGNMENT.FETCHED);
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);
@@ -130,8 +123,7 @@ export class AssignmentController {
         id,
         updateAssignmentDto,
       );
-      const mapped = AssignmentMapper.toResponse(assignment);
-      return CustomResponse.success(mapped, MESSAGES.ASSIGNMENT.UPDATED);
+      return CustomResponse.success(assignment, MESSAGES.ASSIGNMENT.UPDATED);
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);
@@ -156,8 +148,7 @@ export class AssignmentController {
   async remove(@Param('id') id: string) {
     try {
       const assignment = await this.assignmentService.remove(id);
-      const mapped = AssignmentMapper.toResponse(assignment);
-      return CustomResponse.success(mapped, MESSAGES.ASSIGNMENT.DELETED);
+      return CustomResponse.success(assignment, MESSAGES.ASSIGNMENT.DELETED);
     } catch (error) {
       if (error instanceof NotFoundException) {
         return CustomResponse.error(error.message, null, 404);

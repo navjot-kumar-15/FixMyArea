@@ -23,7 +23,6 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryResponseDto } from './dto/category-response.dto';
-import { CategoryMapper } from './mapper/category.mapper';
 import { ApiResponse as CustomResponse } from '../../common/responses/api-response';
 import { MESSAGES } from '../../common/constants/messages.constant';
 
@@ -46,7 +45,7 @@ export class CategoryController {
     try {
       const category = await this.categoryService.create(createCategoryDto);
       return CustomResponse.success(
-        CategoryMapper.toResponse(category),
+        category,
         MESSAGES.CATEGORY.CREATED,
       );
     } catch (error) {
@@ -78,7 +77,7 @@ export class CategoryController {
       const onlyActive = all !== 'true';
       const categories = await this.categoryService.findAll(onlyActive);
       return CustomResponse.success(
-        CategoryMapper.toResponseList(categories),
+        categories,
         MESSAGES.CATEGORY.FETCHED_ALL,
       );
     } catch (error) {
@@ -99,7 +98,7 @@ export class CategoryController {
     try {
       const category = await this.categoryService.findOne(id);
       return CustomResponse.success(
-        CategoryMapper.toResponse(category),
+        category,
         MESSAGES.CATEGORY.FETCHED,
       );
     } catch (error) {
@@ -128,7 +127,7 @@ export class CategoryController {
     try {
       const category = await this.categoryService.update(id, updateCategoryDto);
       return CustomResponse.success(
-        CategoryMapper.toResponse(category),
+        category,
         MESSAGES.CATEGORY.UPDATED,
       );
     } catch (error) {
@@ -155,7 +154,7 @@ export class CategoryController {
     try {
       const category = await this.categoryService.remove(id);
       return CustomResponse.success(
-        CategoryMapper.toResponse(category),
+        category,
         MESSAGES.CATEGORY.DELETED,
       );
     } catch (error) {
