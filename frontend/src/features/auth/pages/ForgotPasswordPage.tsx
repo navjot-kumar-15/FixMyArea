@@ -1,76 +1,91 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
-
-const forgotSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-});
-
-type ForgotFormValues = z.infer<typeof forgotSchema>;
+import { Link } from 'react-router-dom';
+import { Button, Input, ErrorState } from '@/components/ui';
+import { MockAuthService } from '@/services/mockAuth';
+import { Mail, CheckCircle2, ArrowLeft } from 'lucide-react';
 
 export const ForgotPasswordPage: React.FC = () => {
+  const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<ForgotFormValues>({
-    resolver: zodResolver(forgotSchema),
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
 
-  const onSubmit = async () => {
-    await new Promise((res) => setTimeout(res, 800));
-    setSubmitted(true);
+    try {
+      await MockAuthService.forgotPassword(email);
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(err.message || 'Failed to process request.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Reset Your Password
-        </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          Enter your registered email and we'll send you instructions to reset your password.
+        <h1 className="text-2xl font-extrabold text-white font-display tracking-tight">
+          Forgot Password?
+        </h1>
+        <p className="text-xs text-slate-400">
+          Enter your account email to receive a password reset link.
         </p>
       </div>
 
+      {error && <ErrorState title="Request Error" message={error} />}
+
       {submitted ? (
-        <div className="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-center space-y-3">
-          <CheckCircle2 className="w-12 h-12 text-emerald-600 dark:text-emerald-400 mx-auto" />
-          <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">Check your inbox</h4>
-          <p className="text-xs text-slate-600 dark:text-slate-300">
-            We sent a password reset link to your email. Click the link in the email to set a new password.
-          </p>
-          <Button variant="outline" className="w-full mt-2" onClick={() => (window.location.href = '/login')}>
-            Back to Sign In
-          </Button>
+        <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+            <CheckCircle2 className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm font-bold text-white">Reset Link Sent</h3>
+            <p className="text-xs text-slate-300">
+              Check your inbox at <span className="text-white font-bold">{email}</span> for instructions.
+            </p>
+          </div>
+          <Link
+            to="/reset-password"
+            className="inline-block px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500"
+          >
+            Demo: Continue to Reset Screen
+          </Link>
         </div>
       ) : (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Email Address"
+            label="Account Email"
             type="email"
-            placeholder="user@civicconnect.org"
-            leftIcon={<Mail className="w-4 h-4" />}
-            error={errors.email?.message}
-            {...register('email')}
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="citizen@civic.gov"
+            leftIcon={<Mail className="w-4 h-4 text-slate-400" />}
           />
 
-          <Button type="submit" variant="primary" className="w-full py-3" isLoading={isSubmitting}>
-            Send Reset Link
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full justify-center py-3 text-sm font-bold"
+            isLoading={isLoading}
+          >
+            Send Reset Instructions
           </Button>
         </form>
       )}
 
-      <div className="text-center text-xs">
-        <a href="/login" className="inline-flex items-center gap-1 font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600">
+      <div className="text-center">
+        <Link
+          to="/login"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white"
+        >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Sign In
-        </a>
+        </Link>
       </div>
     </div>
   );

@@ -4,7 +4,9 @@ import { RoleDock } from '@/components/ui/RoleDock';
 import { WorkspaceHeader } from '@/components/navigation/WorkspaceHeader';
 import { NotificationDrawer } from './NotificationDrawer';
 
-export const CitizenLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+import { Outlet } from 'react-router-dom';
+
+export const CitizenLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   return (
     <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col font-sans transition-colors relative overflow-x-hidden pb-32 sm:pb-36">
       <WorkspaceHeader />
@@ -16,7 +18,7 @@ export const CitizenLayout: React.FC<{ children: React.ReactNode }> = ({ childre
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-8 py-4 relative z-10"
       >
-        {children}
+        {children || <Outlet />}
       </motion.main>
 
       <RoleDock />

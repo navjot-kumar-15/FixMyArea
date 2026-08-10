@@ -15,6 +15,8 @@ export * from './Avatar';
 export * from './Breadcrumb';
 export * from './ConfirmDialog';
 export * from './EmptyState';
+export * from './ErrorState';
+export * from './Toast';
 export * from './OTPInput';
 export * from './PageLoader';
 export * from './Progress';

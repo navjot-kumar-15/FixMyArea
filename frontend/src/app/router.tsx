@@ -14,11 +14,22 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 import { RoleBasedRoute } from '@/routes/RoleBasedRoute';
 
-// Lazy Loaded Pages
+// Lazy Loaded Guest Pages
 const LandingPage = lazy(() => import('@/features/guest/pages/LandingPage').then((m) => ({ default: m.LandingPage })));
+const ExplorePage = lazy(() => import('@/features/guest/pages/ExplorePage').then((m) => ({ default: m.ExplorePage })));
+const PublicReportDetailPage = lazy(() => import('@/features/guest/pages/PublicReportDetailPage').then((m) => ({ default: m.PublicReportDetailPage })));
+const PublicActivityPage = lazy(() => import('@/features/guest/pages/PublicActivityPage').then((m) => ({ default: m.PublicActivityPage })));
+const AboutPage = lazy(() => import('@/features/guest/pages/AboutPage').then((m) => ({ default: m.AboutPage })));
 const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('@/features/auth/pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
 const ForgotPasswordPage = lazy(() => import('@/features/auth/pages/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage })));
+const ResetPasswordPage = lazy(() => import('@/features/auth/pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })));
+const VerifyEmailPage = lazy(() => import('@/features/auth/pages/VerifyEmailPage').then((m) => ({ default: m.VerifyEmailPage })));
+
+// Error Fallback Pages
+const UnauthorizedPage = lazy(() => import('@/features/error/UnauthorizedPage').then((m) => ({ default: m.UnauthorizedPage })));
+const ForbiddenPage = lazy(() => import('@/features/error/ForbiddenPage').then((m) => ({ default: m.ForbiddenPage })));
+const NotFoundPage = lazy(() => import('@/features/error/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
 // Citizen Pages
 const CitizenDashboard = lazy(() => import('@/features/reports/pages/CitizenDashboard').then((m) => ({ default: m.CitizenDashboard })));
@@ -74,10 +85,24 @@ const RootLayout: React.FC = () => {
 
 
 
+const DesignSystemShowcase = lazy(() => import('@/features/foundation/DesignSystemShowcase').then((m) => ({ default: m.DesignSystemShowcase })));
+import { AppShell } from '@/shared/layouts/AppShell';
+
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
+      // Phase 1 Foundation Showcase Route
+      {
+        path: '/showcase',
+        element: (
+          <AppShell>
+            <Suspense fallback={<PageLoader />}>
+              <DesignSystemShowcase />
+            </Suspense>
+          </AppShell>
+        ),
+      },
       // Public Landing Page
       {
         path: '/',
@@ -90,13 +115,43 @@ const router = createBrowserRouter([
         ),
       },
 
-      // Public Spatial Explorer Route
+      // Public Guest Experience Routes
       {
         path: '/explore',
         element: (
           <GuestLayout>
             <Suspense fallback={<PageLoader />}>
-              <NearbyIssuesMapPage />
+              <ExplorePage />
+            </Suspense>
+          </GuestLayout>
+        ),
+      },
+      {
+        path: '/reports/:id',
+        element: (
+          <GuestLayout>
+            <Suspense fallback={<PageLoader />}>
+              <PublicReportDetailPage />
+            </Suspense>
+          </GuestLayout>
+        ),
+      },
+      {
+        path: '/activity',
+        element: (
+          <GuestLayout>
+            <Suspense fallback={<PageLoader />}>
+              <PublicActivityPage />
+            </Suspense>
+          </GuestLayout>
+        ),
+      },
+      {
+        path: '/about',
+        element: (
+          <GuestLayout>
+            <Suspense fallback={<PageLoader />}>
+              <AboutPage />
             </Suspense>
           </GuestLayout>
         ),
@@ -131,6 +186,44 @@ const router = createBrowserRouter([
               <ForgotPasswordPage />
             </Suspense>
           </AuthLayout>
+        ),
+      },
+      {
+        path: '/reset-password',
+        element: (
+          <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <ResetPasswordPage />
+            </Suspense>
+          </AuthLayout>
+        ),
+      },
+      {
+        path: '/verify-email',
+        element: (
+          <AuthLayout>
+            <Suspense fallback={<PageLoader />}>
+              <VerifyEmailPage />
+            </Suspense>
+          </AuthLayout>
+        ),
+      },
+
+      // Error Fallback Routes
+      {
+        path: '/401',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <UnauthorizedPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/403',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ForbiddenPage />
+          </Suspense>
         ),
       },
 
@@ -243,7 +336,7 @@ const router = createBrowserRouter([
         path: '/worker/dashboard',
         element: (
           <ProtectedRoute>
-            <RoleBasedRoute allowedRoles={['worker']} permission="canViewWorkerDashboard">
+            <RoleBasedRoute allowedRoles={['worker', 'admin']} permission="canViewWorkerDashboard">
               <WorkerLayout>
                 <Suspense fallback={<PageLoader />}>
                   <WorkerDashboard />
@@ -257,7 +350,7 @@ const router = createBrowserRouter([
         path: '/worker/tasks',
         element: (
           <ProtectedRoute>
-            <RoleBasedRoute allowedRoles={['worker']} permission="canUpdateProgress">
+            <RoleBasedRoute allowedRoles={['worker', 'admin']} permission="canUpdateProgress">
               <WorkerLayout>
                 <Suspense fallback={<PageLoader />}>
                   <WorkerTasksPage />
@@ -271,7 +364,7 @@ const router = createBrowserRouter([
         path: '/worker/calendar',
         element: (
           <ProtectedRoute>
-            <RoleBasedRoute allowedRoles={['worker']}>
+            <RoleBasedRoute allowedRoles={['worker', 'admin']}>
               <WorkerLayout>
                 <Suspense fallback={<PageLoader />}>
                   <WorkerCalendarPage />
@@ -285,7 +378,7 @@ const router = createBrowserRouter([
         path: '/worker/history',
         element: (
           <ProtectedRoute>
-            <RoleBasedRoute allowedRoles={['worker']}>
+            <RoleBasedRoute allowedRoles={['worker', 'admin']}>
               <WorkerLayout>
                 <Suspense fallback={<PageLoader />}>
                   <WorkerHistoryPage />
@@ -408,6 +501,15 @@ const router = createBrowserRouter([
               </AdminLayout>
             </RoleBasedRoute>
           </ProtectedRoute>
+        ),
+      },
+      // 404 Wildcard Catch-All Route
+      {
+        path: '*',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <NotFoundPage />
+          </Suspense>
         ),
       },
     ],

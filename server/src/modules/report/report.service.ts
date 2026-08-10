@@ -243,7 +243,6 @@ export class ReportService {
             },
           },
         })
-        .exec();
       if (closest) {
         resolvedLocationId = closest._id;
       } else {

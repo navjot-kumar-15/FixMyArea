@@ -1,144 +1,190 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useDispatch } from 'react-redux';
-import { loginSuccess } from '@/store/slices/authSlice';
-import { Input, Select } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { Mail, Lock, User as UserIcon, Phone, UserPlus } from 'lucide-react';
-import toast from 'react-hot-toast';
-
-const registerSchema = z
-  .object({
-    name: z.string().min(2, 'Name must be at least 2 characters'),
-    email: z.string().email('Valid email address required'),
-    phone: z.string().min(10, 'Valid phone number required'),
-    role: z.enum(['citizen', 'worker', 'admin']),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Button, Input, ErrorState } from '@/components/ui';
+import { MockAuthService } from '@/services/mockAuth';
+import { UserRole } from '@/types';
+import { User, Mail, Lock, Building, ArrowRight, Shield } from 'lucide-react';
 
 export const RegisterPage: React.FC = () => {
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      role: 'citizen',
-    },
-  });
+  const [step, setStep] = useState(1);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState<UserRole>('citizen');
+  const [ward, setWard] = useState('Ward 4 - Metro East');
+  const [department, setDepartment] = useState('Public Works & Infrastructure');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const onSubmit = async (data: RegisterFormValues) => {
-    await new Promise((res) => setTimeout(res, 800));
-    const newUser = {
-      id: `usr-${Date.now()}`,
-      name: data.name,
-      email: data.email,
-      role: data.role,
-      phone: data.phone,
-      areaName: 'Downtown North',
-      createdAt: new Date().toISOString(),
-    };
-    dispatch(loginSuccess({ user: newUser, token: 'demo-jwt-token' }));
-    toast.success('Account created successfully!');
+  const handleNext = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !email) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+    setError('');
+    setStep(2);
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    try {
+      await MockAuthService.register({
+        name,
+        email,
+        password,
+        role,
+        ward: role === 'citizen' ? ward : undefined,
+        department: role === 'worker' ? department : undefined,
+      });
+
+      // Redirect to Email OTP Verification
+      navigate('/verify-email', { state: { email } });
+    } catch (err: any) {
+      setError(err.message || 'Registration failed. Please check details.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Create Your CivicConnect Account
-        </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          Join thousands of citizens improving municipal infrastructure together.
+        <h1 className="text-2xl font-extrabold text-white font-display tracking-tight">
+          Create CivicConnect Account
+        </h1>
+        <p className="text-xs text-slate-400">
+          Join the modern municipal civic engagement network.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <Input
-          label="Full Name"
-          placeholder="Jane Doe"
-          leftIcon={<UserIcon className="w-4 h-4" />}
-          error={errors.name?.message}
-          {...register('name')}
-        />
+      {/* Step Indicator */}
+      <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono">
+        <div className={`flex-1 py-1 text-center rounded-lg ${step === 1 ? 'bg-indigo-600 text-white font-bold' : 'text-slate-500'}`}>
+          1. Account Details
+        </div>
+        <div className={`flex-1 py-1 text-center rounded-lg ${step === 2 ? 'bg-indigo-600 text-white font-bold' : 'text-slate-500'}`}>
+          2. Role & Jurisdiction
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {error && <ErrorState title="Registration Error" message={error} />}
+
+      {step === 1 ? (
+        <form onSubmit={handleNext} className="space-y-4">
+          <Input
+            label="Full Name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Aarav Sharma"
+            leftIcon={<User className="w-4 h-4 text-slate-400" />}
+          />
+
           <Input
             label="Email Address"
             type="email"
-            placeholder="jane@example.com"
-            leftIcon={<Mail className="w-4 h-4" />}
-            error={errors.email?.message}
-            {...register('email')}
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="aarav@civic.gov"
+            leftIcon={<Mail className="w-4 h-4 text-slate-400" />}
           />
-          <Input
-            label="Phone Number"
-            type="tel"
-            placeholder="+1 (555) 000-0000"
-            leftIcon={<Phone className="w-4 h-4" />}
-            error={errors.phone?.message}
-            {...register('phone')}
-          />
-        </div>
 
-        <Select
-          label="Account Role"
-          options={[
-            { value: 'citizen', label: 'Citizen (Report & Track Issues)' },
-            { value: 'worker', label: 'Field Worker (Task Execution)' },
-            { value: 'admin', label: 'Administrator (Manage Platform)' },
-          ]}
-          error={errors.role?.message}
-          {...register('role')}
-        />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Input
             label="Password"
             type="password"
-            placeholder="••••••••"
-            leftIcon={<Lock className="w-4 h-4" />}
-            error={errors.password?.message}
-            {...register('password')}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="At least 6 characters"
+            leftIcon={<Lock className="w-4 h-4 text-slate-400" />}
           />
-          <Input
-            label="Confirm Password"
-            type="password"
-            placeholder="••••••••"
-            leftIcon={<Lock className="w-4 h-4" />}
-            error={errors.confirmPassword?.message}
-            {...register('confirmPassword')}
-          />
-        </div>
 
-        <Button
-          type="submit"
-          variant="primary"
-          className="w-full py-3 mt-2"
-          isLoading={isSubmitting}
-          leftIcon={<UserPlus className="w-4 h-4" />}
-        >
-          Create Account
-        </Button>
-      </form>
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full justify-center py-3 text-sm font-bold mt-2"
+            rightIcon={<ArrowRight className="w-4 h-4" />}
+          >
+            Continue to Role Setup
+          </Button>
+        </form>
+      ) : (
+        <form onSubmit={handleRegister} className="space-y-4">
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+              Select Persona Role
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {(['citizen', 'worker', 'admin'] as UserRole[]).map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRole(r)}
+                  className={`p-3 rounded-2xl border text-xs font-bold text-center capitalize transition-all ${
+                    role === r
+                      ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/25'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      <div className="text-center text-xs text-slate-500">
+          {role === 'citizen' && (
+            <Input
+              label="Municipal Ward / Jurisdiction"
+              value={ward}
+              onChange={(e) => setWard(e.target.value)}
+              placeholder="e.g. Ward 4 - Metro East"
+              leftIcon={<Building className="w-4 h-4 text-slate-400" />}
+            />
+          )}
+
+          {role === 'worker' && (
+            <Input
+              label="Department Unit"
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+              placeholder="e.g. Public Works & Sanitation"
+              leftIcon={<Shield className="w-4 h-4 text-slate-400" />}
+            />
+          )}
+
+          <div className="flex gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setStep(1)}
+              className="flex-1 justify-center"
+            >
+              Back
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              className="flex-2 justify-center py-3 text-sm font-bold"
+              isLoading={isLoading}
+            >
+              Complete Registration
+            </Button>
+          </div>
+        </form>
+      )}
+
+      <div className="text-center text-xs text-slate-400">
         Already have an account?{' '}
-        <a href="/login" className="font-bold text-blue-600 hover:underline">
+        <Link to="/login" className="font-bold text-indigo-400 hover:text-indigo-300">
           Sign In
-        </a>
+        </Link>
       </div>
     </div>
   );

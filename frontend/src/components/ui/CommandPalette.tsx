@@ -101,46 +101,27 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             </div>
           </div>
 
-          {/* Quick Demo Persona Switcher Bar (ADMIN Privilege Only) */}
-          {role === 'admin' && (
-            <div className="px-4 py-2 bg-indigo-950/40 border-b border-indigo-900/40 flex items-center justify-between text-xs">
-              <span className="text-indigo-400 font-medium flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" /> Dev Role Preview:
-              </span>
-              <div className="flex items-center gap-1.5">
+          {/* Quick Demo Persona Switcher Bar */}
+          <div className="px-4 py-2 bg-indigo-950/40 border-b border-indigo-900/40 flex items-center justify-between text-xs">
+            <span className="text-indigo-400 font-medium flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> Quick Persona Switcher:
+            </span>
+            <div className="flex items-center gap-1.5">
+              {(['citizen', 'worker', 'admin'] as UserRole[]).map((r) => (
                 <button
-                  onClick={() => handleRoleSwitch('citizen')}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
-                    role === 'citizen'
+                  key={r}
+                  onClick={() => handleRoleSwitch(r)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors capitalize ${
+                    role === r
                       ? 'bg-indigo-600 text-white border-indigo-600'
                       : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-indigo-500'
                   }`}
                 >
-                  Citizen
+                  {r}
                 </button>
-                <button
-                  onClick={() => handleRoleSwitch('worker')}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
-                    role === 'worker'
-                      ? 'bg-indigo-600 text-white border-indigo-600'
-                      : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-indigo-500'
-                  }`}
-                >
-                  Worker
-                </button>
-                <button
-                  onClick={() => handleRoleSwitch('admin')}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
-                    role === 'admin'
-                      ? 'bg-indigo-600 text-white border-indigo-600'
-                      : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-indigo-500'
-                  }`}
-                >
-                  Admin
-                </button>
-              </div>
+              ))}
             </div>
-          )}
+          </div>
 
           {/* Authorized Options List */}
           <div className="max-h-96 overflow-y-auto p-2 space-y-1">

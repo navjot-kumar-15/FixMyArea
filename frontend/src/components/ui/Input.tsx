@@ -3,12 +3,13 @@ import React, { InputHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttribute
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  helperText?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, leftIcon, rightIcon, className = '', id, ...props }, ref) => {
+  ({ label, error, helperText, leftIcon, rightIcon, className = '', id, ...props }, ref) => {
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
     return (
@@ -33,6 +34,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {rightIcon && <div className="absolute right-3 text-slate-400">{rightIcon}</div>}
         </div>
         {error && <p className="text-xs text-red-500 font-medium">{error}</p>}
+        {!error && helperText && <p className="text-xs text-slate-500">{helperText}</p>}
       </div>
     );
   }
